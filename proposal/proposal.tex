@@ -1,0 +1,55 @@
+\documentclass[a4paper,
+		12pt,
+		oneside,ngerman
+		]{scrartcl}
+\usepackage[german,ngerman]{babel}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{paralist}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{eurosym}
+
+\linespread{1.25}
+
+%opening
+\title{Proposal zur Bachelorarbeit ``MOJITO: Measurements and Optimizations with Just-In-Time code generation on the Openflow reference implementation''}
+\author{Brack Samuel}
+\date{\today}
+
+\begin{document}
+\maketitle
+OpenFlow ist eine Spezifikation für Switches, deren Implementierungen es Netzwerkadministatoren erlauben die Switches mit weit mehr Freiheitsgraden zu konfigurieren als bei herkömmlicher Hardware.
+Die Weiterleitungstabelle wird dabei durch mehrere Flow-Tabellen ersetzt.
+Diese können manuell editiert werden.
+
+Dabei gibt es im Netzwerk einen Controller, welcher die Switches steuert und in jedem der Switches die Einträge der Flow-Tables modifiziert.
+Die Flow-Tabellen sind je eine Menge von Flow-Einträgen, welche wiederum je ein Tupel aus einigen Headerdaten eines Pakets sind. 
+Dadurch wird eine Zugehörigkeit von Paketen zu Flows definiert.
+Zum Beispiel kann ein Flow alle Pakete beinhalten, die vom Host A gesendet werden und an UDP-Port B adressiert sind.
+Diese Flow-Zuordnung kann auf mehreren Geräten im Netzwerk erfolgen, da der Kontrollrechner die Netzwerkgeräte über einen eigenen sicheren Kanal ansprechen und konfigurieren kann.
+
+Die Arbeit basiert auf der Modifikation der Linux-Referenzimplementierung eines OpenFlow-Switches.
+Es wird angestrebt die bestehenden Algorithmen zur Auswahl des korrekten Flow-Eintrags aus der Flow-Tabelle bei Ankunft eines Pakets zu ergänzen.
+
+Verschiedene Ziele bieten sich in dieser Umgebung an:
+\begin{enumerate}
+    \item Implementierung einer bereits bekannten, noch nicht eingebauten Struktur zum schnellen Matching in der Tabelle (siehe auch das ATTI-Projekt); bisher existieren nur eine lineare Suche und eine Hash-Suche.
+    \item Implementierung des Matchers als JIT-Funktion in x86\_64-Maschinencode, die als Eingabe das zu untersuchenden Paket erhält und dann den darauf passenden Flow-Eintrag möglichst schnell ermittelt.
+\end{enumerate}
+
+Dabei stellt (1) das Minimalziel der Arbeit dar, wobei (2) ein Spezialfall von (1) ist.
+
+Das zweite vorgestellte Ziel soll den primären Fokus der Arbeit darstellen und bietet auch ausreichend Potential, um weiterführende interessante Fragestellungen zu bearbeiten.
+Einige Beispiele hierfür sind:
+\begin{enumerate}
+    \item Anfallende Traffic-Muster sollen auch zur Optimierung der Flow-Tabelle genutzt werden, um im average case möglichst kurze Entscheidungszeiten zu erreichen.
+    \item Effiziente Gestaltung der Einfüge- und Entferungsoperationen von Einträgen der Flow-Tabelle.
+\end{enumerate}
+
+Die Evaluierung der Implementierung erfolgt idealerweise mithilfe eines Trafficgenerators, der verschiedene Traffic-Szenarien aus der realen Welt nachbilden kann und eine hohe Durchsatzrate bietet.
+\end{document}
