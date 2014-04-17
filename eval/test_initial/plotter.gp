@@ -19,5 +19,7 @@ set title 'UDP datarate'
 set xlabel 'Number of flowtable entries' 
 set ylabel 'Maximum throughput (MBit/s)'
 
+set xrange [-5:1000]
+
 plot 'test_initial.dat' using 1:2 with boxes notitle
 
