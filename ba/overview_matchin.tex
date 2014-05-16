@@ -1,0 +1,39 @@
+\documentclass[a4paper,
+		12pt,
+		parskip=full,
+		titlepage,
+		oneside
+		]{scrartcl}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{paralist}
+
+\begin{document}
+\begin{table}
+\caption{Match types required by OpenFlow 1.3}
+
+\begin{tabular}{|l|c|p{3.5cm}|p{4cm}|}
+\hline
+Name&Length&Format&Prerequisites\\
+\hline
+In-Port&32\ bit&Single number&\\
+Ethernet Destination&48\ bit&Arbitrary bitmask&\\
+Ethernet Source&48\ bit&Arbitrary bitmask&\\
+Ethernet Type&16\ bit&Single number&\\
+IP protocol number&8\ bit&Single number&Ethernet Type either $0x0800$ or $0x86dd$\\
+IPv4 source address&32\ bit&Arbitrary bitmask or prefix&Ethernet Type $0x0800$\\
+IPv4 destination address&32\ bit&Arbitrary bitmask or prefix&Ethernet Type $0x0800$\\
+IPv6 source address&128\ bit&Arbitrary bitmask or prefix&Ethernet Type $0x86dd$\\
+IPv6 destination address&128\ bit&Arbitrary bitmask or prefix&Ethernet Type $0x86dd$\\
+TCP source port&16\ bit&Single number&IP protocol number $6$\\
+TCP destination port&16\ bit&Single number&IP protocol number $6$\\
+UDP source port&16\ bit&Single number&IP protocol number $17$\\
+UDP destination port&16\ bit&Single number&IP protocol number $17$\\
+\hline
+\end{tabular}
+\end{table}
+\end{document}
