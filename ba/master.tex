@@ -1,0 +1,144 @@
+\documentclass[a4paper,
+		12pt,
+		parskip=full,
+		titlepage
+		]{scrartcl}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{float}
+
+
+\usepackage{paralist}
+\usepackage[section]{placeins} %don't float to next section
+
+\usepackage[lofdepth,lotdepth]{subfig}
+
+%\usepackage{minted}
+
+\hyphenpenalty=10000
+
+
+%\geometry{a4paper,left=40mm,right=40mm, top=20mm, bottom=40mm}
+
+\linespread{1.25}
+
+\graphicspath{{abbildungen/}} 
+\titleformat{\section}[block]{\sffamily\Large\bfseries\filcenter}{\thesection}{1em}{}
+\pagestyle{empty}
+
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
+
+%opening
+\title{Dokument}
+\author{}
+\date{}
+
+\begin{document}
+\thispagestyle{empty}
+
+\hspace{20cm}
+\vspace{-3cm}
+
+\begin{figure}[H] \hspace{11cm}
+\includegraphics[width=3.2 cm]{HU_Logo}
+\end{figure}
+% \vspace{5cm}
+\begin{center}
+  % \vspace{0.5 cm}
+  \huge{\bf Title} \\ % Hier fuegen Sie den Titel Ihrer Arbeit ein.
+  \vspace{1cm}
+  \LARGE  Bachelorarbeit \\ % Geben Sie anstelle der Punkte an, ob es sich um eine
+                % Diplomarbeit, eine Masterarbeit oder eine Bachelorarbeit handelt.
+  \vspace{1cm}
+  \Large zur Erlangung des akademischen Grades \\
+  Bachelor of Science (B. Sc.)\\ % Bitte tragen Sie hier anstelle der Punkte ein:
+         % Diplominformatiker(in),
+         % Bachelor of Arts (B. A.),
+         % Bachelor of Science (B. Sc.),
+         % Master of Education (M. Ed.) oder
+         % Master of Science (M. Sc.).
+  \vspace{1.5cm}
+  {\large
+    \bf{
+      \scshape
+      Humboldt-Universit\"at zu Berlin \\
+      Mathematisch-Naturwissenschaftliche Fakult\"at II \\
+      Institut f\"ur Informatik\\
+    }
+  } 
+  % \normalfont
+\enlargethispage{10\baselineskip}
+\end{center}
+\vspace {4 cm}% gegebenenfalls kleiner, falls der Titel der Arbeit sehr lang sein sollte
+%{3.2 cm} bei Verwendung von scrreprt, gegebenenfalls kleiner, falls der Titel der Arbeit sehr lang sein sollte
+{\large
+  \begin{tabular}{llll}
+    eingereicht von:    &  && \\ % Bitte Vor- und Nachnamen anstelle der Punkte eintragen.
+    geboren am:         &  && \\
+    in:                 &  && \\
+    &&&\\
+    Gutachter: &  && \\
+              &  && \\% Bitte Namen der Gutachter(innen) anstelle der Punkte eintragen
+                 % bei zwei männlichen Gutachtern kann das (innen) weggestrichen werden
+    &&&\\
+    eingereicht am:     &   \hspace{3cm} verteidigt am: &  \\ % Bitte lassen Sie
+                                    % diese beiden Felder leer.
+                                    % Loeschen Sie ggf. das letzte Feld, wenn
+                                    % Sie Ihre Arbeit laut Pruefungsordnung nicht
+                                    % verteidigen muessen.
+  \end{tabular}
+}
+
+\newpage
+
+\chapter{Statement of authorship}
+
+\thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Selbststaendigkeitserklaerung
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\parindent 0cm
+%%%%%%%%%%%%%%%%%%%%%%%%%%english version%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+I declare that I completed this thesis on my own and that information which has been
+directly or indirectly taken from other sources has been noted as such. Neither this
+nor a similar work has been presented to an examination committee.
+
+  \vspace{3\baselineskip}
+ 
+  Berlin, \today \hspace{0.25\linewidth}\parbox{0.3\linewidth}{\dotfill}
+}
+\newpage
+
+\begin{abstract}
+
+\end{abstract}
+
+\addcontentsline{toc}{section}{Contents}
+\setcounter{page}{1}
+\tableofcontents{}
+
+
+\pagebreak
+
+\pagestyle{headings}
+
+\newpage
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{acm}
+\bibliography{refs.bib,paper-build/conferences-crossref}
+
+\end{document}
