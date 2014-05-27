@@ -41,7 +41,7 @@
 
 %opening
 \title{Dokument}
-\author{}
+\author{Samuel Brack}
 \date{}
 
 \begin{document}
@@ -101,6 +101,34 @@
 }
 
 \newpage
+
+\chapter{Introduction}
+The growth of the internet constantly poses new challenges to the producers of network equipment.
+Today's applications like Multimedia, Web and Voice over IP are dependant of a transport network (the internet) with
+high data rates, low latency, soft realtime properties and quality of service mechanisms.
+This catalogue of network parameters is already implemented in the internet protocol stack.
+
+However, due to Moore's Law the growth of the actual data traffic can not be handled by pure protocol optimizaions, 
+but must be engineered in faster hardware.
+
+The critical points in the internet's architecture concerning performance are the stations who have to decide for each packet what to do.
+These are mostly Firewalls, Level-2-Switches and Level-3-Routers.
+In general, these machines inspect the header data of every incoming IP packet and forward it following a ruleset that has been implemented before.
+These rulesets can be mostly static (e.g. in case of a small router) or very dynamic (e.g. in a large stateful firewall).
+
+One main point in optimization therefore lies in the matching algorithms executing this process.
+Many rulesets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
+The last two fields imply the usage of TCP or UDP as transport protocol.
+But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.
+
+Matching algorithms become slower the more header fields they have to match.
+Additionally, some fields require rules that imply certain ranges or prefixes, e.g. IP adresses.
+These constraints make it more difficult to implement simple matching algorithms and in order to match with high speed, more sophisticated
+algorithms have to be used for these fields.
+
+%TODO: Openflow/SDN
+
+The main objective of this work is to implement a faster matching engine in the OpenFlow 1.3 reference implementation.
 
 \chapter{Statement of authorship}
 
