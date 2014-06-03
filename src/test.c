@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-    Range_borders* obj = range_borders_ctor(INIT_SIZE, 0);
+    Range_borders* obj = range_borders_ctor();
     // test insert function
     for (int i = 0; i < 100; ++i) {
         printf("%d\n", i);

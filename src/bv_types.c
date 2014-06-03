@@ -14,7 +14,7 @@ int Rb_insert_element(struct Range_borders_t* this, int new_element) {
     if (this->range_borders_current < this->range_borders_max) {
         this->range_borders[this->range_borders_current++] = new_element;
     } else {
-        this->range_borders_max = 2 * this->range_borders_max;
+        this->range_borders_max *= 2;
         this->range_borders = (int*)realloc(this->range_borders, (this->range_borders_max) * sizeof(int));
         this->range_borders[this->range_borders_current++] = new_element;
     }

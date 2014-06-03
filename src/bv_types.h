@@ -8,8 +8,8 @@ typedef struct Range_borders_t {
     int range_borders_current; //track the current first unused element
     int range_borders[INIT_SIZE];
  
-    int (* insert_element)(struct Range_borders_t*, int);
-    int (* delete_element)(struct Range_borders_t*, int);
+    int (*insert_element)(struct Range_borders_t*, int);
+    int (*delete_element)(struct Range_borders_t*, int);
 } Range_borders;
 
 struct Range_borders* range_borders_ctor();
