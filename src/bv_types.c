@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "bv_types.h"
 
-struct Range_borders_t* range_borders_ctor() {
+struct Range_borders* range_borders_ctor() {
     Range_borders* object = (Range_borders*) calloc(1, sizeof(Range_borders));
     if (object == NULL)
         return NULL;
@@ -16,12 +16,12 @@ struct Range_borders_t* range_borders_ctor() {
     return object;
 }
 
-void range_borders_dtor(struct Range_borders_t* this) {
+void range_borders_dtor(struct Range_borders* this) {
     free(this->range_borders);
     free(this);
 }
 
-int Rb_insert_element(struct Range_borders_t* this, int new_element) {
+int Rb_insert_element(struct Range_borders* this, int new_element) {
     if (this->range_borders_current < this->range_borders_max) {
         this->range_borders[this->range_borders_current++] = new_element;
     } else {
@@ -38,7 +38,7 @@ int Rb_insert_element(struct Range_borders_t* this, int new_element) {
     return 0;
 }
 
-int Rb_delete_element(struct Range_borders_t* this, int index) {
+int Rb_delete_element(struct Range_borders* this, int index) {
     // check if index is in array
     if (index > this->range_borders_current - 1) {
         return 1;
