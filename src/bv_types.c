@@ -13,6 +13,8 @@ struct Range_borders* range_borders_ctor() {
     object->range_borders_current = 0;
     object->insert_element = Rb_insert_element;
     object->delete_element = Rb_delete_element;
+    object->add_rule = Rb_add_rule;
+    object->match_packet = Rb_match_packet;
     return object;
 }
 
@@ -21,6 +23,7 @@ void range_borders_dtor(struct Range_borders* this) {
     free(this);
 }
 
+// Insert one element into the array
 int Rb_insert_element(struct Range_borders* this, int new_element) {
     if (this->range_borders_current < this->range_borders_max) {
         this->range_borders[this->range_borders_current++] = new_element;
@@ -38,6 +41,7 @@ int Rb_insert_element(struct Range_borders* this, int new_element) {
     return 0;
 }
 
+// Delete a single element in the array
 int Rb_delete_element(struct Range_borders* this, int index) {
     // check if index is in array
     if (index > this->range_borders_current - 1) {
@@ -60,4 +64,18 @@ int Rb_delete_element(struct Range_borders* this, int index) {
         }
     }
     return 0;
+}
+
+// Insert a new rule into the routing table
+int Rb_add_rule(struct Range_borders* this, int begin_index, int end_index) {
+    // check if we insert the first rule, if yes we just insert the borders
+    if (this->range_borders_current == 0) {
+        Rb_insert_element(this, begin_index);
+        Rb_insert_element(this, end_index);
+    }
+}
+
+// Match a header field value of an incoming packet
+int Rb_match_packet(struct Range_borders* this, int header_value) {
+
 }

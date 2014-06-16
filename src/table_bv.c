@@ -2,6 +2,7 @@
 #include "oflib/ofl.h"
 #include "flow_table.h"
 #include "oflib/ofl-messages.h"
+#include "bv_types.h"
 
 /* Handle OpenFlow ADD message */
 static ofl_err
