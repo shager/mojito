@@ -39,8 +39,47 @@ int main() {
         printf("%d ", obj->range_borders[i]);
     }
     
+    printf("\n");
+    
+    printf("%s\n", "Searching for number 53:");
+    printf("Found at index %d\n", obj->find_element(obj, 53));
+    
     printf("\n%s", "Freeing memory... ");
     range_borders_dtor(obj);
     printf("%s\n", "Success.");
-    return 0;
+    
+    printf("%s\n", "..... next test: insert at index:");
+    Range_borders* obj2 = range_borders_ctor();
+    for (int i = 0; i < 100; i++){
+        printf("%d ", i);
+        if (obj2->insert_element_at_index(obj2, i, i) == 1) {
+            printf("%s", "Allocation error at inserting numbers, aborting...");
+            return 1;
+        }
+    }
+    
+    /*printf("\n%s", "Inserting number 42 all 5 positions... ");
+    for (int i = 0; i < 100; i+=5){
+        obj2->insert_element_at_index(obj2, 42, i);
+    }*/
+    
+    printf("\n");
+    
+    printf("%s\n", "Extracting numbers:");
+    for (int i = 0; i < obj2->range_borders_current; ++i) {
+        printf("%d ", obj2->range_borders[i]);
+    }
+    
+    printf("\n\n");
+    
+    printf("%s\n", "Searching for number 42:");
+    printf("Found at index %d\n", obj2->find_element(obj2, 42));
+    
+    printf("\n");
+    
+    printf("%s\n", "Searching for number 1337:");
+    printf("Found at index %d\n", obj2->find_element(obj2, 1337));
+    
+    
+    return 0;    
 }
