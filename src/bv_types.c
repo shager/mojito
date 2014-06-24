@@ -6,6 +6,7 @@ struct Range_borders* range_borders_ctor() {
     Range_borders* object = (Range_borders*) calloc(1, sizeof(Range_borders));
     if (object == NULL)
         return NULL;
+    
     object->range_borders = (int*) calloc(INIT_SIZE, sizeof(int));
     if (object->range_borders == NULL)
         return NULL;
@@ -17,6 +18,7 @@ struct Range_borders* range_borders_ctor() {
     object->add_rule = Rb_add_rule;
     object->find_element = Rb_find_element;
     object->match_packet = Rb_match_packet;
+    
     return object;
 }
 
@@ -91,9 +93,31 @@ int Rb_add_rule(struct Range_borders* this, int begin_index, int end_index, int 
     if (this->range_borders_current == 0) {
         Rb_insert_element(this, begin_index);
         Rb_insert_element(this, end_index);
-    } else {
-        // search through range_borders elements where we can insert the new entries
+        
+        return 0;
     }
+    
+    // search through range_borders elements where we can insert the new entries
+    int position_begin = find_free_position(this, begin_index);
+    
+    // check if an element already exists at our border
+    if (begin_index == this->range_borders[position_begin]) {
+        // TODO: append rule_index to entry
+    } else {
+        // create new entry with begin_index as new element
+        Rb_insert_element_at_index(this, begin_index, position_begin); //TODO: insert rule_index!
+    }
+    
+    // do the same for end_index
+    int position_end = find_free_position(this, end_index);
+    
+    if (end_index == this->range_borders[position_begin]) {
+        return 0;
+    } else {
+        Rb_insert_element_at_index(this, end_index, position_end);
+        // TODO: append all rules from previous entry here
+    }
+
     return 0;
 }
 
@@ -101,7 +125,12 @@ int Rb_add_rule(struct Range_borders* this, int begin_index, int end_index, int 
 int Rb_find_element(struct Range_borders* this, int value) {
     if (this->range_borders_current == 0)
         return -1;
-    return binary_search(this, value, 0, this->range_borders_current);
+    return binary_search(this, value, 0, this->range_borders_current - 1);
+}
+
+// Match a header field value of an incoming packet
+int Rb_match_packet(struct Range_borders* this, int header_value) {
+    return 0;
 }
 
 int binary_search(struct Range_borders* this, int value, int lower, int upper) {
@@ -118,7 +147,16 @@ int binary_search(struct Range_borders* this, int value, int lower, int upper) {
     return mid_index;
 }
 
-// Match a header field value of an incoming packet
-int Rb_match_packet(struct Range_borders* this, int header_value) {
-    return 0;
+int find_free_position(struct Range_borders* this, int target) {
+    int lower = 0; 
+    int upper = this->range_borders_current - 1;
+    while (lower != upper) {
+        int mid_index = lower + ((upper - lower) / 2);
+        if (this->range_borders[mid_index] <= target) {
+            lower = mid_index + 1;
+        } else {
+            upper = mid_index;
+        }
+    }
+    return upper;
 }
