@@ -11,8 +11,8 @@ struct Range_borders* range_borders_ctor() {
     if (object->range_borders == NULL)
         return NULL;
     for (int i = 0; i < INIT_SIZE; ++i) {
-        range_borders[i]->delimiter_value = 0;
-        range_borders[i]->rule_list = list_ctor();
+        object->range_borders[i]->delimiter_value = 0;
+        object->range_borders[i]->rule_list = list_ctor();
     }
     object->range_borders_max = INIT_SIZE;
     object->range_borders_current = 0;

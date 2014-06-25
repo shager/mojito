@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "bv_list.h"
 
 struct Bv_list* list_ctor() {
