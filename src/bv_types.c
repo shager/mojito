@@ -38,7 +38,7 @@ int Rb_insert_element(struct Range_borders* this, struct Delimiter* new_element)
         this->range_borders[this->range_borders_current++] = new_element;
     } else {
         this->range_borders_max *= 2;
-        struct Delimiter* tmp = (Delimiter*)realloc(this->range_borders, (this->range_borders_max) * sizeof(Delimiter));
+        Delimiter* tmp = (Delimiter*)realloc(this->range_borders, (this->range_borders_max) * sizeof(Delimiter));
         if (tmp != NULL) {
             this->range_borders = tmp;
         } else {
@@ -160,7 +160,7 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
         // append all rules from previous entry here
         Bv_list* tmp =  this->range_borders[position_end]->rule_list->next;
         while (tmp != NULL) {
-            end_list->append(tmp->rule_index);
+            end_list->append(end_list, tmp->rule_index);
             tmp = tmp->next;
         }
         new_end_entry->rule_list = end_list;
