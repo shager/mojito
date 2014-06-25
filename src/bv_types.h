@@ -6,21 +6,21 @@
 #include "bv_list.h"
 
 typedef struct Delimiter {
-    int delimiter_value;
+    uint32_t delimiter_value;
     struct Bv_list* rule_list;
 } Delimiter;
 
 typedef struct Range_borders {
-    int range_borders_max; //track what max index the array has at the moment
-    int range_borders_current; //track the current first unused element
-    int *range_borders;
+    uint32_t range_borders_max; //track what max index the array has at the moment
+    uint32_t range_borders_current; //track the current first unused element
+    Delimiter *range_borders;
  
-    int (*insert_element)(struct Range_borders*, int);
-    int (*insert_element_at_index)(struct Range_borders*, int, int);
-    int (*delete_element)(struct Range_borders*, int);
-    int (*add_rule)(struct Range_borders*, int, int, int);
-    int (*find_element)(struct Range_borders*, int);
-    int (*match_packet)(struct Range_borders*, int);
+    int (*insert_element)(struct Range_borders*, struct Delimiter*);
+    int (*insert_element_at_index)(struct Range_borders*, struct Delimiter*, uint32_t);
+    int (*delete_element)(struct Range_borders*, uint32_t);
+    int (*add_rule)(struct Range_borders*, uint32_t, uint32_t, uint32_t);
+    int64_t (*find_element)(struct Range_borders*, uint32_t);
+    int (*match_packet)(struct Range_borders*, uint32_t);
 } Range_borders;
 
 struct Range_borders* range_borders_ctor();

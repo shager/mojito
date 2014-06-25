@@ -14,7 +14,12 @@ struct Bv_list* list_ctor() {
 }
 
 void list_dtor(struct Bv_list* this) {
-    //TODO
+    while (this->next != NULL) {
+        Bv_list* next_element = this->next;
+        free(this);
+        this = next_element;
+    }
+    free(this);
 }
 
 uint8_t L_append(struct Bv_list* this, uint32_t new_element) {
