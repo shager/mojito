@@ -54,6 +54,7 @@ int Rb_insert_element(struct Range_borders* this, struct Delimiter* new_element)
 // range_borders_current, the new_element is inserted in the last position of the array
 int Rb_insert_element_at_index(struct Range_borders* this, struct Delimiter* new_element, uint32_t index) {
     // check if the insertion happens in a new slot at the end of the array
+    printf("Entered insert at index...");
     if (index >= this->range_borders_current) {
         this->insert_element(this, new_element);
         return 0;
@@ -64,6 +65,7 @@ int Rb_insert_element_at_index(struct Range_borders* this, struct Delimiter* new
         }
         this->range_borders[index] = *new_element;
     }
+    printf("done\n");
     return 0;
 }
 
@@ -97,8 +99,9 @@ int Rb_delete_element(struct Range_borders* this, uint32_t index) {
 // Insert a new rule into the routing table
 int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_index, uint32_t rule_index) {
     
-    // check if we insert the first rule, if yes we just insert the borders
+    // check if we insert the first rule, if yes we just insert the borders (at the end of the array)
     if (this->range_borders_current == 0) {
+        printf("first call of insertion\n");
         Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         Delimiter* new_end_entry = malloc(sizeof(Delimiter));
         if ((new_begin_entry == NULL) || (new_end_entry == NULL))
@@ -120,14 +123,17 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
     }
     
     // search through range_borders elements where we can insert the new entries
-    int position_begin = find_free_position(this, begin_index);
+    int position_begin = find_free_position(this, begin_index) - 1;
+    printf("position_begin: %d\n", position_begin);
     
     // check if an element already exists at our border
     if (begin_index == this->range_borders[position_begin].delimiter_value) {
         // append rule_index to entry
+        printf("border conflict at value %d\n", begin_index);
         this->range_borders[position_begin].rule_list->append(this->range_borders[position_begin].rule_list, rule_index);
     } else {
         // create new entry with begin_index as new element
+        printf("Creating new entry %d in array...\n", begin_index);
         Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
@@ -137,18 +143,22 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
         // append all rules from previous entry here
         Bv_list* tmp =  this->range_borders[position_begin].rule_list->next;
         while (tmp != NULL) {
+            printf("Inserting previous rules...");
             begin_list->append(begin_list, tmp->rule_index);
             tmp = tmp->next;
         }
+        printf("...done\n");
         
         begin_list->append(begin_list, rule_index);
+        printf("bop\n");
         new_begin_entry->rule_list = begin_list;
-        
+        printf("bip\n");
         Rb_insert_element_at_index(this, new_begin_entry, position_begin);
     }
     
     // do the same for end_index
-    int position_end = find_free_position(this, end_index);
+    int position_end = find_free_position(this, end_index) - 1;
+    printf("position_end: %d\n", position_end);
     
     if (end_index == this->range_borders[position_begin].delimiter_value) {
         return 0;
@@ -172,7 +182,7 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
 }
 
 // Binary search, returns index
-uint64_t Rb_find_element(struct Range_borders* this, uint32_t value) {
+int64_t Rb_find_element(struct Range_borders* this, uint32_t value) {
     if (this->range_borders_current == 0)
         return -1;
     return binary_search(this, value, 0, this->range_borders_current - 1);
@@ -181,13 +191,20 @@ uint64_t Rb_find_element(struct Range_borders* this, uint32_t value) {
 // Match a header field value of an incoming packet
 uint8_t Rb_match_packet(struct Range_borders* this, struct Bv_list* result, uint32_t header_value) {
     int relevant_border = find_free_position(this, header_value);
+    if (relevant_border == -1) {
+        result = NULL;
+        return 0;
+    }
+    printf("delim: %d\n", this->range_borders[relevant_border].delimiter_value);
     if (this->range_borders[relevant_border].rule_list->next == NULL)
         return 1;
+        
+    printf("entry 1: %d", this->range_borders[relevant_border].rule_list->rule_index);
     result = this->range_borders[relevant_border].rule_list->next;
     return 0;
 }
 
-uint64_t binary_search(struct Range_borders* this, uint32_t value, uint32_t lower, uint32_t upper) {
+int64_t binary_search(struct Range_borders* this, uint32_t value, uint32_t lower, uint32_t upper) {
     if (upper < lower)
         return -1;
     
@@ -204,6 +221,8 @@ uint64_t binary_search(struct Range_borders* this, uint32_t value, uint32_t lowe
 uint32_t find_free_position(struct Range_borders* this, uint32_t target) {
     int lower = 0;
     int upper = this->range_borders_current - 1;
+    if (upper == -1)
+        return upper;
     while (lower != upper) {
         int mid_index = lower + ((upper - lower) / 2);
         if (this->range_borders[mid_index].delimiter_value <= target) {
@@ -212,5 +231,5 @@ uint32_t find_free_position(struct Range_borders* this, uint32_t target) {
             upper = mid_index;
         }
     }
-    return upper;
+    return lower;
 }

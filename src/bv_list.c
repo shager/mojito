@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "bv_list.h"
 
 struct Bv_list* list_ctor() {
@@ -24,12 +25,11 @@ void list_dtor(struct Bv_list* this) {
 }
 
 uint8_t L_append(struct Bv_list* this, uint32_t new_element) {
-    Bv_list* new_object = (Bv_list*) calloc(1, sizeof(Bv_list));
+    Bv_list* new_object = (Bv_list*)calloc(1, sizeof(Bv_list));
     if (new_object == NULL)
         return 1;
     new_object->rule_index = new_element;
     new_object->next = NULL;
-    
     this->next = new_object;
     return 0;
 }

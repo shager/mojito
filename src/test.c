@@ -5,22 +5,28 @@ int main() {
     Range_borders* obj = range_borders_ctor();
     // test rule-adding function
     printf("Adding rules:\n");
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 50; ++i) {
         if (obj->add_rule(obj, i * 100, i * 100 + 1000, i * 10) != 0) {
             printf("Error adding rule %d\n", i);
         }
     }
     
+    obj->add_rule(obj, 1000, 2000, 1337);
+    obj->add_rule(obj, 1000, 2000, 1234);
+    
+    printf("range_borders_current = %d\n", obj->range_borders_current);
+    printf("range_borders_max = %d\n", obj->range_borders_max);
+    
     printf("done.\n\nMatching packets:\n");
     Bv_list* result_list = list_ctor();
-    if (obj->match_packet(obj, result_list, 170) != 0)
-        printf("Error matching packet 170\n");
+    if (obj->match_packet(obj, result_list, 1000) != 0)
+        printf("Error matching packet 1000\n");
     
     printf("Matching rules are: ");
-    while (result_list->next != NULL) {
-        printf("%d ", result_list->rule_index);
+    do {
+        printf("%d \n", result_list->rule_index);
         result_list = result_list->next;
-    }
+    } while (result_list->next != NULL);
     
     printf("\n");
     return 0;
