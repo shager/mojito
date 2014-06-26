@@ -11,8 +11,8 @@ struct Range_borders* range_borders_ctor() {
     if (object->range_borders == NULL)
         return NULL;
     for (int i = 0; i < INIT_SIZE; ++i) {
-        object->range_borders[i]->delimiter_value = 0;
-        object->range_borders[i]->rule_list = list_ctor();
+        object->range_borders[i].delimiter_value = 0;
+        object->range_borders[i].rule_list = list_ctor();
     }
     object->range_borders_max = INIT_SIZE;
     object->range_borders_current = 0;
@@ -35,7 +35,7 @@ void range_borders_dtor(struct Range_borders* this) {
 // Insert one element into the array
 int Rb_insert_element(struct Range_borders* this, struct Delimiter* new_element) {
     if (this->range_borders_current < this->range_borders_max) {
-        this->range_borders[this->range_borders_current++] = new_element;
+        this->range_borders[this->range_borders_current++] = *new_element;
     } else {
         this->range_borders_max *= 2;
         Delimiter* tmp = (Delimiter*)realloc(this->range_borders, (this->range_borders_max) * sizeof(Delimiter));
@@ -45,7 +45,7 @@ int Rb_insert_element(struct Range_borders* this, struct Delimiter* new_element)
             free(tmp);
             return 1;
         }
-        this->range_borders[this->range_borders_current++] = new_element;
+        this->range_borders[this->range_borders_current++] = *new_element;
     }
     return 0;
 }
@@ -58,11 +58,11 @@ int Rb_insert_element_at_index(struct Range_borders* this, struct Delimiter* new
         this->insert_element(this, new_element);
         return 0;
     } else { // insertion happens somewhere "in the middle"
-        this->insert_element(this, this->range_borders[this->range_borders_current - 1]);
+        this->insert_element(this, &(this->range_borders[this->range_borders_current - 1]));
         for (int i = this->range_borders_current - 2; i >= index; --i){
             this->range_borders[i + 1] = this->range_borders[i];
         }
-        this->range_borders[index] = new_element;
+        this->range_borders[index] = *new_element;
     }
     return 0;
 }
@@ -82,7 +82,7 @@ int Rb_delete_element(struct Range_borders* this, uint32_t index) {
     // check if we can resize the array to half
     if (this->range_borders_current < this->range_borders_max / 2) {
         this->range_borders_max /= 2;
-        struct Delimiter* tmp = (Delimiter*)realloc(this->range_borders, (this->range_borders_max) * sizeof(Delimiter));
+        Delimiter* tmp = (Delimiter*)realloc(this->range_borders, (this->range_borders_max) * sizeof(Delimiter));
         if (tmp != NULL) {
             this->range_borders = tmp;
         } else {
@@ -98,8 +98,8 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
     
     // check if we insert the first rule, if yes we just insert the borders
     if (this->range_borders_current == 0) {
-        struct Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
-        struct Delimiter* new_end_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_end_entry = malloc(sizeof(Delimiter));
         if ((new_begin_entry == NULL) || (new_end_entry == NULL))
             return 1;
         
@@ -122,21 +122,21 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
     int position_begin = find_free_position(this, begin_index);
     
     // check if an element already exists at our border
-    if (begin_index == this->range_borders[position_begin]->delimiter_value) {
+    if (begin_index == this->range_borders[position_begin].delimiter_value) {
         // append rule_index to entry
-        this->range_borders[position_begin]->rule_list.append(this->range_borders[position_begin]->rule_list, rule_index);
+        this->range_borders[position_begin].rule_list->append(this->range_borders[position_begin].rule_list, rule_index);
     } else {
         // create new entry with begin_index as new element
-        struct Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
         new_begin_entry->delimiter_value = begin_index;
         struct Bv_list* begin_list = list_ctor();
         
         // append all rules from previous entry here
-        Bv_list* tmp =  this->range_borders[position_begin]->rule_list->next;
+        Bv_list* tmp =  this->range_borders[position_begin].rule_list->next;
         while (tmp != NULL) {
-            begin_list->append(tmp->rule_index);
+            begin_list->append(begin_list, tmp->rule_index);
             tmp = tmp->next;
         }
         
@@ -149,7 +149,7 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
     // do the same for end_index
     int position_end = find_free_position(this, end_index);
     
-    if (end_index == this->range_borders[position_begin]) {
+    if (end_index == this->range_borders[position_begin].delimiter_value) {
         return 0;
     } else {
         struct Delimiter* new_end_entry = malloc(sizeof(Delimiter));
@@ -158,7 +158,7 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
         new_end_entry->delimiter_value = end_index;
         struct Bv_list* end_list = list_ctor();
         // append all rules from previous entry here
-        Bv_list* tmp =  this->range_borders[position_end]->rule_list->next;
+        Bv_list* tmp =  this->range_borders[position_end].rule_list->next;
         while (tmp != NULL) {
             end_list->append(end_list, tmp->rule_index);
             tmp = tmp->next;
@@ -187,7 +187,7 @@ uint64_t binary_search(struct Range_borders* this, uint32_t value, uint32_t lowe
         return -1;
     
     int mid_index = lower + ((upper - lower) / 2);
-    int current = this->range_borders[mid_index]->delimiter_value;
+    int current = this->range_borders[mid_index].delimiter_value;
     if (current > value)
         return binary_search(this, value, lower, mid_index - 1);
     else if (current < value)
@@ -201,7 +201,7 @@ uint32_t find_free_position(struct Range_borders* this, uint32_t target) {
     int upper = this->range_borders_current - 1;
     while (lower != upper) {
         int mid_index = lower + ((upper - lower) / 2);
-        if (this->range_borders[mid_index]->delimiter_value <= target) {
+        if (this->range_borders[mid_index].delimiter_value <= target) {
             lower = mid_index + 1;
         } else {
             upper = mid_index;

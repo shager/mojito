@@ -14,7 +14,7 @@ typedef struct Delimiter {
 typedef struct Range_borders {
     uint32_t range_borders_max; //track what max index the array has at the moment
     uint32_t range_borders_current; //track the current first unused element
-    struct Delimiter **range_borders; //array of struct Delimiter*
+    struct Delimiter *range_borders; //array of struct Delimiter*
  
     int (*insert_element)(struct Range_borders*, struct Delimiter*);
     int (*insert_element_at_index)(struct Range_borders*, struct Delimiter*, uint32_t);
