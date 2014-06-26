@@ -77,7 +77,8 @@ int Rb_delete_element(struct Range_borders* this, uint32_t index) {
     for (int i = index; i < this->range_borders_current; ++i) {
         this->range_borders[i] = this->range_borders[i + 1];
     }
-    this->range_borders[--this->range_borders_current] = NULL; // TODO: free memory
+
+    free(&(this->range_borders[--this->range_borders_current])); //TODO: free objects inside there
 
     // check if we can resize the array to half
     if (this->range_borders_current < this->range_borders_max / 2) {
@@ -178,7 +179,11 @@ uint64_t Rb_find_element(struct Range_borders* this, uint32_t value) {
 }
 
 // Match a header field value of an incoming packet
-uint64_t Rb_match_packet(struct Range_borders* this, uint32_t header_value) {
+uint8_t Rb_match_packet(struct Range_borders* this, struct Bv_list* result, uint32_t header_value) {
+    int relevant_border = find_free_position(this, header_value);
+    if (this->range_borders[relevant_border].rule_list->next == NULL)
+        return 1;
+    result = this->range_borders[relevant_border].rule_list->next;
     return 0;
 }
 

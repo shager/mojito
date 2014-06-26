@@ -3,8 +3,29 @@
 
 int main() {
     Range_borders* obj = range_borders_ctor();
-    // test insert function
-    printf("%s\n", "Inserting numbers:");
+    // test rule-adding function
+    printf("Adding rules:\n");
+    for (int i = 0; i < 1000; ++i) {
+        if (obj->add_rule(obj, i * 100, i * 100 + 1000, i * 10) != 0) {
+            printf("Error adding rule %d\n", i);
+        }
+    }
+    
+    printf("done.\n\nMatching packets:\n");
+    Bv_list* result_list = list_ctor();
+    if (obj->match_packet(obj, result_list, 170) != 0)
+        printf("Error matching packet 170\n");
+    
+    printf("Matching rules are: ");
+    while (result_list->next != NULL) {
+        printf("%d ", result_list->rule_index);
+        result_list = result_list->next;
+    }
+    
+    printf("\n");
+    return 0;
+    
+    /*printf("%s\n", "Inserting numbers:");
     for (int i = 0; i < 130; ++i) {
         printf("%d ", i);
         if (obj->insert_element(obj, i) == 1) {
@@ -56,14 +77,14 @@ int main() {
             printf("%s", "Allocation error at inserting numbers, aborting...");
             return 1;
         }
-    }
+    }*/
     
     /*printf("\n%s", "Inserting number 42 all 5 positions... ");
     for (int i = 0; i < 100; i+=5){
         obj2->insert_element_at_index(obj2, 42, i);
     }*/
     
-    printf("\n");
+    /*printf("\n");
     
     printf("%s\n", "Extracting numbers:");
     for (int i = 0; i < obj2->range_borders_current; ++i) {
@@ -81,5 +102,5 @@ int main() {
     printf("Found at index %d\n", obj2->find_element(obj2, 1337));
     
     
-    return 0;    
+    return 0;*/
 }
