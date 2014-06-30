@@ -3,7 +3,8 @@ CC=gcc
 # remove tool
 RM=rm -f
 #compiler flags
-CFLAGS=-O3 -Wall -Werror -Wpedantic -pedantic -pedantic-errors -std=c99
+DEBUGFLAGS=-g
+CFLAGS=-O3 -Wall -Werror -Wpedantic -pedantic -pedantic-errors -std=c99 $(DEBUGFLAGS)
 
 # precompiled headers
 GCH=bv_types.h.gch

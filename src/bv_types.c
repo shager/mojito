@@ -54,13 +54,18 @@ int Rb_insert_element(struct Range_borders* this, struct Delimiter* new_element)
 // range_borders_current, the new_element is inserted in the last position of the array
 int Rb_insert_element_at_index(struct Range_borders* this, struct Delimiter* new_element, uint32_t index) {
     // check if the insertion happens in a new slot at the end of the array
-    printf("Entered insert at index...");
+    printf("Entered insert at index %d...\n", index);
+    fflush(stdout);
     if (index >= this->range_borders_current) {
         this->insert_element(this, new_element);
         return 0;
     } else { // insertion happens somewhere "in the middle"
+        printf("bep\n");
+        fflush(stdout);
         this->insert_element(this, &(this->range_borders[this->range_borders_current - 1]));
-        for (int i = this->range_borders_current - 2; i >= index; --i){
+        for (uint32_t i = this->range_borders_current - 2; i > index; --i){ // was >=
+            printf("in loop, i = %d\n", i);
+            fflush(stdout);
             this->range_borders[i + 1] = this->range_borders[i];
         }
         this->range_borders[index] = *new_element;
@@ -119,6 +124,7 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
         Rb_insert_element(this, new_begin_entry);
         Rb_insert_element(this, new_end_entry);
         
+        printf("first insertion done\n");
         return 0;
     }
     
@@ -134,10 +140,11 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
     } else {
         // create new entry with begin_index as new element
         printf("Creating new entry %d in array...\n", begin_index);
-        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
+        struct Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
         new_begin_entry->delimiter_value = begin_index;
+        printf("value = %d\n", new_begin_entry->delimiter_value);
         struct Bv_list* begin_list = list_ctor();
         
         // append all rules from previous entry here
