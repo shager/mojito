@@ -18,17 +18,19 @@ int main() {
     printf("range_borders_max = %d\n", obj->range_borders_max);
     
     printf("done.\n\nMatching packets:\n");
-    Bv_list* result_list = list_ctor();
-    if (obj->match_packet(obj, result_list, 1000) != 0)
+    Bv_list* result_list;// = list_ctor();
+    if (obj->match_packet(obj, &result_list, 1000) != 0)
         printf("Error matching packet 1000\n");
     
     printf("Matching rules are: ");
+    //printf("%p\n", (void *)result_list);
     do {
-        printf("%d \n", result_list->rule_index);
+        printf("%d\n", result_list->rule_index);
+        fflush(stdout);
         result_list = result_list->next;
-    } while (result_list->next != NULL);
+    } while (result_list != NULL);
     
-    printf("\n");
+    printf("\ndone!\n");
     return 0;
     
     /*printf("%s\n", "Inserting numbers:");

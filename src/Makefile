@@ -4,7 +4,7 @@ CC=gcc
 RM=rm -f
 #compiler flags
 DEBUGFLAGS=-g
-CFLAGS=-O3 -Wall -Werror -Wpedantic -pedantic -pedantic-errors -std=c99 $(DEBUGFLAGS)
+CFLAGS=-Wall -Werror -Wpedantic -pedantic -pedantic-errors -std=c99 $(DEBUGFLAGS)
 
 # precompiled headers
 GCH=bv_types.h.gch
