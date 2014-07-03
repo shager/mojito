@@ -13,6 +13,7 @@ int main() {
     
     obj->add_rule(obj, 1000, 2000, 1337);
     obj->add_rule(obj, 1000, 2000, 1234);
+    obj->add_rule(obj, 100000, 200000, 42);
     
     printf("range_borders_current = %d\n", obj->range_borders_current);
     printf("range_borders_max = %d\n", obj->range_borders_max);
@@ -23,7 +24,6 @@ int main() {
         printf("Error matching packet 1000\n");
     
     printf("Matching rules are: ");
-    //printf("%p\n", (void *)result_list);
     do {
         printf("%d\n", result_list->rule_index);
         fflush(stdout);
