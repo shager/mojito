@@ -1,0 +1,3 @@
+mkdir -p ~/texmf/tex/latex/beamer/theme # Erstelle lokalen Tex-tree, falls noch nicht vhd.
+cp . /texmf/tex/latex/beamer/theme # Kopiere Theme in lokalen Tex-tree
+texhash 
