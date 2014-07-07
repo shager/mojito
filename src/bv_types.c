@@ -2,6 +2,64 @@
 #include <stdio.h>
 #include "bv_types.h"
 
+struct Bitvector* bitvector_ctor() {
+    Bitvector* object = (Bitvector*) calloc(1, sizeof(Bitvector));
+    if (object == NULL)
+        return NULL;
+    
+    object->bitvector_length = 0;
+    object->bitvector = calloc(1, sizeof(uint64_t));
+    if (object->bitvector == NULL)
+        return NULL;
+        
+    object->insert_rule_at_position = Bv_insert_rule_at_position;
+    object->delete_rule_from_position = Bv_delete_rule_from_position;
+    object->merge_bitvectors = Bv_merge_bitvectors;
+    
+    return object;
+}
+
+void bitvector_dtor(struct Bitvector* this) {
+    free(this->bitvector);
+}
+
+int Bv_insert_rule_at_position(struct Bitvector* this, uint32_t position, uint8_t value) {
+    const int stepsize = (sizeof(uint64_t) * 8); // stepsize = 64
+    if (this->bitvector_length % stepsize == 0) {
+        this->bitvector = (uint64_t*)realloc(this->bitvector, sizeof(uint64_t) * (this->bitvector_length / stepsize) + 1);
+    }
+    
+    this->bitvector_length++;
+    
+    // find out which element in the array has to be altered
+    uint32_t pos_in_array = position / stepsize;
+    
+    // right-shift bits at and after insert-position ("blockwise")
+    int last_bit = this->bitvector[pos_in_array] & 0x1;
+    for (int i = pos_in_array + 1; i <= ((this->bitvector_length / stepsize) + 1); ++i) {
+        int _last_bit = this->bitvector[i] & 0x1;
+        this->bitvector[i] >>= 1;
+        this->bitvector[i] |= (last_bit << (sizeof(int) - 1));
+        last_bit = _last_bit;
+    }
+    //TODO: insert bit, shift right in respective block
+    
+    return 0;
+}
+
+int Bv_delete_rule_from_position(struct Bitvector* this, uint32_t position) {
+    return 0;
+}
+
+// merges Bitvectors first and second into second
+int Bv_merge_bitvectors(struct Bitvector* first, struct Bitvector* second) {
+    const int stepsize = (sizeof(uint64_t) * 8);
+    for (int i = 0; i <= first->bitvector_length / stepsize; ++i) {
+        second->bitvector[i] = second->bitvector[i] & first->bitvector[i];
+    }
+    return 0;
+}
+
 struct Range_borders* range_borders_ctor() {
     Range_borders* object = (Range_borders*) calloc(1, sizeof(Range_borders));
     if (object == NULL)
@@ -12,7 +70,7 @@ struct Range_borders* range_borders_ctor() {
         return NULL;
     for (int i = 0; i < INIT_SIZE; ++i) {
         object->range_borders[i].delimiter_value = 0;
-        object->range_borders[i].rule_list = list_ctor();
+        object->range_borders[i].bitvector = bitvector_ctor();
     }
     object->range_borders_max = INIT_SIZE;
     object->range_borders_current = 0;
@@ -26,8 +84,10 @@ struct Range_borders* range_borders_ctor() {
     return object;
 }
 
-// TODO: Leaks here? (Delimiter lists)
 void range_borders_dtor(struct Range_borders* this) {
+    for (int i = 0; i < this->range_borders_current; ++i) {
+        bitvector_dtor(this->range_borders[i].bitvector);
+    }
     free(this->range_borders);
     free(this);
 }
@@ -55,7 +115,7 @@ int Rb_insert_element(struct Range_borders* this, struct Delimiter* new_element)
 int Rb_insert_element_at_index(struct Range_borders* this, struct Delimiter* new_element, uint32_t index) {
     // check if the insertion happens in a new slot at the end of the array
     //printf("Entered insert at index %d...\n", index);
-    fflush(stdout);
+    //fflush(stdout);
     if (index >= this->range_borders_current) {
         this->insert_element(this, new_element);
         return 0;
@@ -83,7 +143,8 @@ int Rb_delete_element(struct Range_borders* this, uint32_t index) {
         this->range_borders[i] = this->range_borders[i + 1];
     }
 
-    free(&(this->range_borders[--this->range_borders_current])); //TODO: free objects inside there
+    bitvector_dtor(this->range_borders[this->range_borders_current - 1].bitvector);
+    free(&(this->range_borders[--this->range_borders_current]));
 
     // check if we can resize the array to half
     if (this->range_borders_current < this->range_borders_max / 2) {
@@ -101,86 +162,60 @@ int Rb_delete_element(struct Range_borders* this, uint32_t index) {
 
 // Insert a new rule into the routing table
 int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_index, uint32_t rule_index) {
+    int position_begin = find_free_position(this, begin_index); //TODO: check if still right with -1
     
-    // check if we insert the first rule, if yes we just insert the borders (at the end of the array)
-    if (this->range_borders_current == 0) {
-        printf("first call of insertion\n");
-        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
-        Delimiter* new_end_entry = malloc(sizeof(Delimiter));
-        if ((new_begin_entry == NULL) || (new_end_entry == NULL))
-            return 1;
-        
-        new_begin_entry->delimiter_value = begin_index;
-        struct Bv_list* begin_list = list_ctor();
-        begin_list->append(begin_list, rule_index);
-        new_begin_entry->rule_list = begin_list;
-        
-        new_end_entry->delimiter_value = end_index;
-        struct Bv_list* end_list = list_ctor();
-        new_end_entry->rule_list = end_list;
-        
-        Rb_insert_element(this, new_begin_entry);
-        Rb_insert_element(this, new_end_entry);
-        
-        printf("first insertion done\n");
-        return 0;
+    for (int i = 0; i < position_begin; ++i) {
+        this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 0);
     }
     
-    // search through range_borders elements where we can insert the new entries
-    int position_begin = find_free_position(this, begin_index) - 1;
-    //printf("position_begin: %d\n", position_begin);
-    
-    // check if an element already exists at our border
+    // insert new range_border entry, if it doesn't exist
     if (begin_index == this->range_borders[position_begin].delimiter_value) {
-        // append rule_index to entry
-        //printf("border conflict at value %d\n", begin_index);
-        this->range_borders[position_begin].rule_list->append(this->range_borders[position_begin].rule_list, rule_index);
+        this->range_borders[position_begin].bitvector->insert_rule_at_position(this->range_borders[position_begin].bitvector, rule_index, 1);
     } else {
-        // create new entry with begin_index as new element
-        //printf("Creating new entry %d in array...\n", begin_index);
         struct Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
         new_begin_entry->delimiter_value = begin_index;
-        printf("value = %d\n", new_begin_entry->delimiter_value);
-        struct Bv_list* begin_list = list_ctor();
+        
+        struct Bitvector* begin_bitvector = bitvector_ctor();
+        begin_bitvector->insert_rule_at_position(begin_bitvector, rule_index, 1);
         
         // append all rules from previous entry here
-        Bv_list* tmp =  this->range_borders[position_begin].rule_list->next;
-        while (tmp != NULL) {
-            //printf("Inserting previous rules...");
-            begin_list->append(begin_list, tmp->rule_index);
-            tmp = tmp->next;
-        }
-        //printf("...done\n");
+        begin_bitvector->merge_bitvectors(this->range_borders[position_begin - 1].bitvector, begin_bitvector);
         
-        begin_list->append(begin_list, rule_index);
-        new_begin_entry->rule_list = begin_list;
+        new_begin_entry->bitvector = begin_bitvector;
         Rb_insert_element_at_index(this, new_begin_entry, position_begin);
     }
     
-    // do the same for end_index
-    int position_end = find_free_position(this, end_index) - 1;
-    //printf("position_end: %d\n", position_end);
+    // determine end of insertion area
+    int position_end = find_free_position(this, end_index) - 1; //TODO: check if -1 still works
     
-    if (end_index == this->range_borders[position_begin].delimiter_value) {
-        return 0;
+    for (int i = position_begin + 1; i < position_end; ++i) {
+        this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 1);
+    }
+    
+    //insert new range_border entry, if not exists
+    if (end_index == this->range_borders[position_end].delimiter_value) {
+        this->range_borders[position_begin].bitvector->insert_rule_at_position(this->range_borders[position_end].bitvector, rule_index, 0);
     } else {
         struct Delimiter* new_end_entry = malloc(sizeof(Delimiter));
         if (new_end_entry == NULL)
             return 1;
         new_end_entry->delimiter_value = end_index;
-        struct Bv_list* end_list = list_ctor();
+        
+        struct Bitvector* end_bitvector = bitvector_ctor();
+        end_bitvector->insert_rule_at_position(end_bitvector, rule_index, 0);
+        
         // append all rules from previous entry here
-        Bv_list* tmp =  this->range_borders[position_end].rule_list->next;
-        while (tmp != NULL) {
-            end_list->append(end_list, tmp->rule_index);
-            tmp = tmp->next;
-        }
-        new_end_entry->rule_list = end_list;
+        end_bitvector->merge_bitvectors(this->range_borders[position_end - 1].bitvector, end_bitvector);
+        
+        new_end_entry->bitvector = end_bitvector;
         Rb_insert_element_at_index(this, new_end_entry, position_end);
     }
-
+    
+    for (int i = position_end + 1; i < this->range_borders_current; ++i) {
+        this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 0);
+    }
     return 0;
 }
 
@@ -192,19 +227,15 @@ int64_t Rb_find_element(struct Range_borders* this, uint32_t value) {
 }
 
 // Match a header field value of an incoming packet
-uint8_t Rb_match_packet(struct Range_borders* this, struct Bv_list** result, uint32_t header_value) {
-    struct Bv_list* tmp = list_ctor();
+uint8_t Rb_match_packet(struct Range_borders* this, struct Bitvector** result, uint32_t header_value) {
+    struct Bitvector* tmp = bitvector_ctor();
     int relevant_border = find_free_position(this, header_value);
     if (relevant_border == -1) {
         result = NULL;
         return 0;
     }
-    printf("delim: %d\n", this->range_borders[relevant_border].delimiter_value);
-    if (this->range_borders[relevant_border].rule_list->next == NULL)
-        return 1;
-        
-    printf("entry 1: %d\n", this->range_borders[relevant_border].rule_list->next->rule_index);
-    tmp = this->range_borders[relevant_border].rule_list->next;
+    
+    tmp = this->range_borders[relevant_border].bitvector;
     *result = tmp;
     return 0;
 }

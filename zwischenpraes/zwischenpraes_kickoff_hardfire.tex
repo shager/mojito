@@ -45,7 +45,7 @@
 \section{Einführung in OpenFlow}
 \begin{frame}
 \begin{itemize}
-    \item OpenFlow ist populäres SDN zum Einsatz in Forschung und Entwicklung
+    \item OpenFlow ist ein Konzept zur Umsetzung von SDNs zum Einsatz in Forschung und Entwicklung
     \item Aufbau von OpenFlow\\
     \begin{center}
     \includegraphics[height=0.8\textheight]{img/openflow_scheme.png}
@@ -56,8 +56,8 @@
 \begin{frame}
     \begin{itemize}
         \item Controller sendet Control Messages, wertet Statistiken aus
-        \item OpenFlow switch/firewall/\dots\ macht Paketmatching und verwaltet Regelsätze
-        \item Steuerung mehrerer Endgeräte duch einen Controller üblich
+        \item OpenFlow switch/firewall/\dots\ macht Paketmatching und verwendet vom Controller definierte Regelsätze
+        \item Steuerung mehrerer Switches duch einen Controller üblich
     \end{itemize}
 \end{frame}
 
@@ -88,7 +88,9 @@ Demo am Whiteboard
 \frametitle{Der Bitvektor-Algorithmus}
 Komplexität: Seien $N$ Anzahl der Regeln, $k$ Anzahl der Header-Felder.\\
 Dann ist Matching mit der linearen Liste in $\mathcal O(n \cdot k)$.\\
-Der Bitvektor-Ansatz schafft dagegen  $\mathcal O(log\ n \cdot k)$.
+Der Bitvektor-Ansatz schafft dagegen  $\mathcal O(log\ n \cdot k)$.\\
+Nach Ver-UND-ung muss im resultierenden
+Bitvektor noch das am Weitesten links liegende Bit gefunden werden, was nochmal $\mathcal O(n)$ erfordert.\\
 \end{frame}
 
 \section{Aktueller Stand}
