@@ -24,25 +24,52 @@ void bitvector_dtor(struct Bitvector* this) {
 }
 
 int Bv_insert_rule_at_position(struct Bitvector* this, uint32_t position, uint8_t value) {
+    /* General idea: Identify the block in our bitvector where we want to
+     * insert the new bit.
+     * 
+     * Right-shift all blocks positioned right from the desired block 
+     * to make space for the extra bit.
+     * 
+     * Right-shift the righter bits in our desired block
+     * 
+     * Insert our new bit
+     */
+    if (value != 0)
+        value = 1;
+    
     const int stepsize = (sizeof(uint64_t) * 8); // stepsize = 64
+    
+    // Check if we need to extend our bitvector by one block
     if (this->bitvector_length % stepsize == 0) {
-        this->bitvector = (uint64_t*)realloc(this->bitvector, sizeof(uint64_t) * (this->bitvector_length / stepsize) + 1);
+        this->bitvector = (uint64_t*)realloc(this->bitvector, sizeof(uint64_t) * ((this->bitvector_length / stepsize) + 1));
     }
     
     this->bitvector_length++;
     
-    // find out which element in the array has to be altered
-    uint32_t pos_in_array = position / stepsize;
+    // find out which element ("block") in the array has to be altered
+    uint32_t block_in_array = position / stepsize;
+    uint32_t bit_in_block = position % stepsize;
     
     // right-shift bits at and after insert-position ("blockwise")
-    int last_bit = this->bitvector[pos_in_array] & 0x1;
-    for (int i = pos_in_array + 1; i <= ((this->bitvector_length / stepsize) + 1); ++i) {
+    int last_bit = this->bitvector[block_in_array] & 0x1;
+    for (int i = block_in_array + 1; i <= ((this->bitvector_length / stepsize) + 1); ++i) {
         int _last_bit = this->bitvector[i] & 0x1;
         this->bitvector[i] >>= 1;
-        this->bitvector[i] |= (last_bit << (sizeof(int) - 1));
+        this->bitvector[i] |= (last_bit << (sizeof(uint64_t) - 1));
         last_bit = _last_bit;
     }
-    //TODO: insert bit, shift right in respective block
+    // last step: write last bit from modifiable block to next block
+    this->bitvector[block_in_array + 1] |= ((this->bitvector[block_in_array] & 0x1) << (sizeof(uint64_t) - 1));
+    
+    // Now we have a "hole" in our desired block where we can insert our new value
+    // This "hole" has to be shifted to the correct position
+    if (bit_in_block != 0) {
+        this->bitvector[block_in_array] = (this->bitvector[block_in_array] / bit_in_block) + 
+                                      ((this->bitvector[block_in_array] % bit_in_block) >> 1);
+    }
+    
+    // Finally: insert new bit at correct position
+    this->bitvector[block_in_array] |= (value << (bit_in_block));
     
     return 0;
 }
@@ -54,8 +81,13 @@ int Bv_delete_rule_from_position(struct Bitvector* this, uint32_t position) {
 // merges Bitvectors first and second into second
 int Bv_merge_bitvectors(struct Bitvector* first, struct Bitvector* second) {
     const int stepsize = (sizeof(uint64_t) * 8);
+    // check for equal length
+    if (first->bitvector_length / stepsize < second->bitvector_length / stepsize) {
+        second->bitvector = (uint64_t*)realloc(second->bitvector, sizeof(uint64_t) * ((first->bitvector_length / stepsize) + 1));
+    }
+    
     for (int i = 0; i <= first->bitvector_length / stepsize; ++i) {
-        second->bitvector[i] = second->bitvector[i] & first->bitvector[i];
+        second->bitvector[i] = second->bitvector[i] | first->bitvector[i];
     }
     return 0;
 }
@@ -162,7 +194,7 @@ int Rb_delete_element(struct Range_borders* this, uint32_t index) {
 
 // Insert a new rule into the routing table
 int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_index, uint32_t rule_index) {
-    int position_begin = find_free_position(this, begin_index); //TODO: check if still right with -1
+    int position_begin = find_free_position(this, begin_index); //TODO: check if still right without -1
     
     for (int i = 0; i < position_begin; ++i) {
         this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 0);
@@ -181,14 +213,16 @@ int Rb_add_rule(struct Range_borders* this, uint32_t begin_index, uint32_t end_i
         begin_bitvector->insert_rule_at_position(begin_bitvector, rule_index, 1);
         
         // append all rules from previous entry here
-        begin_bitvector->merge_bitvectors(this->range_borders[position_begin - 1].bitvector, begin_bitvector);
+        if (position_begin != 0) {
+            begin_bitvector->merge_bitvectors(this->range_borders[position_begin - 1].bitvector, begin_bitvector);
+        }
         
         new_begin_entry->bitvector = begin_bitvector;
         Rb_insert_element_at_index(this, new_begin_entry, position_begin);
     }
     
     // determine end of insertion area
-    int position_end = find_free_position(this, end_index) - 1; //TODO: check if -1 still works
+    int position_end = find_free_position(this, end_index) + 1; //TODO: check if + 1 still works
     
     for (int i = position_begin + 1; i < position_end; ++i) {
         this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 1);
@@ -258,7 +292,7 @@ uint32_t find_free_position(struct Range_borders* this, uint32_t target) {
     int lower = 0;
     int upper = this->range_borders_current - 1;
     if (upper == -1)
-        return upper;
+        return lower;
     while (lower != upper) {
         int mid_index = lower + ((upper - lower) / 2);
         if (this->range_borders[mid_index].delimiter_value <= target) {

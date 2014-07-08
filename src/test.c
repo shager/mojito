@@ -5,8 +5,9 @@ int main() {
     Range_borders* obj = range_borders_ctor();
     // test rule-adding function
     printf("Adding rules:\n");
-    for (int i = 0; i < 50; ++i) {
-        if (obj->add_rule(obj, i * 100, i * 100 + 1000, i * 10) != 0) {
+    for (int i = 0; i < 100; ++i) {
+        printf("Adding rule %d\n", i);
+        if (obj->add_rule(obj, i, i + 10, i) != 0) {
             printf("Error adding rule %d\n", i);
         }
     }
@@ -19,16 +20,12 @@ int main() {
     printf("range_borders_max = %d\n", obj->range_borders_max);
     
     printf("done.\n\nMatching packets:\n");
-    Bv_list* result_list;// = list_ctor();
-    if (obj->match_packet(obj, &result_list, 1000) != 0)
+    Bitvector* result_bv;// = list_ctor();
+    if (obj->match_packet(obj, &result_bv, 1000) != 0)
         printf("Error matching packet 1000\n");
     
     printf("Matching rules are: ");
-    do {
-        printf("%d\n", result_list->rule_index);
-        fflush(stdout);
-        result_list = result_list->next;
-    } while (result_list != NULL);
+    //TODO
     
     printf("\ndone!\n");
     return 0;
