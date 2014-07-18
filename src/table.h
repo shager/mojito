@@ -39,6 +39,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "bv_types.h"
 
 struct datapath; /* Forward declaration for delete operation */
 struct sw_flow;
@@ -72,8 +73,6 @@ struct sw_table {
      * However, we're primarily concerned about speed. */
     unsigned long long n_lookup;
     unsigned long long n_matched;
-    
-    struct sw_flow** flow_array;
 
     /* Searches 'table' for a flow matching 'key', which must not have any
      * wildcard fields.  Returns the flow if successful, a null pointer
@@ -133,20 +132,37 @@ struct sw_table {
      * 'position' is updated to a value that can be passed back to the
      * iterator function to resume iteration later with the following
      * flow. */
-    /*int (*iterate)(struct sw_table *table,
+    int (*iterate)(struct sw_table *table,
                const struct sw_flow_key *key, uint16_t out_port,
                struct sw_table_position *position,
                int (*callback)(struct sw_flow *flow, void *private),
-               void *private);*/
+               void *private);
 
     /* Dumps statistics for 'table' into 'stats'. */
     void (*stats)(struct sw_table *table, struct sw_table_stats *stats);
+    
+    //NEW part
+    struct sw_flow** flow_array;
+    
+    Range_borders* range_borders_ip_src; //IP address source
+    Range_borders* range_borders_ip_dst; //IP address dst
+    Range_borders* range_borders_port_number; //physical/virtual ingress port number
+    Range_borders* range_borders_vlan_id; //VLAN ID
+    Range_borders* range_borders_eth_type; //Ethernet frame type
+    Range_borders* range_borders_transport_src; //either TCP or UDP src port
+    Range_borders* range_borders_transport_dst; //either TCP or UDP dst port
+    Range_borders* range_borders_eth_src; //MAC src address
+    Range_borders* range_borders_eth_dst; //MAC dst address
+    Range_borders* range_borders_vlan_prio; //Input VLAN priority
+    Range_borders* range_borders_ip_dcsp; //IPv4 DCSP
+    Range_borders* range_borders_ip_protocol; //IP protocol (e.g. UDP, TCP, ICMP)
 };
 
-struct sw_table *table_hash_create(unsigned int polynomial,
+struct sw_table* table_hash_create(unsigned int polynomial,
                                    unsigned int n_buckets);
-struct sw_table *table_hash2_create(unsigned int poly0, unsigned int buckets0,
+struct sw_table* table_hash2_create(unsigned int poly0, unsigned int buckets0,
                                     unsigned int poly1, unsigned int buckets1);
-struct sw_table *table_linear_create(unsigned int max_flows);
+struct sw_table* table_linear_create(unsigned int max_flows);
+struct sw_table* table_jit_create(unsigned int max_flows);
 
 #endif /* table.h */

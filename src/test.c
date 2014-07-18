@@ -1,22 +1,37 @@
 #include "bv_types.h"
 #include <stdio.h>
+#include <assert.h>
 
 int main() {
     Range_borders* obj = range_borders_ctor();
-    // test rule-adding function
-    printf("Adding rules:\n");
-    for (int i = 0; i < 100; ++i) {
+    
+    /* TEST:
+     * find_free_position(struct Range_borders* this, uint64_t target) 
+     */
+     
+    obj->add_rule(obj, 1, 10, 2);
+    Bitvector* res;
+    obj->match_packet(obj, &res, 7);
+    
+    printf("res = %lld\n", (long long unsigned int)(res->bitvector[0]));
+    
+    
+    return 0;
+    assert((find_free_position(obj, 0) == 0) || printf(" find_free_position failed!\n"));
+    
+    /* 
+     * test add_rule(struct Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index)
+     */
+    for (int i = 0; i < 10; ++i) {
         printf("Adding rule %d\n", i);
-        if (obj->add_rule(obj, i, i + 10, i) != 0) {
-            printf("Error adding rule %d\n", i);
-        }
+        assert((obj->add_rule(obj, i, i + 10, i) == 0) || printf("Error adding rule %d\n", i));
     }
     
-    obj->add_rule(obj, 1000, 2000, 1337);
-    obj->add_rule(obj, 1000, 2000, 1234);
-    obj->add_rule(obj, 100000, 200000, 42);
+    obj->add_rule(obj, 999, 2000, 1337);
+    obj->add_rule(obj, 1000, 2800, 1234);
     
     printf("range_borders_current = %d\n", obj->range_borders_current);
+    fflush(stdout);
     printf("range_borders_max = %d\n", obj->range_borders_max);
     
     printf("done.\n\nMatching packets:\n");
@@ -25,7 +40,7 @@ int main() {
         printf("Error matching packet 1000\n");
     
     printf("Matching rules are: ");
-    //TODO
+    printf("%lld\n", (long long int)result_bv->bitvector[0]);
     
     printf("\ndone!\n");
     return 0;

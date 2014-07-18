@@ -13,16 +13,13 @@ OBJ=test.o bv_types.o bv_list.o
 # executables
 EXECS=test
 
-test: test.o bv_types.o bv_list.o
+test: test.o bv_types.o 
 	$(CC) $(CFLAGS) -o $@ $^
 
 test.o: test.c
 	$(CC) $(CFLAGS) -c $^
 
 bv_types.o: bv_types.c bv_types.h
-	$(CC) $(CFLAGS) -c $^
-
-bv_list.o: bv_list.c bv_list.h
 	$(CC) $(CFLAGS) -c $^
 
 clean:
