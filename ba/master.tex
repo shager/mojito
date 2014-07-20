@@ -178,9 +178,17 @@ A key feature of OpenFlow is the control channel system.
 One controller has connections to all existing network hardware and can define their behaviour from a central position.
 The hardware then acts accordingly and handles the traffic as required.
 
-The main objective of this work is to implement a faster matching engine in the OpenFlow 1.3 reference implementation.
+The main objective of this work is to implement a faster matching engine in the OpenFlow 1.0 reference implementation.
 
+\chapter{Related work}
+The bitvector algorithm is not the only promising idea to speed up packet matching in modern network hardware.
+Other approaches to this problem include the usage of tries, hashmaps or even geometric algorithms\cite{hicuts} in order to perform faster than searching in a linear list.
 
+The bitvector approach\cite{bv} has been evaluated in FPGAs\cite{bitvector_fpga} \cite{qu2013fast}.
+Further improvement on this algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
+When all dimensions are matched and the resulting bitvectors are retrieved, these vectors have to be ANDed bit per bit until a 1 is found.
+This is obviously an $\mathcal O(n)$ worst case runtime.
+The ABV algorithm\cite{abv} implements a hierarchical system of bitvectors with fixed length and runs in $\mathcal O(log n)$.
 \pagebreak
 
 \pagestyle{headings}
