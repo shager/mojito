@@ -132,19 +132,22 @@ nor a similar work has been presented to an examination committee.
 \setcounter{page}{1}
 \tableofcontents{}
 
-\chapter{Introduction}
+\section{Introduction}
 The growth of the internet constantly poses new challenges to the producers of network equipment.
 Today's applications like Multimedia, Web and Voice over IP are dependant of a transport network (the internet) with
 high data rates, low latency, soft realtime properties and quality of service mechanisms.
 This catalogue of network parameters is already implemented in the internet protocol stack.
 
-However, due to Moore's Law the growth of the actual data traffic can not be handled by pure protocol optimizaions, 
+However, due to Moore's Law the growth of the actual data traffic can not be handled by pure protocol optimizations, 
 but must be engineered in faster hardware.
+
+Additionally, the number of hosts is growing steadily, which also leads to a more packed address space in case of IPv4.
+Usually, this leads to an increasing size of rule sets in the respecting internet traffic handlers. %TODO: position 1 absatz weiter?
 
 The critical points in the internet's architecture concerning performance are the stations who have to decide for each packet what to do.
 These are mostly Firewalls, Level-2-Switches and Level-3-Routers.
-In general, these machines inspect the header data of every incoming IP packet and forward it following a ruleset that has been implemented before.
-These rulesets can be mostly static (e.g. in case of a small router) or very dynamic (e.g. in a large stateful firewall).
+In general, these machines inspect the header data of every incoming IP packet and forward it following a rule set that has been implemented before.
+These rule sets can be mostly static (e.g. in case of a small router) or very dynamic (e.g. in a large stateful firewall).
 
 One main point in optimization therefore lies in the matching algorithms executing this process.
 Many rulesets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
@@ -152,7 +155,7 @@ The last two fields imply the usage of TCP or UDP as transport protocol.
 But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.
 
 Matching algorithms become slower the more header fields they have to match.
-Additionally, some fields require rules that imply certain ranges or prefixes, e.g. IP adresses.
+Additionally, some fields require rules that imply certain ranges or prefixes, e.g. IP addresses.
 These constraints make it more difficult to implement simple matching algorithms and in order to match with high speed, more sophisticated
 algorithms have to be used for these fields.
 
@@ -173,22 +176,39 @@ The control plane is used for configuring and updating the hardware, e.g. insert
 The data plane handles the incoming traffic and acts accordingly to the objectives defined in the control plane.
 
 One popular instance of a SDN is OpenFlow.
-This project is intended to open a virtual network on real hardware for educational and research usecases.
+This project is intended to open a virtual network on real hardware for educational and research use cases.
 A key feature of OpenFlow is the control channel system.
 One controller has connections to all existing network hardware and can define their behaviour from a central position.
 The hardware then acts accordingly and handles the traffic as required.
 
 The main objective of this work is to implement a faster matching engine in the OpenFlow 1.0 reference implementation.
 
-\chapter{Related work}
+\section{Related Work}
+Speeding up packet classification is one of the current research topics in the computer network community.
+Therefore, several algorithms have been developed in the last years.
 The bitvector algorithm is not the only promising idea to speed up packet matching in modern network hardware.
-Other approaches to this problem include the usage of tries, hashmaps or even geometric algorithms\cite{hicuts} in order to perform faster than searching in a linear list.
+An overview over these algorithms can be gained from \cite{algorithms_survey},
+Approaches to this problem include the usage of tries, hashmaps or geometric algorithms\cite{hicuts}
+in order to perform significantly faster than searching in a linear list.
 
-The bitvector approach\cite{bv} has been evaluated in FPGAs\cite{bitvector_fpga} \cite{qu2013fast}.
-Further improvement on this algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
-When all dimensions are matched and the resulting bitvectors are retrieved, these vectors have to be ANDed bit per bit until a 1 is found.
-This is obviously an $\mathcal O(n)$ worst case runtime.
-The ABV algorithm\cite{abv} implements a hierarchical system of bitvectors with fixed length and runs in $\mathcal O(log n)$.
+Real-world applications of these theoretical concepts are numerous and have been evaluated in different projects.
+Following, there is an overview over different projects using a software packet filter environment.
+
+The Iptables packet filter was improved in the HiPAC project \cite{hipac}, which was founded in a diploma thesis \cite{heinzhigh}.
+Another project focuses on the implementation of EffiCuts in an OpenFlow environment \cite{stimpfling2013optimal}.
+They also faced the challenge to improve the efficiency of packet classification on more than the ususal five-tuple of header fields.
+OpenFlow 1.0.0 \cite{openflow_spec10} requires at least 12 header fields to be matched, later versions are operating on even larger sets.
+To address this problem, they extended the original EffiCuts algorithm in order to achieve a lower memory usage profile.
+
+Other research groups focus on implementing wire speed packet matching in (programmable) hardware instead of software.
+The bitvector approach \cite{bv} has been evaluated in FPGAs \cite{bitvector_fpga} \cite{qu2013fast}.
+However, these papers only focus on five-tuple rule sets as it seems to be common in Intrusion Detection Systems.
+
+Further improvement on the bitvector algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
+When all dimensions are matched and the resulting bitvectors are retrieved, these vectors have to be ANDed bit per bit until a one bit is found.
+This obviously results in an $\mathcal O(n)$ worst case runtime.
+The ABV algorithm \cite{abv} implements a hierarchical system of bitvectors with fixed length and runs in $\mathcal O(log\ n)$.
+However, more memory space is needed to store the bitvectors of the respective hierarchies.
 \pagebreak
 
 \pagestyle{headings}
