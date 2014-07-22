@@ -12,7 +12,8 @@
 \usepackage{color}
 \usepackage{hyperref}
 \usepackage{float}
-
+\usepackage{scrpage2} %use this instead of headings due to bug in KOMA-script
+\usepackage[draft=false,babel,tracking=true,kerning=true,spacing=true]{microtype}
 
 \usepackage{paralist}
 \usepackage[section]{placeins} %don't float to next section
@@ -21,8 +22,11 @@
 
 %\usepackage{minted}
 
-\hyphenpenalty=10000
-
+%\hyphenpenalty=10000
+% Hurenkinder und Schusterjungen verhindern
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
 
 %\geometry{a4paper,left=40mm,right=40mm, top=20mm, bottom=40mm}
 
@@ -40,9 +44,9 @@
 }
 
 %opening
-\title{Dokument}
+\title{Measurements and Optimizations with Just-In-Time code generation on the Openflow reference implementation}
 \author{Samuel Brack}
-\date{}
+\date{\today}
 
 \begin{document}
 \thispagestyle{empty}
@@ -80,7 +84,7 @@
   % \normalfont
 \enlargethispage{10\baselineskip}
 \end{center}
-\vspace {4 cm}% gegebenenfalls kleiner, falls der Titel der Arbeit sehr lang sein sollte
+\vspace {1 cm}% gegebenenfalls kleiner, falls der Titel der Arbeit sehr lang sein sollte
 %{3.2 cm} bei Verwendung von scrreprt, gegebenenfalls kleiner, falls der Titel der Arbeit sehr lang sein sollte
 {\large
   \begin{tabular}{llll}
@@ -88,8 +92,8 @@
     geboren am:         &27. März 1992  && \\
     in:                 &Memmingen  && \\
     &&&\\
-    Gutachter: &  && \\
-              &  && \\% Bitte Namen der Gutachter(innen) anstelle der Punkte eintragen
+    Gutachter: &Prof. Dr. Björn Scheuermann  && \\
+              &Prof. Dr. Jens-Peter Redlich  && \\% Bitte Namen der Gutachter(innen) anstelle der Punkte eintragen
                  % bei zwei männlichen Gutachtern kann das (innen) weggestrichen werden
     &&&\\
     eingereicht am:     &   \hspace{3cm} verteidigt am: &  \\ % Bitte lassen Sie
@@ -124,15 +128,17 @@ nor a similar work has been presented to an examination committee.
 }
 \newpage
 
-\begin{abstract}
+%\begin{abstract}
 
-\end{abstract}
+%\end{abstract}
 
 \addcontentsline{toc}{section}{Contents}
 \setcounter{page}{1}
 \tableofcontents{}
 
 \pagebreak
+
+\pagestyle{scrheadings}
 
 \section{Introduction}
 The growth of the internet constantly poses new challenges to the producers of network equipment.
@@ -223,7 +229,6 @@ This can be an upside in black box scenarios, where the matching engine's source
 However, that idea requires to reorganize the desired rule set and makes updating more complex.
 In case of high-frequent updates this strategy will hit its limitations, as the optimization steps often require the consideration of the entire rule set and not only the updated part.
 
-\pagestyle{headings}
 
 \newpage
 \addcontentsline{toc}{section}{References}
