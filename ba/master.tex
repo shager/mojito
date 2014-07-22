@@ -132,6 +132,8 @@ nor a similar work has been presented to an examination committee.
 \setcounter{page}{1}
 \tableofcontents{}
 
+\pagebreak
+
 \section{Introduction}
 The growth of the internet constantly poses new challenges to the producers of network equipment.
 Today's applications like Multimedia, Web and Voice over IP are dependant of a transport network (the internet) with
@@ -202,14 +204,24 @@ To address this problem, they extended the original EffiCuts algorithm in order 
 
 Other research groups focus on implementing wire speed packet matching in (programmable) hardware instead of software.
 The bitvector approach \cite{bv} has been evaluated in FPGAs \cite{bitvector_fpga} \cite{qu2013fast}.
-However, these papers only focus on five-tuple rule sets as it seems to be common in Intrusion Detection Systems.
+However, these papers only focus on five-tuple rule sets, which decreases the complexity of the problem compared to an OpenFlow 12-tuple.
 
 Further improvement on the bitvector algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
 When all dimensions are matched and the resulting bitvectors are retrieved, these vectors have to be ANDed bit per bit until a one bit is found.
 This obviously results in an $\mathcal O(n)$ worst case runtime.
 The ABV algorithm \cite{abv} implements a hierarchical system of bitvectors with fixed length and runs in $\mathcal O(log\ n)$.
 However, more memory space is needed to store the bitvectors of the respective hierarchies.
-\pagebreak
+
+Another approach to improve matching performance in a packet filter is to reorganize the rule set.
+
+One way to perform such a reorganization is the compression of the rule set as introduced in \cite{firewall_compressor} and \cite{redundancy_removal}.
+They reduce the number of the rules significantly whilst persisting its semantics.
+These optimizations are done offline and before the rule set is loaded into the firewall.
+
+The advantage of that strategy is that the matching engine itself has not to be changed and can be left untouched.
+This can be an upside in black box scenarios, where the matching engine's source code is not open to the user.
+However, that idea requires to reorganize the desired rule set and makes updating more complex.
+In case of high-frequent updates this strategy will hit its limitations, as the optimization steps often require the consideration of the entire rule set and not only the updated part.
 
 \pagestyle{headings}
 
