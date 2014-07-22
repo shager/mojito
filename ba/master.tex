@@ -190,7 +190,7 @@ Speeding up packet classification is one of the current research topics in the c
 Therefore, several algorithms have been developed in the last years.
 The bitvector algorithm is not the only promising idea to speed up packet matching in modern network hardware.
 An overview over these algorithms can be gained from \cite{algorithms_survey},
-Approaches to this problem include the usage of tries, hashmaps or geometric algorithms\cite{hicuts}
+Approaches to this problem include the usage of tries, hash maps or geometric algorithms\cite{hicuts}
 in order to perform significantly faster than searching in a linear list.
 
 Real-world applications of these theoretical concepts are numerous and have been evaluated in different projects.
@@ -198,7 +198,7 @@ Following, there is an overview over different projects using a software packet 
 
 The Iptables packet filter was improved in the HiPAC project \cite{hipac}, which was founded in a diploma thesis \cite{heinzhigh}.
 Another project focuses on the implementation of EffiCuts in an OpenFlow environment \cite{stimpfling2013optimal}.
-They also faced the challenge to improve the efficiency of packet classification on more than the ususal five-tuple of header fields.
+They also faced the challenge to improve the efficiency of packet classification on more than the usual five-tuple of header fields.
 OpenFlow 1.0.0 \cite{openflow_spec10} requires at least 12 header fields to be matched, later versions are operating on even larger sets.
 To address this problem, they extended the original EffiCuts algorithm in order to achieve a lower memory usage profile.
 
