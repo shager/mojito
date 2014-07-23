@@ -10,37 +10,42 @@ int main() {
      */
      
     obj->add_rule(obj, 1, 10, 2);
+    obj->add_rule(obj, 999, 2900, 7);
+    obj->add_rule(obj, 1000, 2800, 1);
     Bitvector* res;
     obj->match_packet(obj, &res, 7);
     
     printf("res = %lld\n", (long long unsigned int)(res->bitvector[0]));
+    assert((res->bitvector[0] >> 61) == 1);
     
+    Bitvector* res2;
+    obj->match_packet(obj, &res2, 1500);
+    printf("res = %lld\n", (long long unsigned int)(res2->bitvector[0]));
+    assert((res2->bitvector[0] >> 62) % 2 == 1);
     
-    return 0;
+    Bitvector* res3;
+    obj->match_packet(obj, &res3, 2888);
+    printf("res = %lld\n", (long long unsigned int)(res3->bitvector[0]));
+    assert((res3->bitvector[0] >> 56) == 1);
+    
+    //return 0;
     assert((find_free_position(obj, 0) == 0) || printf(" find_free_position failed!\n"));
     
     /* 
      * test add_rule(struct Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index)
      */
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
         printf("Adding rule %d\n", i);
         assert((obj->add_rule(obj, i, i + 10, i) == 0) || printf("Error adding rule %d\n", i));
     }
     
-    obj->add_rule(obj, 999, 2000, 1337);
-    obj->add_rule(obj, 1000, 2800, 1234);
-    
-    printf("range_borders_current = %d\n", obj->range_borders_current);
-    fflush(stdout);
-    printf("range_borders_max = %d\n", obj->range_borders_max);
-    
     printf("done.\n\nMatching packets:\n");
-    Bitvector* result_bv;// = list_ctor();
-    if (obj->match_packet(obj, &result_bv, 1000) != 0)
-        printf("Error matching packet 1000\n");
+    Bitvector* result_bv;
+    if (obj->match_packet(obj, &result_bv, 107) != 0)
+        printf("Error matching packet 107\n");
     
     printf("Matching rules are: ");
-    printf("%lld\n", (long long int)result_bv->bitvector[0]);
+    printf("%lld\n", (long long unsigned int)result_bv->bitvector[1]);
     
     printf("\ndone!\n");
     return 0;

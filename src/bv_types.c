@@ -146,7 +146,7 @@ int Rb_insert_element_at_index(Range_borders* this, Delimiter* new_element, uint
         return 0;
     } else { // insertion happens somewhere "in the middle"
         this->insert_element(this, &(this->range_borders[this->range_borders_current - 1]));
-        for (uint32_t i = this->range_borders_current - 2; i >= index; --i){ // was >
+        for (int64_t i = this->range_borders_current - 2; i >= index; --i){ // was >
             //printf("in loop, i = %d\n", i);
             //fflush(stdout);
             this->range_borders[i + 1] = this->range_borders[i];
@@ -157,7 +157,6 @@ int Rb_insert_element_at_index(Range_borders* this, Delimiter* new_element, uint
     return 0;
 }
 
-//TODO: check
 // Delete a single element in the array
 int Rb_delete_element(Range_borders* this, uint32_t index) {
     // check if index is in array
