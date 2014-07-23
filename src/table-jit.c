@@ -42,26 +42,29 @@
 #include "datapath.h"
 #include "bv_types.h"
 
+#include <inttypes.h>
+
 struct sw_table_jit {
     struct sw_table swt;
 
     unsigned int max_flows;
     unsigned int n_flows;
-    
-
+    struct list flows;
+    struct list iter_flows;
+    unsigned long int next_serial;
 
     //For reference: definition of flow in flow.h
     /*
-     * uint32_t nw_src;            
-     * uint32_t nw_dst;            
-     * uint16_t in_port;           
-     * uint16_t dl_vlan;           
-     * uint16_t dl_type;           
-     * uint16_t tp_src;            
-     * uint16_t tp_dst;            
-     * uint8_t dl_src[6];          
-     * uint8_t dl_dst[6];          
-     * uint8_t dl_vlan_pcp;        
+     * uint32_t nw_src;
+     * uint32_t nw_dst;
+     * uint16_t in_port;
+     * uint16_t dl_vlan;
+     * uint16_t dl_type;
+     * uint16_t tp_src;
+     * uint16_t tp_dst;
+     * uint8_t dl_src[6];
+     * uint8_t dl_dst[6];
+     * uint8_t dl_vlan_pcp;
      * uint8_t nw_tos;
      * uint8_t nw_proto;
      */
@@ -78,8 +81,8 @@ Bitvector* lookup_dimension(struct Range_borders* rb_dimension, uint64_t value)
     return NULL;
 }
 
-uint8_t find_leftmost_bit (uint64_t value) {
-    for (uint32_t i = 0; i < sizeof(uint64_t); ++i) {
+uint8_t find_leftmost_bit(uint64_t value) {
+    for (uint8_t i = 0; i < sizeof(uint64_t) * 8; ++i) {
         if ((value & 0x8000000000000000) == 0x8000000000000000) {
             return i;
         }
@@ -92,6 +95,8 @@ uint8_t find_leftmost_bit (uint64_t value) {
 static struct sw_flow* table_jit_lookup(struct sw_table* swt,
                                            const struct sw_flow_key* key)
 {
+    printf("Entering lookup\n");
+    fflush(stdout);
     struct sw_table_jit *tj = (struct sw_table_jit *) swt;
     
     uint64_t mac_src = 0;
@@ -123,6 +128,7 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
         for (uint32_t j = 1; j < 12; ++j) {
             rule_index_result &= bv_array[j]->bitvector[i];
         }
+        
         if (rule_index_result != 0) {
             bitvector_subindex = i;
             break;
@@ -131,40 +137,53 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     }
     
     //no match found -> return NULL flow
-    if (rule_index_result == 0)
+    if (rule_index_result == 0) {
+        printf("lookup done1\n");
+        fflush(stdout);
         return NULL;
+    }
     
     //find leftmost bit in rule_index_result
+    printf("ri_result = %" PRIu64 "\n", rule_index_result);
+    fflush(stdout);
     uint32_t leftmostbit = find_leftmost_bit(rule_index_result);
     
     //ERROR! no match found
     if (leftmostbit == 255) {
+        printf("lookup done2\n");
+        fflush(stdout);
         return NULL;
     }
     
     //re-calculate offset in original bitvector-array
     leftmostbit += bitvector_subindex * 64;
-    
+    printf("lookup done3, lmb = %d\n", leftmostbit);
+    fflush(stdout);
     return swt->flow_array[leftmostbit];
 }
 
-static int table_jit_insert(struct sw_table *swt, struct sw_flow *flow)
+static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
 {
     struct sw_table_jit *tj = (struct sw_table_jit *) swt;
     uint32_t rule_index = tj->n_flows;
     
+    printf("n_flows before loop: %d\n", tj->n_flows);
+    fflush(stdout);
     //check if flow already exists, if yes overwrite
     for (uint32_t i = 0; i < tj->n_flows; ++i)
     {
+        printf("n_flows: %d\n", tj->n_flows);
+        fflush(stdout);
         struct sw_flow* f = swt->flow_array[i];
         if (f == NULL)
             continue;
         if (f->priority == flow->priority
                 && f->key.wildcards == flow->key.wildcards
                 && flow_matches_2wild(&f->key, &flow->key)) {
+            printf("replaced %d\n", i);
+            fflush(stdout);
             flow->serial = f->serial;
-            list_replace(&flow->node, &f->node);
-            list_replace(&flow->iter_node, &f->iter_node);
+            swt->flow_array[i] = flow;
             flow_free(f);
             return 1;
         }
@@ -189,6 +208,7 @@ static int table_jit_insert(struct sw_table *swt, struct sw_flow *flow)
     
     tj->n_flows++;
     swt->flow_array[rule_index] = flow;
+    printf("inserted flow at time %lld\n", (long long int)flow->created);
     
     //short handle for flow struct in sw_flow
     struct flow network_flow = flow->key.flow;
@@ -264,13 +284,6 @@ static int table_jit_has_conflict(struct sw_table *swt,
     return false;
 }
 
-static void
-do_delete(struct sw_flow *flow) 
-{
-    list_remove(&flow->node);
-    list_remove(&flow->iter_node);
-    flow_free(flow);
-}
 
 static int table_jit_delete(struct datapath *dp, struct sw_table *swt,
                                const struct sw_flow_key *key, 
@@ -293,7 +306,7 @@ static int table_jit_delete(struct datapath *dp, struct sw_table *swt,
                 swt->flow_array[j] = swt->flow_array[j + 1];
             }
             
-            do_delete(flow);
+            flow_free(flow);
             
             swt->range_borders_ip_src->delete_element(swt->range_borders_ip_src, i);
             swt->range_borders_ip_dst->delete_element(swt->range_borders_ip_dst, i);
@@ -390,6 +403,9 @@ struct sw_table *table_jit_create(unsigned int max_flows)
 
     tj->max_flows = max_flows;
     tj->n_flows = 0;
+    list_init(&tj->flows);
+    list_init(&tj->iter_flows);
+    tj->next_serial = 0;
     
     swt->range_borders_ip_src = range_borders_ctor();
     swt->range_borders_ip_dst = range_borders_ctor();
