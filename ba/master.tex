@@ -141,6 +141,7 @@ nor a similar work has been presented to an examination committee.
 \pagestyle{scrheadings}
 
 \section{Introduction}
+\subsection{The Packet Classification Problem}
 The growth of the internet constantly poses new challenges to the producers of network equipment.
 Today's applications like Multimedia, Web and Voice over IP are dependant of a transport network (the internet) with
 high data rates, low latency, soft realtime properties and quality of service mechanisms.
@@ -154,12 +155,12 @@ Usually, this leads to an increasing size of rule sets in the respecting interne
 
 The critical points in the internet's architecture concerning performance are the stations who have to decide for each packet what to do.
 These are mostly Firewalls, Level-2-Switches and Level-3-Routers.
-In general, these machines inspect the header data of every incoming IP packet and forward it following a rule set that has been implemented before.
-These rule sets can be mostly static (e.g. in case of a small router) or very dynamic (e.g. in a large stateful firewall).
+In general, these machines inspect the header data of every incoming IP packet and forward or drop it following a rule set that has been implemented before.
+These rule sets can be mostly static (e.g. in case of a small SOHO router) or very dynamic (e.g. in a large stateful firewall).
 
 One main point in optimization therefore lies in the matching algorithms executing this process.
-Many rulesets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
-The last two fields imply the usage of TCP or UDP as transport protocol.
+Many traditional rulesets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
+The last two fields imply the usage of TCP or UDP as transport protocol, as other protocols may not know the concept of ports (e.g. ICMP). %TODO: quote RFCs
 But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.
 
 Matching algorithms become slower the more header fields they have to match.
@@ -169,27 +170,31 @@ algorithms have to be used for these fields.
 
 The best-known example for non trivial matchable fields are IP addresses, where rules are normally defined as IP prefixes.
 Prefixes in IP addresses correspond to subnets, because in IP prefixes there's always a certain amount of fixed bits at the beginning of the address
-and the bits after that are free choosable. %korrektes Englisch?
+and the bits after that are free to choose.
 
-An instance for a prefix of an IPv4 address can look as follows:
+An example for a prefix of an IPv4 address can look as follows:
 0110 1011 0001...
 This means that the first 12 bit of the address space are fixed and that the remaining 20 bits may be choosen freely.
 Now, that rule has to match packets with addresses from 0110 1011 0001 0000 0000 0000 0000 0000 up to
 0110 1011 0001 1111 1111 1111 1111 1111. %TODO: unschön? evtl umformulieren
 
 %TODO: Openflow/SDN
-Software Defined Networking is the idea to decouple the two tasks of network hardware. %quote: sdn-whitepaper 
-They are separated in two logical units: The control and the data plane.
-The control plane is used for configuring and updating the hardware, e.g. inserting new rules into a firewall.
+\subsection{OpenFlow}
+Software Defined Networking (SDN) describes the general idea to decouple the two tasks of network hardware and to introduce a new layer of abstraction in networking. %quote: sdn-whitepaper
+These networks are separated into two logical units: The control and the data plane.
+The control plane is used for configuring and updating the network hardware, e.g. inserting new rules into a firewall.
 The data plane handles the incoming traffic and acts accordingly to the objectives defined in the control plane.
 
 One popular instance of a SDN is OpenFlow.
-This project is intended to open a virtual network on real hardware for educational and research use cases.
+This project is intended to establish a virtual network system on real hardware for educational and research use cases.
 A key feature of OpenFlow is the control channel system.
 One controller has connections to all existing network hardware and can define their behaviour from a central position.
 The hardware then acts accordingly and handles the traffic as required.
 
-The main objective of this work is to implement a faster matching engine in the OpenFlow 1.0 reference implementation.
+Another key feature of SDN marks the ability to switch out the network hardware transparently.
+The abstraction layer interfaces the different systems so that the configuration on controller level can remain regardless of the hardware used.
+
+The main objective of this work is to implement a faster matching engine in the software switch of the OpenFlow 1.0 reference implementation.
 
 \section{Related Work}
 Speeding up packet classification is one of the current research topics in the computer network community.
