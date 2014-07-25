@@ -44,6 +44,8 @@
 
 #include <inttypes.h>
 
+#define UINT64_T_MAX 0xffffffffffffffff
+
 struct sw_table_jit {
     struct sw_table swt;
 
@@ -95,8 +97,6 @@ uint8_t find_leftmost_bit(uint64_t value) {
 static struct sw_flow* table_jit_lookup(struct sw_table* swt,
                                            const struct sw_flow_key* key)
 {
-    printf("Entering lookup\n");
-    fflush(stdout);
     struct sw_table_jit *tj = (struct sw_table_jit *) swt;
     
     uint64_t mac_src = 0;
@@ -121,10 +121,16 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     bv_array[10] = lookup_dimension(swt->range_borders_ip_dcsp, key->flow.nw_tos);
     bv_array[11] = lookup_dimension(swt->range_borders_ip_protocol, key->flow.nw_proto);
     
+    if (bv_array[0]->bitvector_length == 0) {
+        return NULL;
+    }
+    
     uint64_t rule_index_result = bv_array[0]->bitvector[0];
     uint32_t bitvector_subindex = 0;
     //connect all Bitvectors with AND and get result
-    for (uint32_t i = 0; i < (bv_array[0]->bitvector_length) / sizeof(uint64_t); ++i) {
+    for (uint32_t i = 0; i <= ((bv_array[0]->bitvector_length) / (sizeof(uint64_t) * 8)); ++i) {
+        printf("bop\n");
+        fflush(stdout);
         for (uint32_t j = 1; j < 12; ++j) {
             rule_index_result &= bv_array[j]->bitvector[i];
         }
@@ -133,31 +139,47 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
             bitvector_subindex = i;
             break;
         }
-        rule_index_result = bv_array[0]->bitvector[i];
+        rule_index_result = bv_array[0]->bitvector[i + 1];
     }
     
     //no match found -> return NULL flow
     if (rule_index_result == 0) {
-        printf("lookup done1\n");
-        fflush(stdout);
         return NULL;
     }
     
     //find leftmost bit in rule_index_result
-    printf("ri_result = %" PRIu64 "\n", rule_index_result);
-    fflush(stdout);
     uint32_t leftmostbit = find_leftmost_bit(rule_index_result);
     
     //ERROR! no match found
     if (leftmostbit == 255) {
-        printf("lookup done2\n");
+        printf("Lookup failed!\n");
         fflush(stdout);
         return NULL;
     }
     
+    printf("\nLookup of flow\n=============\n");
+    printf("ip_src = %d\n", key->flow.nw_src);
+    printf("ip_dst = %d\n", key->flow.nw_dst);
+    printf("port_number = %d\n", key->flow.in_port);
+    printf("vlan_id = %d\n", key->flow.dl_vlan);
+    printf("eth_type = %d\n", key->flow.dl_type);
+    printf("transport_src = %d\n", key->flow.tp_src);
+    printf("transport_dst = %d\n", key->flow.tp_dst);
+    printf("eth_src = %" PRIu64 "\n", mac_src);
+    printf("eth_dst = %" PRIu64 "\n", mac_dst);
+    printf("vlan_prio = %d\n", key->flow.dl_vlan_pcp);
+    printf("ip_dcsp = %d\n", key->flow.nw_tos);
+    printf("ip_protocol = %d\n", key->flow.nw_proto);
+    printf("=============\n");
+    printf("Result (in_port) = %" PRIu64 "\n", (bv_array[2])->bitvector[0]);
+    fflush(stdout);
+    
     //re-calculate offset in original bitvector-array
     leftmostbit += bitvector_subindex * 64;
-    printf("lookup done3, lmb = %d\n", leftmostbit);
+    printf("ri_result = %" PRIu64 "\n", rule_index_result);
+    printf("Lookup done, lmb = %d\n", leftmostbit);
+    printf("Resulting flow timestamp = %" PRIu64 "\n", (swt->flow_array[leftmostbit])->created);
+    //printf("Action: %d\n", (swt->flow_array[leftmostbit])->sf_acts->actions[0]);
     fflush(stdout);
     return swt->flow_array[leftmostbit];
 }
@@ -166,8 +188,7 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
 {
     struct sw_table_jit *tj = (struct sw_table_jit *) swt;
     uint32_t rule_index = tj->n_flows;
-    
-    printf("n_flows before loop: %d\n", tj->n_flows);
+
     fflush(stdout);
     //check if flow already exists, if yes overwrite
     for (uint32_t i = 0; i < tj->n_flows; ++i)
@@ -201,14 +222,13 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
     }
 
     //create free position in our sw_flow* array
-    for (uint32_t i = tj->n_flows + 1; i > rule_index; --i)
-    {
+    for (uint32_t i = tj->n_flows + 1; i > rule_index; --i) {
         swt->flow_array[i] = swt->flow_array[i - 1];
     }
     
     tj->n_flows++;
     swt->flow_array[rule_index] = flow;
-    printf("inserted flow at time %lld\n", (long long int)flow->created);
+    printf("\nInsert flow at time %lld\n", (long long int)flow->created);
     
     //short handle for flow struct in sw_flow
     struct flow network_flow = flow->key.flow;
@@ -229,18 +249,83 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
     uint64_t ip_dst_end = (network_flow.nw_dst & flow->key.nw_dst_mask) + (~flow->key.nw_dst_mask);
     
     // Add data to range_border structs
-    swt->range_borders_ip_src->add_rule(swt->range_borders_ip_src, ip_src_start, ip_src_end + 1, rule_index);
-    swt->range_borders_ip_dst->add_rule(swt->range_borders_ip_dst, ip_dst_start, ip_dst_end + 1, rule_index);
-    swt->range_borders_port_number->add_rule(swt->range_borders_port_number, network_flow.in_port, network_flow.in_port + 1, rule_index);
-    swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, network_flow.dl_vlan, network_flow.dl_vlan + 1, rule_index);
-    swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, network_flow.dl_type, network_flow.dl_type + 1, rule_index);
-    swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, network_flow.tp_src, network_flow.tp_src + 1, rule_index);
-    swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, network_flow.tp_dst, network_flow.tp_dst + 1, rule_index);
-    swt->range_borders_eth_src->add_rule(swt->range_borders_eth_src, mac_src, mac_src + 1, rule_index);
-    swt->range_borders_eth_dst->add_rule(swt->range_borders_eth_dst, mac_dst, mac_dst + 1, rule_index);
-    swt->range_borders_vlan_prio->add_rule(swt->range_borders_vlan_prio, network_flow.dl_vlan_pcp, network_flow.dl_vlan_pcp + 1, rule_index);
-    swt->range_borders_ip_dcsp->add_rule(swt->range_borders_ip_dcsp, network_flow.nw_tos, network_flow.nw_tos + 1, rule_index);
-    swt->range_borders_ip_protocol->add_rule(swt->range_borders_ip_protocol, network_flow.nw_proto, network_flow.nw_proto + 1, rule_index);
+    /*swt->range_borders_ip_src->add_rule(swt->range_borders_ip_src, ip_src_start, ip_src_end + 1, rule_index);
+    swt->range_borders_ip_dst->add_rule(swt->range_borders_ip_dst, ip_dst_start, ip_dst_end + 1, rule_index);*/
+    
+    //HACK!!!!
+    //TODO: remove HACK!
+    swt->range_borders_ip_src->add_rule(swt->range_borders_ip_src, 0, UINT64_T_MAX, rule_index);
+    swt->range_borders_ip_dst->add_rule(swt->range_borders_ip_dst, 0, UINT64_T_MAX, rule_index);
+    
+    if ((flow->key.wildcards & (1 << 0)) == 0)
+        swt->range_borders_port_number->add_rule(swt->range_borders_port_number, network_flow.in_port, network_flow.in_port + 1, rule_index);
+    else
+        swt->range_borders_port_number->add_rule(swt->range_borders_port_number, network_flow.in_port, UINT64_T_MAX, rule_index);
+    
+    if ((flow->key.wildcards & (1 << 1)) == 0)
+        swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, network_flow.dl_vlan, network_flow.dl_vlan + 1, rule_index);
+    else
+        swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, network_flow.dl_vlan, UINT64_T_MAX, rule_index);
+    
+    if ((flow->key.wildcards & (1 << 4)) == 0)
+        swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, network_flow.dl_type, network_flow.dl_type + 1, rule_index);
+    else
+        swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, network_flow.dl_type, UINT64_T_MAX, rule_index);
+    
+    if ((flow->key.wildcards & (1 << 6)) == 0)
+        swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, network_flow.tp_src, network_flow.tp_src + 1, rule_index);
+    else
+        swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, network_flow.tp_src, UINT64_T_MAX, rule_index);
+        
+    if ((flow->key.wildcards & (1 << 7)) == 0)
+        swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, network_flow.tp_dst, network_flow.tp_dst + 1, rule_index);
+    else
+        swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, network_flow.tp_dst, UINT64_T_MAX, rule_index);
+        
+    if ((flow->key.wildcards & (1 << 2)) == 0)
+        swt->range_borders_eth_src->add_rule(swt->range_borders_eth_src, mac_src, mac_src + 1, rule_index);
+    else
+        swt->range_borders_eth_src->add_rule(swt->range_borders_eth_src, mac_src, UINT64_T_MAX, rule_index);
+        
+    if ((flow->key.wildcards & (1 << 3)) == 0)
+        swt->range_borders_eth_dst->add_rule(swt->range_borders_eth_dst, mac_dst, mac_dst + 1, rule_index);
+    else
+        swt->range_borders_eth_dst->add_rule(swt->range_borders_eth_dst, mac_dst, UINT64_T_MAX, rule_index);
+    
+    if ((flow->key.wildcards & (1 << 20)) == 0)
+        swt->range_borders_vlan_prio->add_rule(swt->range_borders_vlan_prio, network_flow.dl_vlan_pcp, network_flow.dl_vlan_pcp + 1, rule_index);
+    else
+        swt->range_borders_vlan_prio->add_rule(swt->range_borders_vlan_prio, network_flow.dl_vlan_pcp, UINT64_T_MAX, rule_index);
+        
+    if ((flow->key.wildcards & (1 << 21)) == 0)
+        swt->range_borders_ip_dcsp->add_rule(swt->range_borders_ip_dcsp, network_flow.nw_tos, network_flow.nw_tos + 1, rule_index);
+    else
+        swt->range_borders_ip_dcsp->add_rule(swt->range_borders_ip_dcsp, network_flow.nw_tos, UINT64_T_MAX, rule_index);
+        
+    if ((flow->key.wildcards & (1 << 5)) == 0)
+        swt->range_borders_ip_protocol->add_rule(swt->range_borders_ip_protocol, network_flow.nw_proto, network_flow.nw_proto + 1, rule_index);
+    else
+        swt->range_borders_ip_protocol->add_rule(swt->range_borders_ip_protocol, network_flow.nw_proto, UINT64_T_MAX, rule_index);
+        
+    printf("\nAdding flow:\n++++++++++++\n");
+    printf("wildcards = %d\n", flow->key.wildcards);
+    printf("ip_src = %d\n", network_flow.nw_src);
+    printf("wildcard = %d\n", flow->key.nw_src_mask);
+    printf("ip_src_start = %" PRIu64 "\n", ip_src_start);
+    printf("ip_src_end = %" PRIu64 "\n", ip_src_end);
+    printf("ip_dst_start = %" PRIu64 "\n", ip_dst_start);
+    printf("ip_dst_end = %" PRIu64 "\n", ip_dst_end);
+    printf("port_number = %d\n", network_flow.in_port);
+    printf("vlan_id = %d\n", network_flow.dl_vlan);
+    printf("eth_type = %d\n", network_flow.dl_type);
+    printf("transport_src = %d\n", network_flow.tp_src);
+    printf("transport_dst = %d\n", network_flow.tp_dst);
+    printf("eth_src = %" PRIu64 "\n", mac_src);
+    printf("eth_dst = %" PRIu64 "\n", mac_dst);
+    printf("vlan_prio = %d\n", network_flow.dl_vlan_pcp);
+    printf("ip_dcsp = %d\n", network_flow.nw_tos);
+    printf("ip_protocol = %d\n++++++++++++\n", network_flow.nw_proto);
+    fflush(stdout);
     
     //SUCCESS
     return 1;
@@ -254,8 +339,7 @@ static int table_jit_modify(struct sw_table *swt,
     struct sw_flow *flow;
     unsigned int count = 0;
 
-    for (uint32_t i = 0; i < tj->n_flows; ++i)
-    {
+    for (uint32_t i = 0; i < tj->n_flows; ++i) {
         flow = swt->flow_array[i];
         if (flow_matches_desc(&flow->key, key, strict)
                 && (!strict || (flow->priority == priority))) {
@@ -272,6 +356,8 @@ static int table_jit_has_conflict(struct sw_table *swt,
                                      const struct sw_flow_key *key,
                                      uint16_t priority, int strict)
 {
+    printf("JIT_has_conflict called\n");
+    fflush(stdout);
     /*struct sw_table_linear *tl = (struct sw_table_linear *) swt;
     struct sw_flow *flow;
 
