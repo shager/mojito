@@ -42,6 +42,7 @@
 #include "datapath.h"
 #include "bv_types.h"
 
+#include <arpa/inet.h> /*For ntohl etc.*/
 #include <inttypes.h>
 
 #define UINT64_T_MAX 0xffffffffffffffff
@@ -73,14 +74,15 @@ struct sw_table_jit {
 
 };
 
-Bitvector* lookup_dimension(struct Range_borders* rb_dimension, uint64_t value)
+uint8_t lookup_dimension(struct Range_borders* rb_dimension, Bitvector** result_bv, uint64_t value)
 {
     Bitvector* bv = bitvector_ctor();
-    uint8_t result = rb_dimension->match_packet(rb_dimension, &bv, value);
-    if (result == 0) {
-        return bv;
+    uint8_t retval = rb_dimension->match_packet(rb_dimension, &bv, value);
+    if (retval == 0) {
+        *result_bv = bv;
+        return retval;
     }
-    return NULL;
+    return 1;
 }
 
 uint8_t find_leftmost_bit(uint64_t value) {
@@ -101,25 +103,30 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     
     uint64_t mac_src = 0;
     uint64_t mac_dst = 0;
-    for (uint32_t i = 0; i < 6; i++)
+    for (int i = 5; i >= 0; i--)
     {
-        mac_src += (((uint64_t)(key->flow.dl_src[i])) << (i * 8));
-        mac_dst += (((uint64_t)(key->flow.dl_dst[i])) << (i * 8));
+        mac_src += (((uint64_t)(key->flow.dl_src[i])) << ((5 - i) * 8));
+        mac_dst += (((uint64_t)(key->flow.dl_dst[i])) << ((5 - i) * 8));
     }
     
+    uint8_t tmp = 0;
     Bitvector* bv_array[12];
-    bv_array[0] = lookup_dimension(swt->range_borders_ip_src, key->flow.nw_src);
-    bv_array[1] = lookup_dimension(swt->range_borders_ip_dst, key->flow.nw_dst);
-    bv_array[2] = lookup_dimension(swt->range_borders_port_number, key->flow.in_port);
-    bv_array[3] = lookup_dimension(swt->range_borders_vlan_id, key->flow.dl_vlan);
-    bv_array[4] = lookup_dimension(swt->range_borders_eth_type, key->flow.dl_type);
-    bv_array[5] = lookup_dimension(swt->range_borders_transport_src, key->flow.tp_src);
-    bv_array[6] = lookup_dimension(swt->range_borders_transport_dst, key->flow.tp_dst);
-    bv_array[7] = lookup_dimension(swt->range_borders_eth_src, mac_src);
-    bv_array[8] = lookup_dimension(swt->range_borders_eth_dst, mac_dst);
-    bv_array[9] = lookup_dimension(swt->range_borders_vlan_prio, key->flow.dl_vlan_pcp);
-    bv_array[10] = lookup_dimension(swt->range_borders_ip_dcsp, key->flow.nw_tos);
-    bv_array[11] = lookup_dimension(swt->range_borders_ip_protocol, key->flow.nw_proto);
+    tmp += lookup_dimension(swt->range_borders_ip_src, &(bv_array[0]), ntohl(key->flow.nw_src));
+    tmp += lookup_dimension(swt->range_borders_ip_dst, &(bv_array[1]), ntohl(key->flow.nw_dst));
+    tmp += lookup_dimension(swt->range_borders_port_number, &(bv_array[2]), ntohs(key->flow.in_port));
+    tmp += lookup_dimension(swt->range_borders_vlan_id, &(bv_array[3]), ntohs(key->flow.dl_vlan));
+    tmp += lookup_dimension(swt->range_borders_eth_type, &(bv_array[4]), ntohs(key->flow.dl_type));
+    tmp += lookup_dimension(swt->range_borders_transport_src, &(bv_array[5]), ntohs(key->flow.tp_src));
+    tmp += lookup_dimension(swt->range_borders_transport_dst, &(bv_array[6]), ntohs(key->flow.tp_dst));
+    tmp += lookup_dimension(swt->range_borders_eth_src, &(bv_array[7]), mac_src);
+    tmp += lookup_dimension(swt->range_borders_eth_dst, &(bv_array[8]), mac_dst);
+    tmp += lookup_dimension(swt->range_borders_vlan_prio, &(bv_array[9]), key->flow.dl_vlan_pcp);
+    tmp += lookup_dimension(swt->range_borders_ip_dcsp, &(bv_array[10]), key->flow.nw_tos);
+    tmp += lookup_dimension(swt->range_borders_ip_protocol, &(bv_array[11]), key->flow.nw_proto);
+
+    // if a matching error occured return NULL flow
+    if (tmp != 0)
+        return NULL;
     
     if (bv_array[0]->bitvector_length == 0) {
         return NULL;
@@ -129,7 +136,6 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     uint32_t bitvector_subindex = 0;
     //connect all Bitvectors with AND and get result
     for (uint32_t i = 0; i <= ((bv_array[0]->bitvector_length) / (sizeof(uint64_t) * 8)); ++i) {
-        printf("bop\n");
         fflush(stdout);
         for (uint32_t j = 1; j < 12; ++j) {
             rule_index_result &= bv_array[j]->bitvector[i];
@@ -143,9 +149,8 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     }
     
     //no match found -> return NULL flow
-    if (rule_index_result == 0) {
+    if (rule_index_result == 0)
         return NULL;
-    }
     
     //find leftmost bit in rule_index_result
     uint32_t leftmostbit = find_leftmost_bit(rule_index_result);
@@ -162,7 +167,7 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     printf("ip_dst = %d\n", key->flow.nw_dst);
     printf("port_number = %d\n", key->flow.in_port);
     printf("vlan_id = %d\n", key->flow.dl_vlan);
-    printf("eth_type = %d\n", key->flow.dl_type);
+    printf("eth_type = %d\n", ntohs(key->flow.dl_type));
     printf("transport_src = %d\n", key->flow.tp_src);
     printf("transport_dst = %d\n", key->flow.tp_dst);
     printf("eth_src = %" PRIu64 "\n", mac_src);
@@ -236,51 +241,46 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
     /* Get MAC addresses in one int */
     uint64_t mac_src = 0;
     uint64_t mac_dst = 0;
-    for (uint32_t i = 0; i < 6; i++)
+    for (int i = 5; i >= 0; i--)
     {
-        mac_src += (((uint64_t)(network_flow.dl_src[i])) << (i * 8));
-        mac_dst += (((uint64_t)(network_flow.dl_dst[i])) << (i * 8));
+        mac_src += (((uint64_t)(network_flow.dl_src[i])) << ((5 - i) * 8));
+        mac_dst += (((uint64_t)(network_flow.dl_dst[i])) << ((5 - i) * 8));
     }
     
     /* Get IP address start and end points */
-    uint64_t ip_src_start = network_flow.nw_src & flow->key.nw_src_mask;
-    uint64_t ip_dst_start = network_flow.nw_dst & flow->key.nw_dst_mask;
-    uint64_t ip_src_end = (network_flow.nw_src & flow->key.nw_src_mask) + (~flow->key.nw_src_mask);
-    uint64_t ip_dst_end = (network_flow.nw_dst & flow->key.nw_dst_mask) + (~flow->key.nw_dst_mask);
+    uint64_t ip_src_start = ntohl(network_flow.nw_src) & ntohl(flow->key.nw_src_mask);
+    uint64_t ip_dst_start = ntohl(network_flow.nw_dst) & ntohl(flow->key.nw_dst_mask);
+    uint64_t ip_src_end = (ntohl(network_flow.nw_src) & ntohl(flow->key.nw_src_mask)) + (~ntohl(flow->key.nw_src_mask));
+    uint64_t ip_dst_end = (ntohl(network_flow.nw_dst) & ntohl(flow->key.nw_dst_mask)) + (~ntohl(flow->key.nw_dst_mask));
     
     // Add data to range_border structs
-    /*swt->range_borders_ip_src->add_rule(swt->range_borders_ip_src, ip_src_start, ip_src_end + 1, rule_index);
-    swt->range_borders_ip_dst->add_rule(swt->range_borders_ip_dst, ip_dst_start, ip_dst_end + 1, rule_index);*/
-    
-    //HACK!!!!
-    //TODO: remove HACK!
-    swt->range_borders_ip_src->add_rule(swt->range_borders_ip_src, 0, UINT64_T_MAX, rule_index);
-    swt->range_borders_ip_dst->add_rule(swt->range_borders_ip_dst, 0, UINT64_T_MAX, rule_index);
+    swt->range_borders_ip_src->add_rule(swt->range_borders_ip_src, ip_src_start, ip_src_end + 1, rule_index);
+    swt->range_borders_ip_dst->add_rule(swt->range_borders_ip_dst, ip_dst_start, ip_dst_end + 1, rule_index);
     
     if ((flow->key.wildcards & (1 << 0)) == 0)
-        swt->range_borders_port_number->add_rule(swt->range_borders_port_number, network_flow.in_port, network_flow.in_port + 1, rule_index);
+        swt->range_borders_port_number->add_rule(swt->range_borders_port_number, ntohs(network_flow.in_port), ntohs(network_flow.in_port) + 1, rule_index);
     else
-        swt->range_borders_port_number->add_rule(swt->range_borders_port_number, network_flow.in_port, UINT64_T_MAX, rule_index);
+        swt->range_borders_port_number->add_rule(swt->range_borders_port_number, ntohs(network_flow.in_port), UINT64_T_MAX, rule_index);
     
     if ((flow->key.wildcards & (1 << 1)) == 0)
-        swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, network_flow.dl_vlan, network_flow.dl_vlan + 1, rule_index);
+        swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, ntohs(network_flow.dl_vlan), ntohs(network_flow.dl_vlan) + 1, rule_index);
     else
-        swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, network_flow.dl_vlan, UINT64_T_MAX, rule_index);
+        swt->range_borders_vlan_id->add_rule(swt->range_borders_vlan_id, ntohs(network_flow.dl_vlan), UINT64_T_MAX, rule_index);
     
     if ((flow->key.wildcards & (1 << 4)) == 0)
-        swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, network_flow.dl_type, network_flow.dl_type + 1, rule_index);
+        swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, ntohs(network_flow.dl_type), ntohs(network_flow.dl_type) + 1, rule_index);
     else
-        swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, network_flow.dl_type, UINT64_T_MAX, rule_index);
+        swt->range_borders_eth_type->add_rule(swt->range_borders_eth_type, ntohs(network_flow.dl_type), UINT64_T_MAX, rule_index);
     
     if ((flow->key.wildcards & (1 << 6)) == 0)
-        swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, network_flow.tp_src, network_flow.tp_src + 1, rule_index);
+        swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, ntohs(network_flow.tp_src), ntohs(network_flow.tp_src) + 1, rule_index);
     else
-        swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, network_flow.tp_src, UINT64_T_MAX, rule_index);
+        swt->range_borders_transport_src->add_rule(swt->range_borders_transport_src, ntohs(network_flow.tp_src), UINT64_T_MAX, rule_index);
         
     if ((flow->key.wildcards & (1 << 7)) == 0)
-        swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, network_flow.tp_dst, network_flow.tp_dst + 1, rule_index);
+        swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, ntohs(network_flow.tp_dst), ntohs(network_flow.tp_dst) + 1, rule_index);
     else
-        swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, network_flow.tp_dst, UINT64_T_MAX, rule_index);
+        swt->range_borders_transport_dst->add_rule(swt->range_borders_transport_dst, ntohs(network_flow.tp_dst), UINT64_T_MAX, rule_index);
         
     if ((flow->key.wildcards & (1 << 2)) == 0)
         swt->range_borders_eth_src->add_rule(swt->range_borders_eth_src, mac_src, mac_src + 1, rule_index);
@@ -309,17 +309,15 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
         
     printf("\nAdding flow:\n++++++++++++\n");
     printf("wildcards = %d\n", flow->key.wildcards);
-    printf("ip_src = %d\n", network_flow.nw_src);
-    printf("wildcard = %d\n", flow->key.nw_src_mask);
     printf("ip_src_start = %" PRIu64 "\n", ip_src_start);
     printf("ip_src_end = %" PRIu64 "\n", ip_src_end);
     printf("ip_dst_start = %" PRIu64 "\n", ip_dst_start);
     printf("ip_dst_end = %" PRIu64 "\n", ip_dst_end);
-    printf("port_number = %d\n", network_flow.in_port);
-    printf("vlan_id = %d\n", network_flow.dl_vlan);
-    printf("eth_type = %d\n", network_flow.dl_type);
-    printf("transport_src = %d\n", network_flow.tp_src);
-    printf("transport_dst = %d\n", network_flow.tp_dst);
+    printf("port_number = %d\n", ntohs(network_flow.in_port));
+    printf("vlan_id = %d\n", ntohs(network_flow.dl_vlan));
+    printf("eth_type = %d\n", ntohs(network_flow.dl_type));
+    printf("transport_src = %d\n", ntohs(network_flow.tp_src));
+    printf("transport_dst = %d\n", ntohs(network_flow.tp_dst));
     printf("eth_src = %" PRIu64 "\n", mac_src);
     printf("eth_dst = %" PRIu64 "\n", mac_dst);
     printf("vlan_prio = %d\n", network_flow.dl_vlan_pcp);

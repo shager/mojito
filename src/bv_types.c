@@ -262,7 +262,7 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
     return 0;
 }
 
-//TODO: return value in error case
+//TODO: do we need tmp???
 // Match a header field value of an incoming packet
 uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, uint64_t header_value) {
     Bitvector* tmp = bitvector_ctor();
@@ -274,7 +274,7 @@ uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, uint64_t header
     
     // in case of a smaller header value than the smallest delimiter_value
     if (relevant_border == 0 && this->range_borders[0].delimiter_value != header_value) {
-        result = NULL;
+        *result = tmp;
         return 1;
     }
     
