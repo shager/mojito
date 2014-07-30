@@ -8,6 +8,7 @@ import random, subprocess, socket, struct
 #  - number of connected hosts (assumption: IP addresses are 10.0.0.x, MAC is 00:00:00:00:00:xx)
 #  - target: send all traffic to one host
 #  - random seed
+#  - rules_db to use (optional)
 
 def int_to_ip(addr):
     return socket.inet_ntoa(struct.pack("!I", addr))
@@ -52,6 +53,7 @@ nhosts = 0
 random_seed = 0
 target = 0
 sender = 0
+database = ""
 
 parser = OptionParser()
 parser.add_option("-n", "--nrules", dest="nrules", default = 1000,
@@ -64,6 +66,8 @@ parser.add_option("-t", "--target", dest="target", default = -1,
                   help = "target for traffic", metavar = "TARGET NUMBER")
 parser.add_option("-s", "--sender", dest="sender", default = -1,
                   help = "sender for traffic", metavar = "SENDER NUMBER")
+parser.add_option("-d", "--db", dest="database", default = "",
+                  help = "database with rules", metavar = "FILE")
 
 (options, args) = parser.parse_args()
 nrules = int(options.nrules)
@@ -71,6 +75,7 @@ nhosts = int(options.nhosts)
 random_seed = int(options.random_seed)
 target = int(options.target)
 sender = int(options.sender)
+database = options.database
 
 # initialize PRNG
 random.seed(random_seed)
@@ -82,25 +87,43 @@ subprocess.call("/usr/local/bin/dpctl" + " add-flow" + " tcp:127.0.0.1:6634 " + 
 # generate rule set from input
 rule_set = [] #empty list
 
-for number in range(0, nrules):
-    if sender == -1:
-        host = int((random.random() * nhosts) % nhosts) + 1
-    else:
-        host = int(sender)
-    if target == -1:
-        remote = int((random.random() * nhosts) % nhosts) + 1
-    else:
-        remote = int(target)
-    src_ip = ip_to_int("10.0.0." + str(host))
-    dst_ip = ip_to_int("10.0.0." + str(remote))
-    src_port = int(random.random() * 65535)
-    dst_port = int(random.random() * 65535)
-    in_port = str(host)
-    protocol = 17 #udp
-    cur_entry = Rule(src_ip, dst_ip, src_port, dst_port, protocol, in_port, "all")
-    cur_entry.insert_rule()
-    cur_entry.rule_to_file("rules_db")
-    rule_set.append(cur_entry)
+if database == "":
+    for number in range(0, nrules):
+        if sender == -1:
+            host = int((random.random() * nhosts) % nhosts) + 1
+        else:
+            host = int(sender)
+        if target == -1:
+            remote = int((random.random() * nhosts) % nhosts) + 1
+        else:
+            remote = int(target)
+        src_ip = ip_to_int("10.0.0." + str(host))
+        dst_ip = ip_to_int("10.0.0." + str(remote))
+        src_port = int(random.random() * 65535)
+        dst_port = int(random.random() * 65535)
+        in_port = str(host)
+        protocol = 17 #udp
+        cur_entry = Rule(src_ip, dst_ip, src_port, dst_port, protocol, in_port, "all")
+        cur_entry.insert_rule()
+        cur_entry.rule_to_file("rules_db")
+        rule_set.append(cur_entry)
 
-subprocess.call("../trace_generator/trace_generator 1 0.1 2 rules_db", shell=True)
+    subprocess.call("../trace_generator/trace_generator 1 0.1 7 rules_db", shell=True)
+else:
+    with open(database, "r") as f:
+        for entry in f:
+            src_ip = entry.split("\t")[0]
+            src_ip = src_ip[1:]
+            src_ip = src_ip.split("/")[0]
+            dst_ip = entry.split("\t")[1]
+            dst_ip = dst_ip.split("/")[0]
+            src_port = entry.split("\t")[2]
+            src_port = src_port.split(" ")[0]
+            dst_port = entry.split("\t")[3]
+            dst_port = dst_port.split(" ")[0]
+            in_port = src_ip.split(".")[3]
+            protocol = 17
+            cur_entry = Rule(ip_to_int(src_ip), ip_to_int(dst_ip), src_port, dst_port, protocol, in_port, "all")
+            cur_entry.insert_rule()
+
 print "done"

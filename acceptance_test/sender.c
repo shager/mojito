@@ -203,6 +203,7 @@ main (int argc, char **argv)
     size_t packet_count;
     for (packet_count = 0; packet_count < input->num_packets; ++packet_count) {
       //strcpy (dst_ip, argv[1]);
+      usleep(50);
 
       // UDP data
       datalen = 0;
