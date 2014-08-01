@@ -163,13 +163,13 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     }
     
     printf("\nLookup of flow\n=============\n");
-    printf("ip_src = %d\n", key->flow.nw_src);
-    printf("ip_dst = %d\n", key->flow.nw_dst);
-    printf("port_number = %d\n", key->flow.in_port);
-    printf("vlan_id = %d\n", key->flow.dl_vlan);
+    printf("ip_src = %d\n", ntohl(key->flow.nw_src));
+    printf("ip_dst = %d\n", ntohl(key->flow.nw_dst));
+    printf("port_number = %d\n", ntohs(key->flow.in_port));
+    printf("vlan_id = %d\n", ntohs(key->flow.dl_vlan));
     printf("eth_type = %d\n", ntohs(key->flow.dl_type));
-    printf("transport_src = %d\n", key->flow.tp_src);
-    printf("transport_dst = %d\n", key->flow.tp_dst);
+    printf("transport_src = %d\n", ntohs(key->flow.tp_src));
+    printf("transport_dst = %d\n", ntohs(key->flow.tp_dst));
     printf("eth_src = %" PRIu64 "\n", mac_src);
     printf("eth_dst = %" PRIu64 "\n", mac_dst);
     printf("vlan_prio = %d\n", key->flow.dl_vlan_pcp);

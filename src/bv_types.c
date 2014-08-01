@@ -262,11 +262,9 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
     return 0;
 }
 
-//TODO: do we need tmp???
 // Match a header field value of an incoming packet
-uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, uint64_t header_value) {
-    Bitvector* tmp = bitvector_ctor();
-    int relevant_border = find_free_position(this, header_value);
+uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, const uint64_t header_value) {
+    const int relevant_border = find_free_position(this, header_value);
     /* range_borders[relevant_border] either points to
      * a) a value where delimiter_value equals header_value
      * b) the entry right of this value
@@ -274,21 +272,18 @@ uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, uint64_t header
     
     // in case of a smaller header value than the smallest delimiter_value
     if (relevant_border == 0 && this->range_borders[0].delimiter_value != header_value) {
-        *result = tmp;
+        *result = bitvector_ctor();
         return 1;
     }
     
     // in case of an exact hit on a delmiter_value return that (a)
     if (header_value == this->range_borders[relevant_border].delimiter_value) {
-        tmp = this->range_borders[relevant_border].bitvector;
-        *result = tmp;
+        *result = this->range_borders[relevant_border].bitvector;
         return 0;
     }
     
     // case (b)
-    --relevant_border;
-    tmp = this->range_borders[relevant_border].bitvector;
-    *result = tmp;
+    *result = this->range_borders[relevant_border - 1].bitvector;
     return 0;
 }
 
