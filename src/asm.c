@@ -169,7 +169,7 @@ uint32_t construct_node(uint64_t* values_arr, uint32_t values_arr_length, uint32
         jb(&tmp, &memory_len, 0x7); //offset = len(mov) + len(pop_ret)
         
         //return values_arr[low_index]
-        mov(&tmp, &memory_len, (uint32_t)values_arr[low_index]);
+        mov(&tmp, &memory_len, low_index);
         pop_ret(&tmp, &memory_len);
         
         if (low_index == 0) {
@@ -178,7 +178,7 @@ uint32_t construct_node(uint64_t* values_arr, uint32_t values_arr_length, uint32
             pop_ret(&tmp, &memory_len);
         } else {
             //return element left of current one
-            mov(&tmp, &memory_len, (uint32_t)values_arr[low_index - 1]);
+            mov(&tmp, &memory_len, low_index);
             pop_ret(&tmp, &memory_len);
         }
         
@@ -207,7 +207,7 @@ uint32_t construct_node(uint64_t* values_arr, uint32_t values_arr_length, uint32
     // Ja RIGHT
     jae(&tmp, &memory_len, 5 + 2 + left_block); //len = 3, offset = len(mov) + len(pop_ret)
     // return values_arr[mid_index]
-    mov(&tmp, &memory_len, (uint32_t)values_arr[mid_index]);
+    mov(&tmp, &memory_len, mid_index);
     pop_ret(&tmp, &memory_len);
     append_to_array(&tmp, &memory_len, l_mem, left_block); //LEFT
     append_to_array(&tmp, &memory_len, r_mem, right_block); //RIGHT

@@ -379,14 +379,14 @@ uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, const uint64_t 
 
 // JIT search
 uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, const uint64_t header_value) {
-    const int lookup_result = this->jit_lookup(header_value);
+    const int relevant_border = this->jit_lookup(header_value);
     
     //filter out case where 0th element is returned, but header_value is smaller than that element
-    if (lookup_result == this->range_borders[0].delimiter_value && lookup_result > header_value) {
+    if (relevant_border == 0 && this->range_borders[0].delimiter_value != header_value) {
         *result = bitvector_ctor();
         return 1;
     }
-    *result = 
+    *result = this->range_borders[relevant_border].bitvector;
     return 0;
 }
 
