@@ -43,6 +43,7 @@ typedef struct Range_borders {
     
     //JIT lookup function
     uint32_t (*jit_lookup)(uint64_t);
+    uint32_t jit_lookup_size;
 } Range_borders;
 
 Range_borders* range_borders_ctor();
@@ -52,8 +53,10 @@ int Rb_insert_element(Range_borders* this, Delimiter* new_element);
 int Rb_insert_element_at_index(Range_borders* this, Delimiter* new_element, uint32_t index);
 int Rb_delete_element(Range_borders* this, uint32_t index);
 int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index);
+int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index);
 int64_t Rb_find_element(Range_borders* this, uint32_t value);
 uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, uint64_t header_value);
+uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, uint64_t header_value);
 
 int64_t binary_search(Range_borders* this, uint32_t value, uint32_t lower, uint32_t upper);
 uint32_t find_free_position(Range_borders* this, uint64_t target);

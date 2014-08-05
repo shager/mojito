@@ -4,6 +4,9 @@
 #include "asm.h"
 #include "bv_types.h"
 
+//TODO: remove (needed for sleep())
+#include <unistd.h>
+
 Bitvector* bitvector_ctor() {
     Bitvector* object = (Bitvector*) calloc(1, sizeof(Bitvector));
     if (object == NULL)
@@ -102,9 +105,20 @@ Range_borders* range_borders_ctor() {
     object->insert_element = Rb_insert_element;
     object->insert_element_at_index = Rb_insert_element_at_index;
     object->delete_element = Rb_delete_element;
-    object->add_rule = Rb_add_rule;
+    object->add_rule = Rb_add_rule_jit;
     object->find_element = Rb_find_element;
-    object->match_packet = Rb_match_packet;
+    object->match_packet = Rb_match_packet_jit;
+
+    // This section has to be added in order to create some executable
+    // because OpenFlow makes lookups at startup
+    char* code = NULL;
+    uint64_t tmp_array[1] = {0};
+    uint32_t size = construct_node(tmp_array, 1, 0, 0, &code);
+    void* mem = mmap(NULL, size, PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memcpy(mem, code, size);
+    free(code);
+    object->jit_lookup = mem;
+    object->jit_lookup_size = size;
     
     return object;
 }
@@ -115,6 +129,7 @@ void range_borders_dtor(Range_borders* this) {
     }
     free(this->range_borders);
     free(this);
+    munmap(this->jit_lookup, this->jit_lookup_size);
 }
 
 // Append one element to the array
@@ -335,8 +350,8 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     
     /*
      * Build JIT code:
-     * Get the delimiter_value s in an array and then construct JIT
-     */ 
+     * Get the delimiter_values in an array and then construct JIT
+     */
     uint64_t* delim_array = (uint64_t*)malloc((this->range_borders_current) * sizeof(uint64_t));
     for (int i = 0; i < this->range_borders_current; i++) {
         delim_array[i] = this->range_borders[i].delimiter_value;
@@ -348,7 +363,7 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     memcpy(mem, code, size);
     free(code);
     this->jit_lookup = mem;
-    
+    this->jit_lookup_size = size;
     return 0;
 }
 
@@ -382,7 +397,7 @@ uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, const uint6
     const int relevant_border = this->jit_lookup(header_value);
     
     //filter out case where 0th element is returned, but header_value is smaller than that element
-    if (relevant_border == 0 && this->range_borders[0].delimiter_value != header_value) {
+    if (relevant_border == 0 && this->range_borders[0].delimiter_value > header_value) {
         *result = bitvector_ctor();
         return 1;
     }
