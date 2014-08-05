@@ -235,10 +235,39 @@ However, that idea requires to reorganize the desired rule set and makes updatin
 In case of high-frequent updates this strategy will hit its limitations, as the optimization steps often require the consideration of the entire rule set and not only the updated part.
 
 \section{The Bitvector Algorithm}
+\secton{General Description}
 The bitvector algorithm \cite{bv} is an efficient solution to the packet classification problem, which explained in the introduction section.
 This algorithm is designed for matching multi-dimensional header data in a short time.
 The basic idea of this algorithm is to think of the ruleset as a set of multi-dimensional hypercubes.
-Each header field represents one dimension in this geometric object.
+Each header field represents one dimension in this geometric object, so that every hypercube (which represents exactly one rule) has as many dimensions as the packet matching engine is operating on.
+The extent of one rule in one dimension is therefore an interval between two integers.
+They are determined by projecting the hypercube onto the relevant dimension.
+If cubes (and their respective rules) are overlapping, one point on the dimension can be the target of multiple cubes' projections. 
+This property leads to a model, where for any given point in a matching dimension, there is a set of cubes (and therefore rules) that are projected on intervals containing this point.
+
+If there are no matching rules for a point there is no cube projecting an interval to the relevant dimension.
+
+The bitvector algorithm collects these projected rules for every dimension.
+After that, the edges of the rules' intervals are determined.
+Every edge then stores a vector of bits with $n$ bits length.
+For each original rule $r$ in the ruleset with $n$ rules this bit vector sotres a $1$ iff $r$ is projected on the interval beginning at the current edge.
+If $r$ is not projected on the current interval, a $0$ bit is stored.
+This construction is done in every dimension for every edge.
+
+\subsection{Lookup}
+When looking up a packet with the bitvector algorithm, one has to determine a point to look up in every matching dimension.
+These points are header data, for example one point is the source IP address, another one is the destination IP address or the VLAN ID.
+When all relevant points are determined the lookup process works as follows:
+Firstly, there is a search for the target point in every dimension.
+In this implementation, binary search returns the nearest left edge (constructed when inserting the rules) of the search space.
+This edge contains the bitvector with $n$ bits length, where $n$ is the size of the ruleset.
+
+Secondly, all bitvectors from all dimensions are joined by a bitwise AND.
+The resulting vector then indicates by a $1$ at position $p$ that the packet has matched rule $p$.
+Generally, there can be one or more matching rules, for example when default rules exist, that match every packet.
+In order to determine the highest priority matching rule, the resulting bitvector is then scaned for the leftmost set 1-bit.
+The index of this bit in the bitvector then determines the best matching rule in the ruleset.
+After that, the actions defined in the rule can be executed by the network device and the next packet can be matched.
 
 \newpage
 \addcontentsline{toc}{section}{References}
