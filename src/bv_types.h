@@ -40,6 +40,9 @@ typedef struct Range_borders {
     int (*add_rule)(struct Range_borders*, uint64_t, uint64_t, uint32_t);
     int64_t (*find_element)(struct Range_borders*, uint32_t);
     uint8_t (*match_packet)(struct Range_borders*, Bitvector**, uint64_t);
+    
+    //JIT lookup function
+    uint32_t (*jit_lookup)(uint64_t);
 } Range_borders;
 
 Range_borders* range_borders_ctor();

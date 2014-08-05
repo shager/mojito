@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include "asm.h"
 #include "bv_types.h"
 
 Bitvector* bitvector_ctor() {
@@ -71,7 +72,6 @@ int Bv_delete_rule_from_position(Bitvector* this, uint32_t position) {
 }
 
 // merges Bitvectors first and second into second
-//TODO: Test!
 int Bv_merge_bitvectors(Bitvector* first, Bitvector* second) {
     const uint8_t stepsize = (sizeof(uint64_t) * 8);
     // check for equal length
@@ -262,6 +262,96 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
     return 0;
 }
 
+// Insert a new rule into the JIT routing table
+int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index) {
+    int position_begin = find_free_position(this, begin_index);
+    
+    for (int i = 0; i < position_begin; ++i) {
+        this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 0);
+    }
+    
+    // insert new range_border entry, if it doesn't exist
+    if (begin_index == this->range_borders[position_begin].delimiter_value
+        && this->range_borders[position_begin].bitvector->bitvector_length != 0) { //edgecase: first insertion!
+        //printf("Reuse old rb entry (position_begin)\n");
+        this->range_borders[position_begin].bitvector->insert_rule_at_position(this->range_borders[position_begin].bitvector, rule_index, 1);
+    } else {
+        //printf("creating new borders entry\n");
+        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
+        if (new_begin_entry == NULL)
+            return 1;
+        new_begin_entry->delimiter_value = begin_index;
+        
+        Bitvector* begin_bitvector = bitvector_ctor();
+        begin_bitvector->insert_rule_at_position(begin_bitvector, rule_index, 1);
+        
+        // append all rules from previous entry here
+        if (position_begin != 0) {
+            begin_bitvector->merge_bitvectors(this->range_borders[position_begin - 1].bitvector, begin_bitvector);
+        }
+        
+        new_begin_entry->bitvector = begin_bitvector;
+        this->insert_element_at_index(this, new_begin_entry, position_begin);
+        
+        //indicate point from where we can continue to extend the bitvectors
+        position_begin++;
+    }
+    
+    // determine end of insertion area
+    int position_end = find_free_position(this, end_index);
+    
+    for (int i = position_begin; i < position_end; ++i) {
+        //printf("insert 1 for rule %d at position %d\n", rule_index, i);
+        this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 1);
+    }
+    
+    //insert new range_border entry, if it does not exist
+    if (end_index == this->range_borders[position_end].delimiter_value) {
+        this->range_borders[position_end].bitvector->insert_rule_at_position(this->range_borders[position_end].bitvector, rule_index, 0);
+    } else {
+        Delimiter* new_end_entry = malloc(sizeof(Delimiter));
+        if (new_end_entry == NULL)
+            return 1;
+        new_end_entry->delimiter_value = end_index;
+        
+        Bitvector* end_bitvector = bitvector_ctor();
+        //end_bitvector->insert_rule_at_position(end_bitvector, rule_index, 0);
+        
+        // append all rules from previous entry here
+        end_bitvector->merge_bitvectors(this->range_borders[position_end - 1].bitvector, end_bitvector);
+        
+        end_bitvector->insert_rule_at_position(end_bitvector, rule_index, 0);
+        
+        new_end_entry->bitvector = end_bitvector;
+        this->insert_element_at_index(this, new_end_entry, position_end);
+        
+        //indicate point from where we can continue to extend the bitvectors
+        position_end++;
+    }
+    
+    for (int i = position_end; i < this->range_borders_current; ++i) {
+        this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 0);
+    }
+    
+    /*
+     * Build JIT code:
+     * Get the delimiter_value s in an array and then construct JIT
+     */ 
+    uint64_t* delim_array = (uint64_t*)malloc((this->range_borders_current) * sizeof(uint64_t));
+    for (int i = 0; i < this->range_borders_current; i++) {
+        delim_array[i] = this->range_borders[i].delimiter_value;
+    }
+    
+    char* code = NULL;
+    uint32_t size = construct_node(delim_array, this->range_borders_current, 0, this->range_borders_current - 1, &code);
+    void* mem = mmap(NULL, size, PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memcpy(mem, code, size);
+    free(code);
+    this->jit_lookup = mem;
+    
+    return 0;
+}
+
 // Match a header field value of an incoming packet
 uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, const uint64_t header_value) {
     const int relevant_border = find_free_position(this, header_value);
@@ -284,6 +374,19 @@ uint8_t Rb_match_packet(Range_borders* this, Bitvector** result, const uint64_t 
     
     // case (b)
     *result = this->range_borders[relevant_border - 1].bitvector;
+    return 0;
+}
+
+// JIT search
+uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, const uint64_t header_value) {
+    const int lookup_result = this->jit_lookup(header_value);
+    
+    //filter out case where 0th element is returned, but header_value is smaller than that element
+    if (lookup_result == this->range_borders[0].delimiter_value && lookup_result > header_value) {
+        *result = bitvector_ctor();
+        return 1;
+    }
+    *result = 
     return 0;
 }
 
