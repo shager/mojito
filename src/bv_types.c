@@ -4,9 +4,6 @@
 #include "asm.h"
 #include "bv_types.h"
 
-//TODO: remove (needed for sleep())
-#include <unistd.h>
-
 Bitvector* bitvector_ctor() {
     Bitvector* object = (Bitvector*) calloc(1, sizeof(Bitvector));
     if (object == NULL)
@@ -98,7 +95,7 @@ Range_borders* range_borders_ctor() {
         return NULL;
     for (int i = 0; i < INIT_SIZE; ++i) {
         object->range_borders[i].delimiter_value = 0;
-        object->range_borders[i].bitvector = bitvector_ctor();
+        object->range_borders[i].bitvector = NULL;
     }
     object->range_borders_max = INIT_SIZE;
     object->range_borders_current = 0;
@@ -123,12 +120,16 @@ Range_borders* range_borders_ctor() {
     return object;
 }
 
+void delimiter_dtor(Delimiter* this) {
+    free(this);
+}
+
 void range_borders_dtor(Range_borders* this) {
     for (int i = 0; i < this->range_borders_current; ++i) {
         bitvector_dtor(this->range_borders[i].bitvector);
     }
     munmap(this->jit_lookup, this->jit_lookup_size);
-    free(this->range_borders);
+    delimiter_dtor(this->range_borders);
     free(this);
 }
 
@@ -286,12 +287,11 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     }
     
     // insert new range_border entry, if it doesn't exist
-    if (begin_index == this->range_borders[position_begin].delimiter_value
-        && this->range_borders[position_begin].bitvector->bitvector_length != 0) { //edgecase: first insertion!
-        //printf("Reuse old rb entry (position_begin)\n");
+    if (this->range_borders[position_begin].bitvector != NULL //check edgecase: first insertion
+        && begin_index == this->range_borders[position_begin].delimiter_value
+        && this->range_borders[position_begin].bitvector->bitvector_length != 0) {
         this->range_borders[position_begin].bitvector->insert_rule_at_position(this->range_borders[position_begin].bitvector, rule_index, 1);
     } else {
-        //printf("creating new borders entry\n");
         Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
@@ -307,6 +307,9 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         
         new_begin_entry->bitvector = begin_bitvector;
         this->insert_element_at_index(this, new_begin_entry, position_begin);
+        
+        //free(begin_bitvector);
+        free(new_begin_entry);
         
         //indicate point from where we can continue to extend the bitvectors
         position_begin++;
@@ -340,6 +343,9 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         new_end_entry->bitvector = end_bitvector;
         this->insert_element_at_index(this, new_end_entry, position_end);
         
+        //free(end_bitvector);
+        free(new_end_entry);
+        
         //indicate point from where we can continue to extend the bitvectors
         position_end++;
     }
@@ -365,6 +371,7 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     void* mem = mmap(NULL, size, PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     memcpy(mem, code, size);
     free(code);
+    free(delim_array);
     this->jit_lookup = mem;
     this->jit_lookup_size = size;
     return 0;

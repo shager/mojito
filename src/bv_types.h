@@ -29,6 +29,8 @@ typedef struct Delimiter {
     Bitvector* bitvector;
 } Delimiter;
 
+void delimiter_dtor(Delimiter* this);
+
 typedef struct Range_borders {
     uint32_t range_borders_max; //track what max index the array has at the moment
     uint32_t range_borders_current; //track the current first unused element

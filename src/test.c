@@ -9,7 +9,7 @@ int main() {
      * find_free_position(struct Range_borders* this, uint64_t target) 
      */
      
-    obj->add_rule(obj, 1, 10, 2);
+    /*obj->add_rule(obj, 1, 10, 2);
     obj->add_rule(obj, 999, 2900, 7);
     obj->add_rule(obj, 1000, 2800, 1);
     Bitvector* res;
@@ -29,7 +29,7 @@ int main() {
     assert((res3->bitvector[0] >> 56) == 1);
     
     //return 0;
-    assert((find_free_position(obj, 0) == 0) || printf(" find_free_position failed!\n"));
+    assert((find_free_position(obj, 0) == 0) || printf(" find_free_position failed!\n"));*/
     
     /* 
      * test add_rule(struct Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index)
@@ -46,6 +46,8 @@ int main() {
     
     printf("Matching rules are: ");
     printf("%lld\n", (long long unsigned int)result_bv->bitvector[1]);
+    
+    range_borders_dtor(obj);
     
     printf("\ndone!\n");
     return 0;
