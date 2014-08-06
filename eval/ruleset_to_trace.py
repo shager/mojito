@@ -9,7 +9,7 @@ import os, subprocess
 def deploy_rule(dpctl_args):
     subprocess.call("/usr/local/bin/dpctl " + dpctl_args, shell=True)
 
-def write_lines_to_rulefile(lines, filename):
+def write_lines_to_tracefile(lines, filename):
     # delete file if existant
     if os.path.isfile(filename):
         os.remove(filename)
@@ -20,9 +20,9 @@ def write_lines_to_rulefile(lines, filename):
                 str(int(words[3]) + 1) + "\t" + "0x11/0xFF\t0x0800/0xFFFF\n")
     f.close()
 
-def generate_trace(ruleset, rulefile):
-    write_lines_to_rulefile(ruleset, rulefile)
-    subprocess.call("../acceptance_test/trace_generator/trace_generator 1 0.1 10 " + rulefile, shell=True)
+def generate_trace(ruleset, tracefile):
+    write_lines_to_tracefile(ruleset, tracefile)
+    subprocess.call("../acceptance_test/trace_generator/trace_generator 1 0.1 10 " + tracefile, shell=True)
 
 def read_file(filename):
     lines = [line.strip() for line in open(filename)]
@@ -60,14 +60,14 @@ def main():
                 ",ip,idle_timeout=0,actions=" + values[6])
 
     if case == "b":
-        rulefile = infile + ".bcase"
-        generate_trace(ruleset[:len(ruleset) / 3], rulefile)
+        tracefile = infile + ".bcase"
+        generate_trace(ruleset[:len(ruleset) / 3], tracefile)
     elif case == "a":
-        rulefile = infile + ".acase"
-        generate_trace(ruleset[len(ruleset) / 3:2 * (len(ruleset) / 3)], rulefile)
+        tracefile = infile + ".acase"
+        generate_trace(ruleset[len(ruleset) / 3:2 * (len(ruleset) / 3)], tracefile)
     else: #case == w 
-        rulefile = infile + ".wcase"
-        generate_trace(ruleset[2 * (len(ruleset) / 3):], rulefile)
+        tracefile = infile + ".wcase"
+        generate_trace(ruleset[2 * (len(ruleset) / 3):], tracefile)
 
 if  __name__ =='__main__':
     main()
