@@ -98,6 +98,7 @@ Input* read_trace_file(char* filename, int worst_case) {
   uint16_t src_port, dst_port;
   size_t i;
   for (i = 0; i < num_lines; ++i) {
+    char* ret = fgets(buf, 511, file);
     sscanf(buf, "%"SCNu32"\t%"SCNu32"\t%"SCNu16"\t%"SCNu16"\t",
         &src_ip, &dst_ip,
         &src_port, &dst_port);
@@ -141,14 +142,16 @@ main (int argc, char **argv)
   //srand(atoi(argv[4]));
   Input* input = read_trace_file(argv[1], worst_case);
 
-  int datalen, sd, *ip_flags;
+  int status, datalen, sd, *ip_flags;
   const int on = 1;
   char *interface, *target, *src_ip, *dst_ip;
   struct ip iphdr;
   struct udphdr udphdr;
   uint8_t *data, *packet;
-  struct sockaddr_in sin;
+  struct addrinfo hints, *res;
+  struct sockaddr_in *ipv4, sin;
   struct ifreq ifr;
+  void *tmp;
 
   // Allocate memory for various arrays.
   data = allocate_ustrmem (IP_MAXPACKET);
@@ -200,6 +203,7 @@ main (int argc, char **argv)
     size_t packet_count;
     for (packet_count = 0; packet_count < input->num_packets; ++packet_count) {
       //strcpy (dst_ip, argv[1]);
+
       // UDP data
       datalen = 0;
       //data[0] = 'T';

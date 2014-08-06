@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=gnu99 -Wall -Werror -Wpedantic -pedantic -pedantic-errors
+CFLAGS=-std=gnu99
 
 main: sender
 
