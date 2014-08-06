@@ -127,9 +127,9 @@ void range_borders_dtor(Range_borders* this) {
     for (int i = 0; i < this->range_borders_current; ++i) {
         bitvector_dtor(this->range_borders[i].bitvector);
     }
+    munmap(this->jit_lookup, this->jit_lookup_size);
     free(this->range_borders);
     free(this);
-    munmap(this->jit_lookup, this->jit_lookup_size);
 }
 
 // Append one element to the array
@@ -356,6 +356,9 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     for (int i = 0; i < this->range_borders_current; i++) {
         delim_array[i] = this->range_borders[i].delimiter_value;
     }
+    
+    // Unmap (free) the old lookup JIT
+    munmap(this->jit_lookup, this->jit_lookup_size);
     
     char* code = NULL;
     uint32_t size = construct_node(delim_array, this->range_borders_current, 0, this->range_borders_current - 1, &code);
