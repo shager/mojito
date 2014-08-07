@@ -45,7 +45,7 @@ int main() {
         printf("Error matching packet 107\n");
     
     printf("Matching rules are: ");
-    printf("%lld\n", (long long unsigned int)result_bv->bitvector[1]);
+    printf("%lld\n", (long long unsigned int)result_bv->bitvector[0]);
     
     range_borders_dtor(obj);
     

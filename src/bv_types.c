@@ -21,10 +21,6 @@ Bitvector* bitvector_ctor() {
     return object;
 }
 
-void bitvector_dtor(Bitvector* this) {
-    free(this->bitvector);
-}
-
 int Bv_insert_rule_at_position(Bitvector* this, uint32_t position, uint8_t value) {
     /* General idea: Identify the block in our bitvector where we want to
      * insert the new bit.
@@ -79,8 +75,9 @@ int Bv_merge_bitvectors(Bitvector* first, Bitvector* second) {
         second->bitvector = (uint64_t*)realloc(second->bitvector, sizeof(uint64_t) * ((first->bitvector_length / stepsize) + 1));
     }
     
-    for (int i = 0; i <= (first->bitvector_length / stepsize); ++i) {
-        second->bitvector[i] = second->bitvector[i] | first->bitvector[i];
+    for (int i = 0; i <= ((first->bitvector_length - 1) / stepsize); ++i) {
+        uint64_t tmp = first->bitvector[i];
+        second->bitvector[i] = second->bitvector[i] | tmp;
     }
     return 0;
 }
@@ -120,6 +117,10 @@ Range_borders* range_borders_ctor() {
     return object;
 }
 
+void bitvector_dtor(Bitvector* this) {
+    free(this->bitvector);
+}
+
 void delimiter_dtor(Delimiter* this) {
     free(this);
 }
@@ -137,6 +138,7 @@ void range_borders_dtor(Range_borders* this) {
 int Rb_insert_element(Range_borders* this, Delimiter* new_element) {
     if (this->range_borders_current < this->range_borders_max) {
         this->range_borders[this->range_borders_current++] = *new_element;
+        //memcpy(&(this->range_borders[this->range_borders_current++]), new_element, sizeof(Delimiter));
     } else {
         this->range_borders_max *= 2;
         Delimiter* tmp = (Delimiter*)realloc(this->range_borders, (this->range_borders_max) * sizeof(Delimiter));
@@ -147,6 +149,7 @@ int Rb_insert_element(Range_borders* this, Delimiter* new_element) {
             return 1;
         }
         this->range_borders[this->range_borders_current++] = *new_element;
+        //memcpy(&(this->range_borders[this->range_borders_current++]), new_element, sizeof(Delimiter));
     }
     return 0;
 }
@@ -161,15 +164,17 @@ int Rb_insert_element_at_index(Range_borders* this, Delimiter* new_element, uint
         this->insert_element(this, new_element);
         return 0;
     } else { // insertion happens somewhere "in the middle"
-        this->insert_element(this, &(this->range_borders[this->range_borders_current - 1]));
+        Delimiter* tmp_delim = malloc(sizeof(Delimiter));
+        memcpy(tmp_delim, &(this->range_borders[this->range_borders_current - 1]), sizeof(Delimiter));
+        this->insert_element(this, tmp_delim);
         for (int64_t i = this->range_borders_current - 2; i >= index; --i){ // was >
-            //printf("in loop, i = %d\n", i);
-            //fflush(stdout);
             this->range_borders[i + 1] = this->range_borders[i];
+            //memcpy(&(this->range_borders[i + 1]), &(this->range_borders[i]), sizeof(Delimiter));
         }
+        //memcpy(&(this->range_borders[index]), new_element, sizeof(Delimiter));
         this->range_borders[index] = *new_element;
+        free(tmp_delim);
     }
-    //printf("done\n");
     return 0;
 }
 
@@ -194,7 +199,6 @@ int Rb_delete_element(Range_borders* this, uint32_t index) {
         if (tmp != NULL) {
             this->range_borders = tmp;
         } else {
-            free(tmp);
             return 1;
         }
     }
@@ -310,6 +314,7 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         
         //free(begin_bitvector);
         free(new_begin_entry);
+        new_begin_entry = NULL;
         
         //indicate point from where we can continue to extend the bitvectors
         position_begin++;
@@ -324,7 +329,7 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     }
     
     //insert new range_border entry, if it does not exist
-    if (end_index == this->range_borders[position_end].delimiter_value) {
+    if (position_end < this->range_borders_current && end_index == this->range_borders[position_end].delimiter_value) {
         this->range_borders[position_end].bitvector->insert_rule_at_position(this->range_borders[position_end].bitvector, rule_index, 0);
     } else {
         Delimiter* new_end_entry = malloc(sizeof(Delimiter));
@@ -345,6 +350,7 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         
         //free(end_bitvector);
         free(new_end_entry);
+        new_end_entry = NULL;
         
         //indicate point from where we can continue to extend the bitvectors
         position_end++;
