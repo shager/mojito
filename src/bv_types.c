@@ -41,7 +41,7 @@ int Bv_insert_rule_at_position(Bitvector* this, uint32_t position, uint8_t value
     if (position >= this->bitvector_length) {
         this->bitvector_length = position + 1;
         // Check if we need to extend our bitvector by one or more blocks
-        if ((bitvector_old_length - 1 / stepsize) < (position / stepsize)) { //TODO: check that overflow is no bug here!
+        if (((bitvector_old_length - 1) / stepsize) < (position / stepsize)) { //TODO: check that overflow is no bug here!
             this->bitvector = (uint64_t*)realloc(this->bitvector, sizeof(uint64_t) * ((this->bitvector_length / stepsize) + 1));
         }
     }
@@ -55,6 +55,8 @@ int Bv_insert_rule_at_position(Bitvector* this, uint32_t position, uint8_t value
     
     // Finally: insert new bit at correct position
     // Replace the bit in the original integer by a 0 by ANDing it with the inverted mask
+    uint64_t tmp = this->bitvector[block_in_array];
+    tmp++;
     this->bitvector[block_in_array] &= ~((uint64_t)((uint64_t)0x1 << (uint64_t)(bit_in_block)));
     // now overwrite the bit with 0 or 1
     this->bitvector[block_in_array] |= (uint64_t)((uint64_t)value << (uint64_t)(bit_in_block)); 
@@ -158,8 +160,6 @@ int Rb_insert_element(Range_borders* this, Delimiter* new_element) {
 // range_borders_current, the new_element is inserted in the last position of the array
 int Rb_insert_element_at_index(Range_borders* this, Delimiter* new_element, uint32_t index) {
     // check if the insertion happens in a new slot at the end of the array
-    //printf("Entered insert at index %d...\n", index);
-    //fflush(stdout);
     if (index >= this->range_borders_current) {
         this->insert_element(this, new_element);
         return 0;
@@ -210,20 +210,17 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
     //TODO: check edgecases (empty array, target = max, rule_index = 0)
     
     int position_begin = find_free_position(this, begin_index);
-    //printf("position_begin = %d\n", position_begin);
     
     for (int i = 0; i < position_begin; ++i) {
-        //printf("insert 0 for rule %d at position %d\n", rule_index, i);
         this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 0);
     }
     
     // insert new range_border entry, if it doesn't exist
-    if (begin_index == this->range_borders[position_begin].delimiter_value
-        && this->range_borders[position_begin].bitvector->bitvector_length != 0) { //edgecase: first insertion!
-        //printf("Reuse old rb entry (position_begin)\n");
+    if (this->range_borders[position_begin].bitvector != NULL //check edgecase: first insertion
+        && begin_index == this->range_borders[position_begin].delimiter_value
+        && this->range_borders[position_begin].bitvector->bitvector_length != 0) {
         this->range_borders[position_begin].bitvector->insert_rule_at_position(this->range_borders[position_begin].bitvector, rule_index, 1);
     } else {
-        //printf("creating new borders entry\n");
         Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
@@ -240,6 +237,9 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
         new_begin_entry->bitvector = begin_bitvector;
         this->insert_element_at_index(this, new_begin_entry, position_begin);
         
+        free(new_begin_entry);
+        new_begin_entry = NULL;
+        
         //indicate point from where we can continue to extend the bitvectors
         position_begin++;
     }
@@ -248,12 +248,11 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
     int position_end = find_free_position(this, end_index);
     
     for (int i = position_begin; i < position_end; ++i) {
-        //printf("insert 1 for rule %d at position %d\n", rule_index, i);
         this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 1);
     }
     
     //insert new range_border entry, if it does not exist
-    if (end_index == this->range_borders[position_end].delimiter_value) {
+    if (position_end < this->range_borders_current && end_index == this->range_borders[position_end].delimiter_value) {
         this->range_borders[position_end].bitvector->insert_rule_at_position(this->range_borders[position_end].bitvector, rule_index, 0);
     } else {
         Delimiter* new_end_entry = malloc(sizeof(Delimiter));
@@ -271,6 +270,9 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
         
         new_end_entry->bitvector = end_bitvector;
         this->insert_element_at_index(this, new_end_entry, position_end);
+        
+        free(new_end_entry);
+        new_end_entry = NULL;
         
         //indicate point from where we can continue to extend the bitvectors
         position_end++;
@@ -324,7 +326,6 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     int position_end = find_free_position(this, end_index);
     
     for (int i = position_begin; i < position_end; ++i) {
-        //printf("insert 1 for rule %d at position %d\n", rule_index, i);
         this->range_borders[i].bitvector->insert_rule_at_position(this->range_borders[i].bitvector, rule_index, 1);
     }
     
@@ -413,7 +414,7 @@ uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, const uint6
     const int relevant_border = this->jit_lookup(header_value);
     
     //filter out case where 0th element is returned, but header_value is smaller than that element
-    if (relevant_border == 0 && this->range_borders[0].delimiter_value > header_value) {
+    if ((relevant_border == 0) && ((this->range_borders[0].delimiter_value > header_value) || (this->range_borders[0].bitvector == NULL))) {
         *result = bitvector_ctor();
         return 1;
     }
