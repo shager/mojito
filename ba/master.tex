@@ -267,7 +267,22 @@ The resulting vector then indicates by a $1$ at position $p$ that the packet has
 Generally, there can be one or more matching rules, for example when default rules exist, that match every packet.
 In order to determine the highest priority matching rule, the resulting bitvector is then scaned for the leftmost set 1-bit.
 The index of this bit in the bitvector then determines the best matching rule in the ruleset.
-After that, the actions defined in the rule can be executed by the network device and the next packet can be matched.
+After that, the actions defined in the rule can be executed by the network device and the next packet in the queue can be matched.
+
+\subsection{JIT lookup}
+To further speed up the lookup process, another optimization has been implemented.
+At each lookup, the algorithm has to perform a binary search on the bitvectors' locations in each dimension in order to find the matching bitvector for the current packet.
+These locations can be interpreted as delimiters between the realms of the bitvectors.
+In the above example, if the lookup process receives a packet with a source IP address value of 10.0.0.3, the algorithm has to find the first bitvector in the source IP dimension. %TODO: example abgleichen!
+For every header field in the 12-diemnsional OpenFlow header the algorithm has to yield exactly one bitvector.
+This lookup process over the entire delimiter space requires several memory accesses for every lookup.
+The general idea to speed up this operation is to precompute a function that is specific for each dimension and returns the bitvector's index in one dimension when given the header value to be matched.
+
+The function is designed to have zero memory accesses when looking up header values.
+Therefore it performs the binary search only on precomputed values, which leads to the necessity of rebuilding the function at every ruleset update.
+Clearly, that leads to a performance disadvantage for fast changing rulesets at the benefit of having generally faster lookups.
+
+Implementing that functionality has lead to a just in time generated function written in machine language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 
 \newpage
 \addcontentsline{toc}{section}{References}
