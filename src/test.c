@@ -9,7 +9,7 @@ int main() {
      * find_free_position(struct Range_borders* this, uint64_t target) 
      */
     
-    Bitvector* res0;
+    /*Bitvector* res0;
     uint8_t result = obj->match_packet(obj, &res0, 2);
     printf("result = %d\n", result);
     
@@ -34,7 +34,7 @@ int main() {
     
     //return 0;
     assert((find_free_position(obj, 0) == 0) || printf(" find_free_position failed!\n"));
-    
+    */
     /* 
      * test add_rule(struct Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index)
      */
