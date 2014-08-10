@@ -5,7 +5,8 @@
 #include "bv_types.h"
 
 Bitvector* bitvector_ctor() {
-    Bitvector* object = (Bitvector*) calloc(1, sizeof(Bitvector));
+    Bitvector* object = NULL;
+    object = (Bitvector*) calloc(1, sizeof(Bitvector));
     if (object == NULL)
         return NULL;
     
@@ -36,13 +37,17 @@ int Bv_insert_rule_at_position(Bitvector** this, uint32_t position, uint8_t valu
         value = 1;
     
     const uint8_t stepsize = (sizeof(uint64_t) * 8); // stepsize = 64
-    uint32_t bitvector_old_length = (*this)->bitvector_length;
+    //uint32_t bitvector_old_length = (*this)->bitvector_length;
+    uint32_t bitvector_blocks = 0;
+    if ((*this)->bitvector_length > 0) {
+        bitvector_blocks = (((*this)->bitvector_length - 1) / stepsize) + 1;
+    }
     
     if (position >= (*this)->bitvector_length) {
         (*this)->bitvector_length = position + 1;
         // Check if we need to extend our bitvector by one or more blocks
-        if (((bitvector_old_length - 1) / stepsize) < (position / stepsize)) { //TODO: check that overflow is no bug here!
-            (*this)->bitvector = realloc((*this)->bitvector, sizeof(uint64_t) * (((*this)->bitvector_length / stepsize) + 1));
+        if (bitvector_blocks == 0 || bitvector_blocks < (position / stepsize) + 1) {
+            (*this)->bitvector = realloc((*this)->bitvector, sizeof(uint64_t) * ((position / stepsize) + 1));
         }
     }
     
@@ -69,7 +74,27 @@ int Bv_delete_rule_from_position(Bitvector** this, uint32_t position) {
 
 // merges Bitvectors first and second into second
 int Bv_merge_bitvectors(Bitvector* first, Bitvector** second) {
+    assert(first->bitvector_length != 0);
+    
     const uint8_t stepsize = (sizeof(uint64_t) * 8);
+    
+    uint32_t blocks_in_bv1 = ((first->bitvector_length - 1) / stepsize) + 1;
+    uint32_t blocks_in_bv2 = 0;
+    if ((*second)->bitvector_length != 0) {
+        blocks_in_bv2 = (((*second)->bitvector_length - 1) / stepsize) + 1;
+    }
+    
+    if (blocks_in_bv2 < blocks_in_bv1) {
+        (*second)->bitvector = realloc((*second)->bitvector, blocks_in_bv1 * sizeof(uint64_t));
+    }
+    
+    for (int i = 0; i < blocks_in_bv1; i++) {
+        (*second)->bitvector[i] |= first->bitvector[i];
+    }
+    
+    (*second)->bitvector_length = first->bitvector_length;
+    return 0;
+#if 0
     // check for equal length
     if ((*second)->bitvector_length < first->bitvector_length) {
         /*printf("in resize mode merge_bv\n");
@@ -86,6 +111,7 @@ int Bv_merge_bitvectors(Bitvector* first, Bitvector** second) {
     }
     (*second)->bitvector_length = first->bitvector_length;
     return 0;
+#endif
 }
 
 Range_borders* range_borders_ctor() {
@@ -105,9 +131,9 @@ Range_borders* range_borders_ctor() {
     object->insert_element = Rb_insert_element;
     object->insert_element_at_index = Rb_insert_element_at_index;
     object->delete_element = Rb_delete_element;
-    object->add_rule = Rb_add_rule_jit;
+    object->add_rule = Rb_add_rule;
     object->find_element = Rb_find_element;
-    object->match_packet = Rb_match_packet_jit;
+    object->match_packet = Rb_match_packet;
 
     // This section has to be added in order to create some executable
     // because OpenFlow makes lookups at startup
@@ -227,7 +253,8 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
         && this->range_borders[position_begin].bitvector->bitvector_length != 0) {
         this->range_borders[position_begin].bitvector->insert_rule_at_position(&(this->range_borders[position_begin].bitvector), rule_index, 1);
     } else {
-        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_begin_entry = NULL;
+        new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
         new_begin_entry->delimiter_value = begin_index;
@@ -261,7 +288,8 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
     if (position_end < this->range_borders_current && end_index == this->range_borders[position_end].delimiter_value) {
         this->range_borders[position_end].bitvector->insert_rule_at_position(&(this->range_borders[position_end].bitvector), rule_index, 0);
     } else {
-        Delimiter* new_end_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_end_entry = NULL;
+        new_end_entry = malloc(sizeof(Delimiter));
         if (new_end_entry == NULL)
             return 1;
         new_end_entry->delimiter_value = end_index;
@@ -304,7 +332,8 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         && this->range_borders[position_begin].bitvector->bitvector_length != 0) {
         this->range_borders[position_begin].bitvector->insert_rule_at_position(&(this->range_borders[position_begin].bitvector), rule_index, 1);
     } else {
-        Delimiter* new_begin_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_begin_entry = NULL;
+        new_begin_entry = malloc(sizeof(Delimiter));
         if (new_begin_entry == NULL)
             return 1;
         new_begin_entry->delimiter_value = begin_index;
@@ -339,7 +368,8 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
     if (position_end < this->range_borders_current && end_index == this->range_borders[position_end].delimiter_value) {
         this->range_borders[position_end].bitvector->insert_rule_at_position(&(this->range_borders[position_end].bitvector), rule_index, 0);
     } else {
-        Delimiter* new_end_entry = malloc(sizeof(Delimiter));
+        Delimiter* new_end_entry = NULL;
+        new_end_entry = malloc(sizeof(Delimiter));
         if (new_end_entry == NULL)
             return 1;
         new_end_entry->delimiter_value = end_index;
@@ -375,7 +405,8 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
      * Build JIT code:
      * Get the delimiter_values in an array and then construct JIT
      */
-    uint64_t* delim_array = (uint64_t*)malloc((this->range_borders_current) * sizeof(uint64_t));
+    uint64_t* delim_array = NULL;
+    delim_array = (uint64_t*)malloc((this->range_borders_current) * sizeof(uint64_t));
     for (int i = 0; i < this->range_borders_current; i++) {
         delim_array[i] = this->range_borders[i].delimiter_value;
     }
