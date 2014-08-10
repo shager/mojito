@@ -125,8 +125,9 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     tmp += lookup_dimension(swt->range_borders_ip_protocol, &(bv_array[11]), key->flow.nw_proto);
 
     // if a matching error occured return NULL flow
-    if (tmp != 0)
+    if (tmp != 0) {
         return NULL;
+    }
     
     if (bv_array[0]->bitvector_length == 0) {
         return NULL;
@@ -136,7 +137,6 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     uint32_t bitvector_subindex = 0;
     //connect all Bitvectors with AND and get result
     for (uint32_t i = 0; i <= ((bv_array[0]->bitvector_length) / (sizeof(uint64_t) * 8)); ++i) {
-        fflush(stdout);
         for (uint32_t j = 1; j < 12; ++j) {
             rule_index_result &= bv_array[j]->bitvector[i];
         }
@@ -149,20 +149,19 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     }
     
     //no match found -> return NULL flow
-    if (rule_index_result == 0)
+    if (rule_index_result == 0) {
         return NULL;
+    }
     
     //find leftmost bit in rule_index_result
     uint32_t leftmostbit = find_leftmost_bit(rule_index_result);
     
     //ERROR! no match found
     if (leftmostbit == 255) {
-        printf("Lookup failed!\n");
-        fflush(stdout);
         return NULL;
     }
     
-    printf("\nLookup of flow\n=============\n");
+    /*printf("\nLookup of flow\n=============\n");
     printf("ip_src = %d\n", ntohl(key->flow.nw_src));
     printf("ip_dst = %d\n", ntohl(key->flow.nw_dst));
     printf("port_number = %d\n", ntohs(key->flow.in_port));
@@ -176,16 +175,17 @@ static struct sw_flow* table_jit_lookup(struct sw_table* swt,
     printf("ip_dcsp = %d\n", key->flow.nw_tos);
     printf("ip_protocol = %d\n", key->flow.nw_proto);
     printf("=============\n");
-    printf("Result (in_port) = %" PRIu64 "\n", (bv_array[2])->bitvector[0]);
-    fflush(stdout);
+    printf("Result (in_port) = %" PRIu64 "\n", (bv_array[2])->bitvector[2]);
+    fflush(stdout);*/
     
     //re-calculate offset in original bitvector-array
     leftmostbit += bitvector_subindex * 64;
-    printf("ri_result = %" PRIu64 "\n", rule_index_result);
+    
+    /*printf("ri_result = %" PRIu64 "\n", rule_index_result);
     printf("Lookup done, lmb = %d\n", leftmostbit);
     printf("Resulting flow timestamp = %" PRIu64 "\n", (swt->flow_array[leftmostbit])->created);
-    //printf("Action: %d\n", (swt->flow_array[leftmostbit])->sf_acts->actions[0]);
-    fflush(stdout);
+    printf("Leaving lookup\n");
+    fflush(stdout);*/
     return swt->flow_array[leftmostbit];
 }
 
@@ -193,21 +193,15 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
 {
     struct sw_table_jit *tj = (struct sw_table_jit *) swt;
     uint32_t rule_index = tj->n_flows;
-
-    fflush(stdout);
     //check if flow already exists, if yes overwrite
     for (uint32_t i = 0; i < tj->n_flows; ++i)
     {
-        printf("n_flows: %d\n", tj->n_flows);
-        fflush(stdout);
         struct sw_flow* f = swt->flow_array[i];
         if (f == NULL)
             continue;
         if (f->priority == flow->priority
                 && f->key.wildcards == flow->key.wildcards
                 && flow_matches_2wild(&f->key, &flow->key)) {
-            printf("replaced %d\n", i);
-            fflush(stdout);
             flow->serial = f->serial;
             swt->flow_array[i] = flow;
             flow_free(f);
@@ -233,7 +227,6 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
     
     tj->n_flows++;
     swt->flow_array[rule_index] = flow;
-    printf("\nInsert flow at time %lld\n", (long long int)flow->created);
     
     //short handle for flow struct in sw_flow
     struct flow network_flow = flow->key.flow;
@@ -307,7 +300,7 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
     else
         swt->range_borders_ip_protocol->add_rule(swt->range_borders_ip_protocol, network_flow.nw_proto, UINT64_T_MAX, rule_index);
         
-    printf("\nAdding flow:\n++++++++++++\n");
+    /*printf("\nAdding flow:\n++++++++++++\n");
     printf("wildcards = %d\n", flow->key.wildcards);
     printf("ip_src_start = %" PRIu64 "\n", ip_src_start);
     printf("ip_src_end = %" PRIu64 "\n", ip_src_end);
@@ -323,7 +316,7 @@ static int table_jit_insert(struct sw_table* swt, struct sw_flow* flow)
     printf("vlan_prio = %d\n", network_flow.dl_vlan_pcp);
     printf("ip_dcsp = %d\n", network_flow.nw_tos);
     printf("ip_protocol = %d\n++++++++++++\n", network_flow.nw_proto);
-    fflush(stdout);
+    fflush(stdout);*/
     
     //SUCCESS
     return 1;
@@ -345,7 +338,6 @@ static int table_jit_modify(struct sw_table *swt,
             count++;
         }
     }
-    
     return count;
 }
 
@@ -354,8 +346,6 @@ static int table_jit_has_conflict(struct sw_table *swt,
                                      const struct sw_flow_key *key,
                                      uint16_t priority, int strict)
 {
-    printf("JIT_has_conflict called\n");
-    fflush(stdout);
     /*struct sw_table_linear *tl = (struct sw_table_linear *) swt;
     struct sw_flow *flow;
 
