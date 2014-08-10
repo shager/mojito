@@ -52,7 +52,7 @@ int main() {
     printf("done.\n\nMatching packets:\n");
     Bitvector* result_bv = NULL;
     result_bv = bitvector_ctor();
-    if (obj->match_packet(obj, &result_bv, 1) != 0)
+    if (obj->match_packet(obj, &result_bv, 1023) != 0)
         printf("Error matching packet 1\n");
     
     printf("Len of result: %d\n", result_bv->bitvector_length);

@@ -101,24 +101,6 @@ int Bv_merge_bitvectors(Bitvector* first, Bitvector** second) {
     
     (*second)->bitvector_length = first->bitvector_length;
     return 0;
-#if 0
-    // check for equal length
-    if ((*second)->bitvector_length < first->bitvector_length) {
-        /*printf("in resize mode merge_bv\n");
-        fflush(stdout);*/
-        (*second)->bitvector = realloc((*second)->bitvector, sizeof(uint64_t) * ((first->bitvector_length / stepsize) + 1));
-        
-        /*printf("resize done\n");
-        fflush(stdout);*/
-    }
-    
-    for (int i = 0; i <= ((first->bitvector_length - 1) / stepsize); ++i) {
-        uint64_t tmp = first->bitvector[i];
-        (*second)->bitvector[i] = (*second)->bitvector[i] | tmp;
-    }
-    (*second)->bitvector_length = first->bitvector_length;
-    return 0;
-#endif
 }
 
 Range_borders* range_borders_ctor() {
@@ -180,7 +162,6 @@ void range_borders_dtor(Range_borders* this) {
 int Rb_insert_element(Range_borders** this, Delimiter* new_element) {
     if ((*this)->range_borders_current < (*this)->range_borders_max) {
         (*this)->range_borders[(*this)->range_borders_current++] = *new_element;
-        //memcpy(&(this->range_borders[this->range_borders_current++]), new_element, sizeof(Delimiter));
     } else {
         (*this)->range_borders_max *= 2;
         Delimiter* tmp = realloc((*this)->range_borders, ((*this)->range_borders_max) * sizeof(Delimiter));
@@ -191,7 +172,6 @@ int Rb_insert_element(Range_borders** this, Delimiter* new_element) {
             return 1;
         }
         (*this)->range_borders[(*this)->range_borders_current++] = *new_element;
-        //memcpy(&(this->range_borders[this->range_borders_current++]), new_element, sizeof(Delimiter));
     }
     return 0;
 }
@@ -207,11 +187,9 @@ int Rb_insert_element_at_index(Range_borders** this, Delimiter* new_element, uin
         Delimiter* tmp_delim = malloc(sizeof(Delimiter));
         memcpy(tmp_delim, &((*this)->range_borders[(*this)->range_borders_current - 1]), sizeof(Delimiter));
         (*this)->insert_element(this, tmp_delim);
-        for (int64_t i = (*this)->range_borders_current - 2; i >= index; --i){ // was >
+        for (int64_t i = (*this)->range_borders_current - 2; i >= index; --i) {
             (*this)->range_borders[i + 1] = (*this)->range_borders[i];
-            //memcpy(&(this->range_borders[i + 1]), &(this->range_borders[i]), sizeof(Delimiter));
         }
-        //memcpy(&(this->range_borders[index]), new_element, sizeof(Delimiter));
         (*this)->range_borders[index] = *new_element;
         free(tmp_delim);
     }
@@ -220,8 +198,6 @@ int Rb_insert_element_at_index(Range_borders** this, Delimiter* new_element, uin
 
 // Delete a single element in the array
 int Rb_delete_element(Range_borders* this, uint32_t index) {
-    printf("Delete element called\n");
-    fflush(stdout);
     // check if index is in array
     if (index > this->range_borders_current - 1) {
         return 1;
@@ -249,8 +225,6 @@ int Rb_delete_element(Range_borders* this, uint32_t index) {
 
 // Insert a new rule into the routing table
 int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index) {
-    //TODO: check edgecases (empty array, target = max, rule_index = 0)
-    
     int position_begin = find_free_position(this, begin_index);
     
     for (int i = 0; i < position_begin; ++i) {
@@ -359,7 +333,6 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         new_begin_entry->bitvector = begin_bitvector;
         this->insert_element_at_index(&this, new_begin_entry, position_begin);
         
-        //free(begin_bitvector);
         free(new_begin_entry);
         new_begin_entry = NULL;
     }
@@ -383,7 +356,6 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         
         Bitvector* end_bitvector = NULL;
         end_bitvector = bitvector_ctor();
-        //end_bitvector->insert_rule_at_position(end_bitvector, rule_index, 0);
         
         // append all rules from previous entry here
         end_bitvector->merge_bitvectors(this->range_borders[position_end - 1].bitvector, &end_bitvector);
@@ -463,7 +435,6 @@ uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, const uint6
         *result = bitvector_ctor();
         return 1;
     }
-    printf("Relevant border = %d\n", relevant_border);
     *result = this->range_borders[relevant_border].bitvector;
     return 0;
 }
