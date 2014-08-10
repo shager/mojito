@@ -38,19 +38,44 @@ int main() {
     /* 
      * test add_rule(struct Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index)
      */
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 1025; ++i) {
         printf("Adding rule %d\n", i);
-        assert((obj->add_rule(obj, i, i + 10, i) == 0) || printf("Error adding rule %d\n", i));
+        assert((obj->add_rule(obj, i, i + 1, i) == 0) || printf("Error adding rule %d\n", i));
     }
     
+    /*obj->add_rule(obj, 5, 6, 5);
+    obj->add_rule(obj, 6, 7, 6);
+    obj->add_rule(obj, 1, 2, 1);
+    obj->add_rule(obj, 800, 801, 800);
+    obj->add_rule(obj, 999, 1020, 999);*/
+    
     printf("done.\n\nMatching packets:\n");
-    Bitvector* result_bv;
-    if (obj->match_packet(obj, &result_bv, 107) != 0)
-        printf("Error matching packet 107\n");
+    Bitvector* result_bv = NULL;
+    result_bv = bitvector_ctor();
+    if (obj->match_packet(obj, &result_bv, 1) != 0)
+        printf("Error matching packet 1\n");
     
+    printf("Len of result: %d\n", result_bv->bitvector_length);
     printf("Matching rules are: ");
-    printf("%lld\n", (long long unsigned int)result_bv->bitvector[1]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[0]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[1]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[2]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[3]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[4]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[5]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[6]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[7]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[8]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[9]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[10]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[11]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[12]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[13]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[14]);
+    printf("%lld ", (long long unsigned int)result_bv->bitvector[15]);
+    printf("%lld\n", (long long unsigned int)result_bv->bitvector[16]);
     
+    bitvector_dtor(result_bv);
     range_borders_dtor(obj);
     
     printf("\ndone!\n");

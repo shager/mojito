@@ -6,7 +6,7 @@
 
 Bitvector* bitvector_ctor() {
     Bitvector* object = NULL;
-    object = (Bitvector*) calloc(1, sizeof(Bitvector));
+    object = malloc(sizeof(Bitvector));
     if (object == NULL)
         return NULL;
     
@@ -48,6 +48,9 @@ int Bv_insert_rule_at_position(Bitvector** this, uint32_t position, uint8_t valu
         // Check if we need to extend our bitvector by one or more blocks
         if (bitvector_blocks == 0 || bitvector_blocks < (position / stepsize) + 1) {
             (*this)->bitvector = realloc((*this)->bitvector, sizeof(uint64_t) * ((position / stepsize) + 1));
+            for (int i = bitvector_blocks; i < ((position / stepsize) + 1); i++) {
+                (*this)->bitvector[i] = 0;
+            }
         }
     }
     
@@ -86,6 +89,10 @@ int Bv_merge_bitvectors(Bitvector* first, Bitvector** second) {
     
     if (blocks_in_bv2 < blocks_in_bv1) {
         (*second)->bitvector = realloc((*second)->bitvector, blocks_in_bv1 * sizeof(uint64_t));
+    }
+    
+    for (int i = blocks_in_bv2; i < blocks_in_bv1; i++) {
+        (*second)->bitvector[i] = 0;
     }
     
     for (int i = 0; i < blocks_in_bv1; i++) {
@@ -131,12 +138,12 @@ Range_borders* range_borders_ctor() {
     object->insert_element = Rb_insert_element;
     object->insert_element_at_index = Rb_insert_element_at_index;
     object->delete_element = Rb_delete_element;
-    object->add_rule = Rb_add_rule;
+    object->add_rule = Rb_add_rule_jit;
     object->find_element = Rb_find_element;
-    object->match_packet = Rb_match_packet;
+    object->match_packet = Rb_match_packet_jit;
 
     // This section has to be added in order to create some executable
-    // because OpenFlow makes lookups at startup
+    // because OpenFlow does lookups at startup
     char* code = NULL;
     uint64_t tmp_array[1] = {0};
     uint32_t size = construct_node(tmp_array, 1, 0, 0, &code);
@@ -151,10 +158,12 @@ Range_borders* range_borders_ctor() {
 
 void bitvector_dtor(Bitvector* this) {
     free(this->bitvector);
+    this->bitvector = NULL;
 }
 
 void delimiter_dtor(Delimiter* this) {
     free(this);
+    this = NULL;
 }
 
 void range_borders_dtor(Range_borders* this) {
@@ -164,6 +173,7 @@ void range_borders_dtor(Range_borders* this) {
     munmap(this->jit_lookup, this->jit_lookup_size);
     delimiter_dtor(this->range_borders);
     free(this);
+    this = NULL;
 }
 
 // Append one element to the array
@@ -352,15 +362,12 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         //free(begin_bitvector);
         free(new_begin_entry);
         new_begin_entry = NULL;
-        
-        //indicate point from where we can continue to extend the bitvectors
-        position_begin++;
     }
     
     // determine end of insertion area
     int position_end = find_free_position(this, end_index);
     
-    for (int i = position_begin; i < position_end; ++i) {
+    for (int i = position_begin + 1; i < position_end; ++i) {
         this->range_borders[i].bitvector->insert_rule_at_position(&(this->range_borders[i].bitvector), rule_index, 1);
     }
     
@@ -374,7 +381,8 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
             return 1;
         new_end_entry->delimiter_value = end_index;
         
-        Bitvector* end_bitvector = bitvector_ctor();
+        Bitvector* end_bitvector = NULL;
+        end_bitvector = bitvector_ctor();
         //end_bitvector->insert_rule_at_position(end_bitvector, rule_index, 0);
         
         // append all rules from previous entry here
@@ -387,17 +395,13 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         
         if (end_bitvector != this->range_borders[position_end].bitvector) {
             free(end_bitvector);
-            printf("I'm freeee!\n");
             end_bitvector = NULL;
         }
         free(new_end_entry);
         new_end_entry = NULL;
-        
-        //indicate point from where we can continue to extend the bitvectors
-        position_end++;
     }
     
-    for (int i = position_end; i < this->range_borders_current; ++i) {
+    for (int i = position_end + 1; i < this->range_borders_current; ++i) {
         this->range_borders[i].bitvector->insert_rule_at_position(&(this->range_borders[i].bitvector), rule_index, 0);
     }
     
@@ -459,6 +463,7 @@ uint8_t Rb_match_packet_jit(Range_borders* this, Bitvector** result, const uint6
         *result = bitvector_ctor();
         return 1;
     }
+    printf("Relevant border = %d\n", relevant_border);
     *result = this->range_borders[relevant_border].bitvector;
     return 0;
 }
