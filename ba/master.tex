@@ -284,6 +284,14 @@ Clearly, that leads to a performance disadvantage for fast changing rulesets at 
 
 Implementing that functionality has lead to a just in time generated function written in machine language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 
+The algorithm used in this implementation is a slightly modified binary search.
+%TODO: Pseudocode hier einfügen
+
+Figure TODO shows the significant loss in efficiency when inserting rules. %TODO: Grafik
+The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
+Because of the requirement that the matching engine has to be operable immediately after every update operation, every update implies a complete regeneration of the JIT code.
+That behaviour explains the additional update time seen in the measured data. 
+
 \newpage
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{acm}
