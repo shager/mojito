@@ -142,24 +142,24 @@ nor a similar work has been presented to an examination committee.
 
 \section{Introduction}
 \subsection{The Packet Classification Problem}
-The growth of the internet constantly poses new challenges to the producers of network equipment.
-Today's applications like Multimedia, Web and Voice over IP are dependant of a transport network (the internet) with
+The growth of the Internet constantly poses new challenges to the producers of network equipment.
+Today's applications like Multimedia, Web and Voice over IP are dependent on a transport network (the Internet) with
 high data rates, low latency, soft realtime properties and quality of service mechanisms.
-This catalogue of network parameters is already implemented in the internet protocol stack.
+This catalogue of network parameters is already implemented in the Internet protocol stack.
 
-However, due to Moore's Law the growth of the actual data traffic can not be handled by pure protocol optimizations, 
-but must be engineered in faster hardware.
+However, due to Moore's Law the growth of the actual data traffic must be engineered in faster hardware on the nodes handling this traffic.
 
-Additionally, the number of hosts is growing steadily, which also leads to a more packed address space in case of IPv4.
-Usually, this leads to an increasing size of rule sets in the respecting internet traffic handlers. %TODO: position 1 absatz weiter?
+Additionally, the number of hosts is growing steadily.
+This also contributes to a denser address space in case of IPv4.
+Usually, this leads to an increasing size of rule sets in the respective internet traffic handlers. %TODO: position 1 absatz weiter?
 
-The critical points in the internet's architecture concerning performance are the stations who have to decide for each packet what to do.
-These are mostly Firewalls, Level-2-Switches and Level-3-Routers.
-In general, these machines inspect the header data of every incoming IP packet and forward or drop it following a rule set that has been implemented before.
+The critical points in the internet's architecture concerning performance are the stations which have to decide for each packet what to do.
+These are mostly firewalls, Level-2-Switches and Level-3-Routers.
+In general, these machines inspect the header data of every incoming IP packet and process it following a rule set that has been specified before.
 These rule sets can be mostly static (e.g. in case of a small SOHO router) or very dynamic (e.g. in a large stateful firewall).
 
 One main point in optimization therefore lies in the matching algorithms executing this process.
-Many traditional rulesets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
+Many traditional rule sets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
 The last two fields imply the usage of TCP or UDP as transport protocol, as other protocols may not know the concept of ports (e.g. ICMP). %TODO: quote RFCs
 But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.
 
@@ -168,33 +168,41 @@ Additionally, some fields require rules that imply certain ranges or prefixes, e
 These constraints make it more difficult to implement simple matching algorithms and in order to match with high speed, more sophisticated
 algorithms have to be used for these fields.
 
-The best-known example for non trivial matchable fields are IP addresses, where rules are normally defined as IP prefixes.
+\subsection{Longest Prefix Matching}
+The best-known example for non-trivial matchable fields are IP forwarding tables, where rules are normally defined as IP prefixes.
 Prefixes in IP addresses correspond to subnets, because in IP prefixes there's always a certain amount of fixed bits at the beginning of the address
 and the bits after that are free to choose.
 
-An example for a prefix of an IPv4 address can look as follows:
-0110 1011 0001...
-This means that the first 12 bit of the address space are fixed and that the remaining 20 bits may be choosen freely.
-Now, that rule has to match packets with addresses from 0110 1011 0001 0000 0000 0000 0000 0000 up to
-0110 1011 0001 1111 1111 1111 1111 1111. %TODO: unschön? evtl umformulieren
+TODO: Example (with graphics)
+
+Therefore, an algorithm used for matching packets has to be capable of longest prefix matching.
+
+%An example for a prefix of an IPv4 address can look as follows:
+%0110 1011 0001...
+%This means that the first 12 bit of the address space are fixed and that the remaining 20 bits may be choosen freely.
+%Now, that rule has to match packets with addresses from 0110 1011 0001 0000 0000 0000 0000 0000 up to
+%0110 1011 0001 1111 1111 1111 1111 1111. %TODO: unschön? evtl umformulieren
 
 %TODO: Openflow/SDN
 \subsection{OpenFlow}
 Software Defined Networking (SDN) describes the general idea to decouple the two tasks of network hardware and to introduce a new layer of abstraction in networking. %quote: sdn-whitepaper
-These networks are separated into two logical units: The control and the data plane.
+These networks are separated into two logical units: the control and the data plane.
 The control plane is used for configuring and updating the network hardware, e.g. inserting new rules into a firewall.
 The data plane handles the incoming traffic and acts accordingly to the objectives defined in the control plane.
 
-One popular instance of a SDN is OpenFlow.
+One popular instance of an SDN is OpenFlow.
 This project is intended to establish a virtual network system on real hardware for educational and research use cases.
 A key feature of OpenFlow is the control channel system.
-One controller has connections to all existing network hardware and can define their behaviour from a central position.
-The hardware then acts accordingly and handles the traffic as required.
+One controller has connections to all existing hard- and software switches and can define their behaviour from a central position.
+The controlled SDN switch then acts accordingly and handles the traffic as required.
 
-Another key feature of SDN marks the ability to switch out the network hardware transparently.
-The abstraction layer interfaces the different systems so that the configuration on controller level can remain regardless of the hardware used.
+Another key feature of SDN marks the ability to change the underlying hardware transparently.
+The abstraction layer hides the details of the different systems so that the configuration on controller level can remain regardless of the hardware used.
 
 The main objective of this work is to implement a faster matching engine in the software switch of the OpenFlow 1.0 reference implementation.
+Currently, that matching engine uses a linear search in the specified rule set when classifying packets.
+This approach may be fast enough in cases of small rule sets but with a growing number of rule in its database, the efficiency of a linear search decreases.
+
 
 \section{Related Work}
 Speeding up packet classification is one of the current research topics in the computer network community.
@@ -215,7 +223,7 @@ To address this problem, they extended the original EffiCuts algorithm in order 
 
 Other research groups focus on implementing wire speed packet matching in (programmable) hardware instead of software.
 The bitvector approach \cite{bv} has been evaluated in FPGAs \cite{bitvector_fpga} \cite{qu2013fast}.
-However, these papers only focus on five-tuple rule sets, which decreases the complexity of the problem compared to an OpenFlow 12-tuple.
+However, these papers mainly focus on five-tuple rule sets, which decreases the complexity of the problem compared to an OpenFlow 12-tuple.
 
 Further improvement on the bitvector algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
 When all dimensions are matched and the resulting bitvectors are retrieved, these vectors have to be ANDed bit per bit until a one bit is found.
@@ -227,7 +235,7 @@ Another approach to improve matching performance in a packet filter is to reorga
 
 One way to perform such a reorganization is the compression of the rule set as introduced in \cite{firewall_compressor} and \cite{redundancy_removal}.
 They reduce the number of the rules significantly whilst persisting its semantics.
-These optimizations are done offline and before the rule set is loaded into the firewall.
+%These optimizations are done offline and before the rule set is loaded into the firewall.
 
 The advantage of that strategy is that the matching engine itself has not to be changed and can be left untouched.
 This can be an upside in black box scenarios, where the matching engine's source code is not open to the user.
