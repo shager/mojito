@@ -9,10 +9,10 @@ import os, subprocess
 def deploy_rule(dpctl_args):
     subprocess.call("/usr/local/bin/dpctl " + dpctl_args, shell=True)
 
-def write_lines_to_tracefile(lines, filename):
-    # delete file if existant
+def write_lines_to_casefile(lines, filename):
+    # do nothing if file exists
     if os.path.isfile(filename):
-        os.remove(filename)
+        return 
     f = open(filename,'a')
     for line in lines:
         words = line.split(" ")
@@ -20,9 +20,10 @@ def write_lines_to_tracefile(lines, filename):
                 str(int(words[3]) + 1) + "\t" + "0x11/0xFF\t0x0800/0xFFFF\n")
     f.close()
 
-def generate_trace(ruleset, tracefile):
-    write_lines_to_tracefile(ruleset, tracefile)
-    subprocess.call("../acceptance_test/trace_generator/trace_generator 1 0.1 10 " + tracefile, shell=True)
+def generate_trace(ruleset, casefile):
+    write_lines_to_casefile(ruleset, casefile)
+    if not os.path.isfile(casefile + "_trace"):
+        subprocess.call("../acceptance_test/trace_generator/trace_generator 1 0.1 1000 " + casefile, shell=True)
 
 def read_file(filename):
     lines = [line.strip() for line in open(filename)]
