@@ -50,15 +50,15 @@ def main():
 
     for rule in ruleset:
         values = rule.split(" ")
-        if values[4] == "-": #input port not specified
-            deploy_rule("add-flow tcp:127.0.0.1:6634 nw_src=" + values[0]  + ",nw_dst="
-                + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
-                ",nw_proto=" + values[5] + ",ip,idle_timeout=0,actions=" + values[6])
-        else:
-            deploy_rule("add-flow tcp:127.0.0.1:6634 nw_src=" + values[0]  + ",nw_dst="
-                + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
-                ",in_port=" + values[4]  + ",nw_proto=" + values[5] + 
-                ",ip,idle_timeout=0,actions=" + values[6])
+#        if values[4] == "-": #input port not specified
+#            deploy_rule("add-flow tcp:127.0.0.1:6634 nw_src=" + values[0]  + ",nw_dst="
+#                + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
+#                ",nw_proto=" + values[5] + ",ip,idle_timeout=0,actions=" + values[6])
+#        else:
+#            deploy_rule("add-flow tcp:127.0.0.1:6634 nw_src=" + values[0]  + ",nw_dst="
+#                + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
+#                ",in_port=" + values[4]  + ",nw_proto=" + values[5] + 
+#                ",ip,idle_timeout=0,actions=" + values[6])
 
     if case == "b":
         tracefile = infile + ".bcase"
