@@ -208,14 +208,14 @@ This approach may be fast enough in cases of small rule sets but with a growing 
 Speeding up packet classification is one of the current research topics in the computer network community.
 Therefore, several algorithms have been developed in the last years.
 The bitvector algorithm is not the only promising idea to speed up packet matching in modern network hardware.
-An overview over these algorithms can be gained from \cite{algorithms_survey},
+An overview over these algorithms can be gained from \cite{algorithms_survey}.%TODO
 Approaches to this problem include the usage of tries, hash maps or geometric algorithms\cite{hicuts}
 in order to perform significantly faster than searching in a linear list.
 
 Real-world applications of these theoretical concepts are numerous and have been evaluated in different projects.
 Following, there is an overview over different projects using a software packet filter environment.
 
-The Iptables packet filter was improved in the HiPAC project \cite{hipac}, which was founded in a diploma thesis \cite{heinzhigh}.
+The Iptables\cite{iptables} packet filter was improved in the HiPAC project \cite{hipac}, which was founded in a diploma thesis \cite{heinzhigh}.
 Another project focuses on the implementation of EffiCuts in an OpenFlow environment \cite{stimpfling2013optimal}.
 They also faced the challenge to improve the efficiency of packet classification on more than the usual five-tuple of header fields.
 OpenFlow 1.0.0 \cite{openflow_spec10} requires at least 12 header fields to be matched, later versions are operating on even larger sets.
@@ -235,10 +235,11 @@ Another approach to improve matching performance in a packet filter is to reorga
 
 One way to perform such a reorganization is the compression of the rule set as introduced in \cite{firewall_compressor} and \cite{redundancy_removal}.
 They reduce the number of the rules significantly whilst persisting its semantics.
-%These optimizations are done offline and before the rule set is loaded into the firewall.
+These optimizations can be done offline and before the rule set is loaded into the firewall.
+Additionally, the firewall can perform a heuristic analysis of the traffic patterns and re-order the rule set accordingly while operating.
 
 The advantage of that strategy is that the matching engine itself has not to be changed and can be left untouched.
-This can be an upside in black box scenarios, where the matching engine's source code is not open to the user.
+This can be useful in black box scenarios, where the matching engine's source code is not open to the end user.
 However, that idea requires to reorganize the desired rule set and makes updating more complex.
 In case of high-frequent updates this strategy will hit its limitations, as the optimization steps often require the consideration of the entire rule set and not only the updated part.
 
@@ -258,7 +259,7 @@ If there are no matching rules for a point there is no cube projecting an interv
 The bitvector algorithm collects these projected rules for every dimension.
 After that, the edges of the rules' intervals are determined.
 Every edge then stores a vector of bits with $n$ bits length.
-For each original rule $r$ in the ruleset with $n$ rules this bit vector sotres a $1$ iff $r$ is projected on the interval beginning at the current edge.
+For each original rule $r$ in the rule set with $n$ rules this bit vector stores a $1$ if and only if $r$ is projected on the interval beginning at the current edge.
 If $r$ is not projected on the current interval, a $0$ bit is stored.
 This construction is done in every dimension for every edge.
 
@@ -273,7 +274,7 @@ This edge contains the bitvector with $n$ bits length, where $n$ is the size of 
 Secondly, all bitvectors from all dimensions are joined by a bitwise AND.
 The resulting vector then indicates by a $1$ at position $p$ that the packet has matched rule $p$.
 Generally, there can be one or more matching rules, for example when default rules exist, that match every packet.
-In order to determine the highest priority matching rule, the resulting bitvector is then scaned for the leftmost set 1-bit.
+In order to determine the highest priority matching rule, the resulting bitvector is then scanned for the leftmost set 1-bit.
 The index of this bit in the bitvector then determines the best matching rule in the ruleset.
 After that, the actions defined in the rule can be executed by the network device and the next packet in the queue can be matched.
 
@@ -282,13 +283,13 @@ To further speed up the lookup process, another optimization has been implemente
 At each lookup, the algorithm has to perform a binary search on the bitvectors' locations in each dimension in order to find the matching bitvector for the current packet.
 These locations can be interpreted as delimiters between the realms of the bitvectors.
 In the above example, if the lookup process receives a packet with a source IP address value of 10.0.0.3, the algorithm has to find the first bitvector in the source IP dimension. %TODO: example abgleichen!
-For every header field in the 12-diemnsional OpenFlow header the algorithm has to yield exactly one bitvector.
+For every header field in the 12-dimensional OpenFlow header the algorithm has to yield exactly one bitvector.
 This lookup process over the entire delimiter space requires several memory accesses for every lookup.
 The general idea to speed up this operation is to precompute a function that is specific for each dimension and returns the bitvector's index in one dimension when given the header value to be matched.
 
 The function is designed to have zero memory accesses when looking up header values.
-Therefore it performs the binary search only on precomputed values, which leads to the necessity of rebuilding the function at every ruleset update.
-Clearly, that leads to a performance disadvantage for fast changing rulesets at the benefit of having generally faster lookups.
+Therefore it performs the binary search only on precomputed values, which leads to the necessity of rebuilding the function at every rule set update.
+Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
 
 Implementing that functionality has lead to a just in time generated function written in machine language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 
@@ -299,6 +300,21 @@ Figure TODO shows the significant loss in efficiency when inserting rules. %TODO
 The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
 Because of the requirement that the matching engine has to be operable immediately after every update operation, every update implies a complete regeneration of the JIT code.
 That behaviour explains the additional update time seen in the measured data. 
+
+\section{Evaluation}
+\subsection{Unit Tests}
+An important goal in every software project is to ensure that the program operates correctly.
+The first step in this quality assurance process is to design unit tests for the modules in the software.
+In this project the matching engines have been tested separately before integrating them into the OpenFlow switch.
+Additionally, the just in time generated code has been tested to work properly.
+Erroneous behaviour in that part of the code is not easily debugable.
+
+\subsection{Acceptance Test}
+In order to guarantee the correctness of the two new implementations a predefined acceptance test was developed.
+A reasonable assumption is that, if given a ruleset and a corresponding trace, the old and new implementations are behaving the same.
+This was tested by deriving traces from randomly generated rule sets with the Classbench\cite{classbench_website} tool \textsc{trace\_generator}.
+
+\subsection{Performance Evaluation}
 
 \newpage
 \addcontentsline{toc}{section}{References}
