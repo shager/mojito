@@ -74,7 +74,7 @@ def main():
         case = filename[filename.find("case")-1:filename.find("case")]
         rules = filename[filename.find("2_")+2:filename.find("_", filename.find("2_")+2)]
         rnd_trace = filename[filename.find("_", filename.find("2_")+2):filename.find(".")-1]
-        for run in range(0, 10):
+        for run in range(0, 5):
             start_mininet()
             print "Started mininet"
             insert_rules_in_switch("rulesets/" + filename, case)
@@ -100,6 +100,8 @@ def main():
         
         outfile.write(str(case) + "," + str(rules) + "," + str(rnd_trace) + "," + time_string + packet_string + "\n")
         outfile.close()
+        times = []
+        packets = []
 
 if __name__ == '__main__':
     main()
