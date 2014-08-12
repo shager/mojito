@@ -12,6 +12,7 @@
 \usepackage{color}
 \usepackage{hyperref}
 \usepackage{float}
+\usepackage{csquotes}
 \usepackage{scrpage2} %use this instead of headings due to bug in KOMA-script
 \usepackage[draft=false,babel,tracking=true,kerning=true,spacing=true]{microtype}
 
@@ -143,38 +144,75 @@ nor a similar work has been presented to an examination committee.
 \section{Introduction}
 \subsection{The Packet Classification Problem}
 The growth of the Internet constantly poses new challenges to the producers of network equipment.
-Today's applications like Multimedia, Web and Voice over IP are dependent on a transport network (the Internet) with
+Today's applications like Multimedia, Web and Voice over IP are dependent on a transport network with
 high data rates, low latency, soft realtime properties and quality of service mechanisms.
 This catalogue of network parameters is already implemented in the Internet protocol stack.
+However, the growth of the actual traffic itself leads to a steady demand for faster hardware handling the traffic on the networks. 
 
-However, due to Moore's Law the growth of the actual data traffic must be engineered in faster hardware on the nodes handling this traffic.
+Additionally, the number of hosts is growing permanently.
+This also contributes to a denser populated address space in case of IPv4.
+Historically, the IPv4 address space was divided into three classes\cite{rfc1466}.
+After 1993 the concept of Classless Inter Domain Routing (CIDR) was introduced.
+Firstly, an overview over the classful Internet and its consequences on routing and the corresponding rule sets.
 
-Additionally, the number of hosts is growing steadily.
-This also contributes to a denser address space in case of IPv4.
-Usually, this leads to an increasing size of rule sets in the respective Internet traffic handlers. %TODO: position 1 absatz weiter?
+Very large networks were called Class A networks.
+These networks were located in the address range of 0.0.0.0 to 127.255.255.255 and each network could include up to about 16 million hosts.
+This means that only the first of the four bytes structuring an IPv4 address is fixed, the rest is freely choosable for each host by the owner of the address block.
+Due to their size, the entire IPv4 address space can only contain 128 of these networks.
+Class A networks were assigned to big companies and organisations in the early days of the Internet.
 
+A more common class especially for smaller organisations like German universities were Class B networks.
+These networks had two of the four bytes in an IPv4 address fixed.
+This lead to 16384 possible Class B networks with up to about 65000 hosts each.
+Similarly, Class C networks were alloted to small entities.
+Each Class C network contains up to 254 hosts and has the first three of the four address bytes set.
+
+This layout faciliated the routing problem.
+Rule sets could be relatively organised and small.
+For example, an entire Class An network only needed one routing rule to have its traffic routed there.
+Additionally, the first byte of a network address already determined the affiliation in its net class.
+On the other hand, this system had major disadvantages.
+Firstly, there are only three sizes for networks.
+This automatically leads to networks too big for the purpose and an enormous waste of addresses.
+Another problem is the lack of flexibility.
+Consider a network that has to be shrinked or enlargened.
+That operation could only properly be executed by moving into another network class instead of extending the 
+previously used address space into its \enquote{neighbouring} area.
+
+In 1993, the IETF introduced Classless Inter Domain Routing\cite{rfc1518} \cite{rfc4632}.
+The main idea is to give up the three static classes and to introduce dynamic subnet sizes.
+In principle, an address can be part of a network of any size and is not bound to be in a certain class.
+This flexibility leads to the necessity of defining the size of the subnet for every subnet.
+In the old scheme, the address 1.2.3.4 was definitely in the Class A network 1.0.0.0 -- 1.255.255.255.
+With CIDR, the containing address space must be determined by defining a fixed prefix for each of the addresses in the subnet.
+Usually, this is done by adding a slash followed the number of fixed bits after the subnet's first address.
+For example, the previous Class A network becomes 1.0.0.0/8, because the first 8 bit are fixed and the rest is part of the subnet.
+With this notation, the entire Internet becomes 0.0.0.0/0 and one single host is for example 141.20.33.1/32.
+
+\subsection{Longest Prefix Matching}
+CIDR opens the opportunity to route different parts of a subnet to different places.
+For example, a rule set can contain a rule for the address space 141.20.0.0/16 and another rule for the included subnet 141.20.33.0/24.
+Packet matchers therefore need to have capabilities to match a packet to its longest matching prefix, as more special rules are normally higher prioritized.
+Usually, CIDR leads to an increasing size of rule sets in the respective Internet traffic handlers. 
+%TODO: Grafik zum Beispiel, mehr Text
+
+\subsection{Affected Internet Infrastructure}
 The critical points in the internet's architecture concerning performance are the stations which have to decide for each packet what to do.
 These are mostly firewalls, Level-2-Switches and Level-3-Routers.
 In general, these machines inspect the header data of every incoming IP packet and process it following a rule set that has been specified before.
-These rule sets can be mostly static (e.g. in case of a small SOHO router) or very dynamic (e.g. in a large stateful firewall).
 
-One main point in optimization therefore lies in the matching algorithms executing this process.
+One main point in optimization therefore lies in the matching algorithms executing this process. %TODO: überarbeiten ab hier
 Many traditional rule sets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
 The last two fields imply the usage of TCP or UDP as transport protocol, as other protocols may not know the concept of ports (e.g. ICMP). %TODO: quote RFCs
-But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.
+But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.%bis hier
 
 Matching algorithms become slower the more header fields they have to match.
 Additionally, some fields require rules that imply certain ranges or prefixes, for example IP addresses.
-A detailed description of the special role of prefixes is described in section \glqq Longest Prefix Matching\grqq.
 These constraints make it more difficult to implement simple matching algorithms and in order to match with high speed, more sophisticated
 algorithms have to be used for these fields.
 
-\subsection{Longest Prefix Matching}
 A common example for non-trivial matchable fields are IP forwarding tables, where rules are normally defined as IP prefixes.
-Prefixes in IP addresses correspond to subnets, because in IP prefixes there is always a certain amount of fixed bits at the beginning of the address
-and the bits after that are free to choose.
 
-TODO: Example (with graphics)
 
 Therefore, an algorithm used for matching packets has to be capable of longest prefix matching.
 
@@ -316,10 +354,29 @@ A reasonable assumption is that, if given a rule set and a corresponding trace, 
 This was tested by deriving traces from randomly generated rule sets with the Classbench\cite{classbench_website} tool \textsf{trace\_generator}.
 
 \subsection{Performance Evaluation}
+The evaluation of the performance of the newly implemented matching algorithm has been executed in a virtualized environment.
+\textsf{mininet}\cite{mininet} provides an easily usable and lightweight virtual network on a local computer.
+It creates two new local interfaces and connects them through a local OpenFlow switch.
+This switch can be configured with \textsf{dpctl}, a tool included in the toolchain of the OpenFlow reference implementation.
+Rule set updates thus are done via a command line call of that tool.
+The evaluation system is a Lenovo Thinkpad T61 laptop with an Intel Core2Duo dual core CPU and 3 GB of memory running a recent Arch Linux. %TODO: Prozessormodell
+
+The matching performance evaluation was setup in the following way.
+\begin{itemize}
+    \item Creation of different sized rule sets from 50 to 1000 rules.
+        For measuring average performances there are 15 rule sets created for every rule set size.
+    \item Generating the best, average and worst case sub-rule sets. 
+        Each original rule set is split into thirds and these are saved separately
+    \item Generating traces for every sub-rule set.
+        Using the Classbench\cite{classbench_website} tool, a packet trace is generated for every previously generated rule set.
+        That means that for every rule set three traces are produced: one for the best case sub-rule set, one for the average and one for the worst case.
+\end{itemize}
+A packet trace consists of packet header data like IP source and destination addresses, transport and Internet protocols et cetera.
+Every trace entry can be translated into a packet that is sent into the OpenFlow switch's matching engine.
 
 \newpage
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{acm}
-\bibliography{references,paper-build/conferences-crossref}
+\bibliography{references,paper-build/conferences-crossref,rfc}
 
 \end{document}

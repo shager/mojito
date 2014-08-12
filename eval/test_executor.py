@@ -44,7 +44,7 @@ def start_mininet():
 def stop_mininet():
     global process
     os.killpg(process.pid, signal.SIGTERM)
-    process.wait
+    process.wait()
     devnull = open('/dev/null', 'w')
     process = subprocess.Popen("mn -c", stdout=devnull, stderr=devnull, shell=True)
     process.wait()
