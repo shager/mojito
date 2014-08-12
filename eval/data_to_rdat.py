@@ -74,22 +74,31 @@ def main():
                 time_dict[value] = mean_and_95_confidence_interval(map(float, time_dict[value]))
             pd_list.append(packet_dict)
             td_list.append(time_dict)
+            print filename + " " + case
 
+    print str(len(pd_list))
     #generate R data files
-    output_string = "\"x\",\"JIT\",\"Simple Bitvector\",\"List\",\"JIT error\",\"Simple Bitvector error\",\"List error\"\n"
-    for i in range(50, 1001, 50):
-        output_string += str(i) + "," #indicate our sample size
-        output_string += str(pd_list[0][i][0]) + "," #get algorithm 1
-        output_string += str(pd_list[1][i][0]) + "," #get algorithm 2
-        output_string += str(pd_list[2][i][0]) + "," #get algorithm 3
-        output_string += str(pd_list[0][i][1]) + "," #get algorithm 1 error
-        output_string += str(pd_list[1][i][1]) + "," #get algorithm 2 error
-        output_string += str(pd_list[2][i][1]) #get algorithm 3 error
-        output_string += "\n"
-    
-    fdes = open("eval.dat", 'w')
-    fdes.write(output_string)
-    fdes.close()
+    for case in range(0, 3):
+        output_string = "\"x\",\"JIT\",\"Simple Bitvector\",\"List\",\"JIT error\",\"Simple Bitvector error\",\"List error\"\n"
+        for i in range(50, 1001, 50):
+            output_string += str(i) + "," #indicate our sample size
+            output_string += str(pd_list[0 + case][i][0]) + "," #get algorithm 1
+            output_string += str(pd_list[1 + case][i][0]) + "," #get algorithm 2
+            output_string += str(pd_list[2 + case][i][0]) + "," #get algorithm 3
+            output_string += str(pd_list[0 + case][i][1]) + "," #get algorithm 1 error
+            output_string += str(pd_list[1 + case][i][1]) + "," #get algorithm 2 error
+            output_string += str(pd_list[2 + case][i][1]) #get algorithm 3 error
+            output_string += "\n"
+        case_s = ""
+        if case == 0:
+            case_s = "a"
+        if case == 1:
+            case_s = "b"
+        if case == 2:
+            case_s = "w"
+        fdes = open("eval.dat_" + case_s, 'w')
+        fdes.write(output_string)
+        fdes.close()
     
 
 if __name__ == '__main__':
