@@ -60,7 +60,7 @@
 % \vspace{5cm}
 \begin{center}
   % \vspace{0.5 cm}
-  \huge{\bf Measurements and Optimizations with Just-In-Time code generation on the Openflow reference implementation} \\ % Hier fuegen Sie den Titel Ihrer Arbeit ein.
+  \huge{\bf Measurements and Optimizations with Just-In-Time Code Generation on the Openflow Reference Implementation} \\ % Hier fuegen Sie den Titel Ihrer Arbeit ein.
   \vspace{1cm}
   \LARGE  Bachelorarbeit \\ % Geben Sie anstelle der Punkte an, ob es sich um eine
                 % Diplomarbeit, eine Masterarbeit oder eine Bachelorarbeit handelt.
@@ -151,7 +151,7 @@ However, due to Moore's Law the growth of the actual data traffic must be engine
 
 Additionally, the number of hosts is growing steadily.
 This also contributes to a denser address space in case of IPv4.
-Usually, this leads to an increasing size of rule sets in the respective internet traffic handlers. %TODO: position 1 absatz weiter?
+Usually, this leads to an increasing size of rule sets in the respective Internet traffic handlers. %TODO: position 1 absatz weiter?
 
 The critical points in the internet's architecture concerning performance are the stations which have to decide for each packet what to do.
 These are mostly firewalls, Level-2-Switches and Level-3-Routers.
@@ -164,13 +164,14 @@ The last two fields imply the usage of TCP or UDP as transport protocol, as othe
 But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.
 
 Matching algorithms become slower the more header fields they have to match.
-Additionally, some fields require rules that imply certain ranges or prefixes, e.g. IP addresses.
+Additionally, some fields require rules that imply certain ranges or prefixes, for example IP addresses.
+A detailed description of the special role of prefixes is described in section \glqq Longest Prefix Matching\grqq.
 These constraints make it more difficult to implement simple matching algorithms and in order to match with high speed, more sophisticated
 algorithms have to be used for these fields.
 
 \subsection{Longest Prefix Matching}
-The best-known example for non-trivial matchable fields are IP forwarding tables, where rules are normally defined as IP prefixes.
-Prefixes in IP addresses correspond to subnets, because in IP prefixes there's always a certain amount of fixed bits at the beginning of the address
+A common example for non-trivial matchable fields are IP forwarding tables, where rules are normally defined as IP prefixes.
+Prefixes in IP addresses correspond to subnets, because in IP prefixes there is always a certain amount of fixed bits at the beginning of the address
 and the bits after that are free to choose.
 
 TODO: Example (with graphics)

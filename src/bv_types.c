@@ -120,9 +120,9 @@ Range_borders* range_borders_ctor() {
     object->insert_element = Rb_insert_element;
     object->insert_element_at_index = Rb_insert_element_at_index;
     object->delete_element = Rb_delete_element;
-    object->add_rule = Rb_add_rule;
+    object->add_rule = Rb_add_rule_jit;
     object->find_element = Rb_find_element;
-    object->match_packet = Rb_match_packet;
+    object->match_packet = Rb_match_packet_jit;
 
     // This section has to be added in order to create some executable
     // because OpenFlow does lookups at startup
