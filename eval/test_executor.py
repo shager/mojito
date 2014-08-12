@@ -18,7 +18,7 @@ def set_routing_table():
     execute_on_host("h2", "route add default gw 10.0.0.1 h2-eth0")
 
 def run_sender(tracefile):
-    execute_on_host("h1", "/home/samuel/studium/ba/mojito/eval/sender /home/samuel/studium/ba/mojito/eval/" + str(tracefile) + " no" + " no")
+    execute_on_host("h1", "timeout 10s /home/samuel/studium/ba/mojito/eval/sender /home/samuel/studium/ba/mojito/eval/" + str(tracefile) + " yes" + " no")
 
 def get_netstat(host):
     netstat_output = execute_on_host(host, "netstat -s -u")
