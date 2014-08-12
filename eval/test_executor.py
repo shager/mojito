@@ -1,7 +1,9 @@
 #!/usr/bin/env python2
 
 from optparse import OptionParser
-import subprocess, time, os
+import subprocess, time, os, signal
+
+process = 0
 
 def execute_on_host(hostname, call_string):
     try:
@@ -34,11 +36,15 @@ def insert_rules_in_switch(ruleset, case):
     process.wait()
 
 def start_mininet():
+    global process
     devnull = open('/dev/null', 'w')
-    subprocess.Popen("mn --topo single,2 --mac --switch user --controller remote", stdout=devnull, stderr=devnull, shell=True)
+    process = subprocess.Popen("mn --topo single,2 --mac --switch user --controller remote", stdout=devnull, stderr=devnull, shell=True, preexec_fn=os.setsid)
     time.sleep(3)
 
 def stop_mininet():
+    global process
+    os.killpg(process.pid, signal.SIGTERM)
+    process.wait
     devnull = open('/dev/null', 'w')
     process = subprocess.Popen("mn -c", stdout=devnull, stderr=devnull, shell=True)
     process.wait()
@@ -73,8 +79,8 @@ def main():
     for filename in tracefiles:
         case = filename[filename.find("case")-1:filename.find("case")]
         rules = filename[filename.find("2_")+2:filename.find("_", filename.find("2_")+2)]
-        rnd_trace = filename[filename.find("_", filename.find("2_")+2):filename.find(".")-1]
-        for run in range(0, 5):
+        rnd_trace = filename[filename.find("_", filename.find("2_")+2)+1:filename.find(".")]
+        for run in range(0, 1):
             start_mininet()
             print "Started mininet"
             insert_rules_in_switch("rulesets/" + filename, case)
