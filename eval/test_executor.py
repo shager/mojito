@@ -5,9 +5,19 @@ import subprocess, time, os, signal
 
 process = 0
 
+def fetch_remote_udp_count():
+    tmp_name = "____________SOME_CRAZY_NAME___________________"
+    cmd = "../../mininet/util/m h2 netstat -s -u | grep Udp: -A 2 | grep -o -E [0-9]+ | awk '{sum = sum + $1} END {print sum}' > %s" % tmp_name
+    os.system(cmd)
+    with open(tmp_name, "r") as tmp:
+        content = tmp.read()
+    os.unlink(tmp_name)
+    return int(content)
+
 def execute_on_host(hostname, call_string):
     try:
-        retval = subprocess.check_output("../../oldrepo/mininet/util/m " + str(hostname) + " " + str(call_string), shell=True)
+        print "../../mininet/util/m " + str(hostname) + " " + str(call_string)
+        retval = os.system("../../mininet/util/m " + str(hostname) + " " + str(call_string))
     except subprocess.CalledProcessError:
         print "Error with command " + str(call_string) + " on host " + str(hostname) + "."
         retval = ""
@@ -18,10 +28,10 @@ def set_routing_table():
     execute_on_host("h2", "route add default gw 10.0.0.1 h2-eth0")
 
 def run_sender(tracefile):
-    execute_on_host("h1", "timeout 10s /home/samuel/studium/ba/mojito/eval/sender /home/samuel/studium/ba/mojito/eval/" + str(tracefile) + " yes" + " no")
+    execute_on_host("h1", "timeout 10s /home/samuel/mojito/eval/sender /home/samuel/mojito/eval/" + str(tracefile) + " yes" + " no")
 
 def get_netstat(host):
-    netstat_output = execute_on_host(host, "netstat -s -u")
+    netstat_output = execute_on_host(host, "echo hallo")
 #    print netstat_output
     lines = netstat_output.split("\n")
     for line in lines:
@@ -86,14 +96,17 @@ def main():
             insert_rules_in_switch("rulesets/" + filename, case)
             set_routing_table()
             
-            old_udp_count = int(get_netstat("h2"))
+            old_udp_count = fetch_remote_udp_count()
+        #    old_udp_count = 0
             start = time.time()
             run_sender("rulesets/" + filename)
             duration = time.time() - start
             print "Time to send trace: " + str(duration)
             times.append(duration)
-            print "Packets received: " + str(int(get_netstat("h2")) - old_udp_count)
-            packets.append(int(get_netstat("h2")) - old_udp_count)
+            remote_udp = fetch_remote_udp_count()
+        #    remote_udp = 3
+            print "Packets received: " + str(remote_udp - old_udp_count)
+            packets.append(remote_udp - old_udp_count)
             stop_mininet()
         
         outfile = open(outfile_name, 'a')
