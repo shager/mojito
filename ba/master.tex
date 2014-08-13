@@ -6,6 +6,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
+\usepackage{tabularx}
 \usepackage{geometry}
 \usepackage{titlesec}
 \usepackage[utf8]{inputenc}
@@ -142,17 +143,65 @@ nor a similar work has been presented to an examination committee.
 \pagestyle{scrheadings}
 
 \section{Introduction}
-\subsection{The Packet Classification Problem}
 The growth of the Internet constantly poses new challenges to the producers of network equipment.
-Today's applications like Multimedia, Web and Voice over IP are dependent on a transport network with
+Today's applications like Multimedia, Peer-to-Peer data exchange, Web and Voice over IP are dependent on a transport network with
 high data rates, low latency, soft realtime properties and quality of service mechanisms.
-This catalogue of network parameters is already implemented in the Internet protocol stack.
-However, the growth of the actual traffic itself leads to a steady demand for faster hardware handling the traffic on the networks. 
+This catalogue of network parameters is already implemented in the Internet protocol stack\cite{rfc3260, rfc3261, rfc5694, rfc3550}.
+Another growing segment of Internet traffic is triggered by the outsourcing of 
+enterprise IT infrastructure to Cloud computing companies like Amazon or Heroku.
+The growth of the actual traffic itself leads to a steady demand for faster hardware handling the traffic on the networks.
 
-Additionally, the number of hosts is growing permanently.
-This also contributes to a denser populated address space in case of IPv4.
+The critical points in the internet's architecture concerning performance are the stations which have to decide for each packet what to do.
+These are mostly firewalls, Level-2-Switches and Level-3-Routers implemented in special, single-purpose hardware.
+In general, these machines inspect the header data of every incoming IP packet and process it 
+following a rule set that has been specified before.
+A recent trend in the networking community are Software Defined Networks (SDNs).
+SDNs simplify the central and dynamic configuration of network hardware\cite{onf_whitepaper}.
+
+This topic is discussed in detail in section \ref{sec:SDN}.
+
+In this work 
+
+\section{Basic Concepts}
+\subsection{Internet Packets}
+The Internet is a global network of packet switched networks\cite[Chapter 1.1]{kurose_ross} for exchanging data. 
+The stream of data that is transported from its source to its destination is broken down into small chunks of bytes.
+In packet switched networks, packets are the smallest independant unit of data transported.
+A packet usually consists of header and payload data.
+The packet header transports meta information for directing the packet to the correct host.
+Depending on the protocol, headers may also contain meta data for congestion control or data order.
+For instance, the TCP protocol transports additional information like sequence numbers in the packet headers\cite[Chapter 3.5]{kurose_ross}.
+Payload data is a chunk of bytes from the original data stream.
+
+When sending data over the Internet every packet is routed separately.
+This can lead to differently chosen paths for one transmission, if it sonsists of more than one packet.
+A router or switch has to inspect every incoming packet seperately and then decide what action to apply.
+
+\subsection{The Packet Classification Problem}
+Due to the characteristics of packet switched networks, every station in the path of a data transmission on the Internet 
+has to decide for each packet which action to execute.
+Typical actions are DROP, REJECT, OUTPUT(\textit{port}), MODIFY and ACCEPT, as explained in table \ref{table:actions}.
+
+\begin{table}
+  \centering
+  \begin{tabularx}{\textwidth}{l|X}
+  Name&Description\\
+  \hline
+  DROP&Drop the packet and do not notify anyone.\\
+  REJECT&Drop the packet and notify the previous station or the sender.\\
+  OUTPUT(\textit{port})&Transfer the packet to the specified output port and send it to the next station.\\
+  MODIFY&Modify some of the header data fields (usually in combination with OUTPUT).\\
+  ACCEPT&Accept the packet locally and process it in the own network stack. The packet is not relayed to another host.\\
+  \end{tabularx}
+  \caption{Typical actions for network stations.}
+  \label{table:actions}
+\end{table}
+
+\subsection{The IP Address Space}
+The number of hosts on the Internet is growing permanently.
+This contributes to a denser populated address space in case of IPv4.
 Historically, the IPv4 address space was divided into three classes\cite{rfc1466}.
-After 1993 the concept of Classless Inter Domain Routing (CIDR) was introduced.
+In 1993 the concept of Classless Inter Domain Routing (CIDR) was introduced.
 Firstly, an overview over the classful Internet and its consequences on routing and the corresponding rule sets.
 
 Very large networks were called Class A networks.
@@ -197,10 +246,6 @@ Usually, CIDR leads to an increasing size of rule sets in the respective Interne
 %TODO: Grafik zum Beispiel, mehr Text
 
 \subsection{Affected Internet Infrastructure}
-The critical points in the internet's architecture concerning performance are the stations which have to decide for each packet what to do.
-These are mostly firewalls, Level-2-Switches and Level-3-Routers.
-In general, these machines inspect the header data of every incoming IP packet and process it following a rule set that has been specified before.
-
 One main point in optimization therefore lies in the matching algorithms executing this process. %TODO: überarbeiten ab hier
 Many traditional rule sets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
 The last two fields imply the usage of TCP or UDP as transport protocol, as other protocols may not know the concept of ports (e.g. ICMP). %TODO: quote RFCs
@@ -223,7 +268,9 @@ Therefore, an algorithm used for matching packets has to be capable of longest p
 %0110 1011 0001 1111 1111 1111 1111 1111. %TODO: unschön? evtl umformulieren
 
 %TODO: Openflow/SDN
-\subsection{OpenFlow}
+\subsection{Software Defined networks}
+\label{sec:SDN}
+\subsubsection{OpenFlow}
 Software Defined Networking (SDN) describes the general idea to decouple the two tasks of network hardware and to introduce a new layer of abstraction in networking. %quote: sdn-whitepaper
 These networks are separated into two logical units: the control and the data plane.
 The control plane is used for configuring and updating the network hardware, e.g. inserting new rules into a firewall.
