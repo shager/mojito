@@ -380,15 +380,11 @@ The function is designed to have zero memory accesses when looking up header val
 Therefore it performs the binary search only on precomputed values, which leads to the necessity of rebuilding the function at every rule set update.
 Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
 
-Implementing that functionality has lead to a just in time generated function written in machine language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
+Implementing that functionality has lead to a just in time generated function written in machine 
+language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 
 The algorithm used in this implementation is a slightly modified binary search.
 %TODO: Pseudocode hier einfügen
-
-Figure TODO shows the significant loss in efficiency when inserting rules. %TODO: Grafik
-The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
-Because of the requirement that the matching engine has to be operable immediately after every update operation, every update implies a complete regeneration of the JIT code.
-That behaviour explains the additional update time seen in the measured data. 
 
 \section{Evaluation}
 \subsection{Unit Tests}
@@ -396,7 +392,7 @@ An important goal in every software project is to ensure that the program operat
 The first step in this quality assurance process is to design unit tests for the modules in the software.
 In this project the matching engines have been tested separately before integrating them into the OpenFlow switch.
 Additionally, the just in time generated code has been tested to work properly.
-Erroneous behaviour in that part of the code is not easily debuggable.
+%Erroneous behaviour in that part of the code is not easily debuggable.
 
 \subsection{Acceptance Test}
 In order to guarantee the correctness of the two new implementations a predefined acceptance test was developed.
@@ -409,21 +405,53 @@ The evaluation of the performance of the newly implemented matching algorithm ha
 It creates two new local interfaces and connects them through a local OpenFlow switch.
 This switch can be configured with \textsf{dpctl}, a tool included in the toolchain of the OpenFlow reference implementation.
 Rule set updates thus are done via a command line call of that tool.
-The evaluation system is a Lenovo Thinkpad T61 laptop with an Intel Core2Duo dual core CPU and 3 GB of memory running a recent Arch Linux. %TODO: Prozessormodell
+The evaluation system is a computer with an Intel Xeon E3-1270 v3 CPU running at 3.5 GHz and 16 GB of memory running Ubuntu Linux 14.04 LTS.
 
+\subsubsection{Matching Performance}
 The matching performance evaluation was setup in the following way.
 \begin{itemize}
-    \item Creation of different sized rule sets from 50 to 1000 rules.
-        For measuring average performances there are 15 rule sets created for every rule set size.
-    \item Generating the best, average and worst case sub-rule sets. 
-        Each original rule set is split into thirds and these are saved separately
+    \item Creation of different sized rule sets from 100 to 3500 rules.
+        For measuring average performances there are 10 rule sets created for every rule set size.
+    \item Generating good, average and bad case sub-rule sets. 
+        Each original rule set is split into thirds and these are saved separately.
     \item Generating traces for every sub-rule set.
         Using the Classbench\cite{classbench_website} tool, a packet trace is generated for every previously generated rule set.
-        That means that for every rule set three traces are produced: one for the best case sub-rule set, one for the average and one for the worst case.
+        That means that for every rule set three traces are produced: 
+        one for the good case sub-rule set, one for the average one and one for the bad case set.
 \end{itemize}
 A packet trace consists of packet header data like IP source and destination addresses, transport and Internet protocols et cetera.
 Every trace entry can be translated into a packet that is sent into the OpenFlow switch's matching engine.
+The performace was tested by looping through every generated trace for ten seconds and sending packets through the switch.
+After that time the number of received packets was measured on the destination host with the \textsf{netstat} command.
 
+\begin{figure}
+\centering
+\includegraphics[height=0.4\textheight]{images/eval_b}
+\caption{Matching performance: Good case.}
+\label{fig:eval_good_case}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[height=0.4\textheight]{images/eval_a}
+\caption{Matching performance: Average case.}
+\label{fig:eval_average_case}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[height=0.4\textheight]{images/eval_w}
+\caption{Matching performance: Bad case.}
+\label{fig:eval_bad_case}
+\end{figure}
+
+\subsubsection{Insertion Time}
+Figure TODO shows the significant loss in efficiency when inserting rules. %TODO: Grafik
+The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
+Because of the requirement that the matching engine has to be operable immediately after every update operation, every update implies a complete regeneration of the JIT code.
+That behaviour explains the additional update time seen in the measured data. 
+
+\subsubsection{Memory Usage}
 \newpage
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{acm}
