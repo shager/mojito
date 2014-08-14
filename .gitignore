@@ -56,3 +56,11 @@ docs/_build/
 
 # binary images
 *.png
+
+# LaTeX stuff
+*.aux
+*.bbl
+*.toc
+*.pdf
+*.blg
+*.out
