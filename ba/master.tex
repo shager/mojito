@@ -157,10 +157,13 @@ In general, these machines inspect the header data of every incoming IP packet a
 following a rule set that has been specified before.
 A recent trend in the networking community are Software Defined Networks (SDNs).
 SDNs simplify the central and dynamic configuration of network hardware\cite{onf_whitepaper}.
-
+Administrators can define network parameters and rules and the configuration on the end hosts is then managed by the SDN controller
 This topic is discussed in detail in section \ref{sec:SDN}.
 
-In this work 
+In this work the focus lies on the reference implementation of the SDN protocol suite OpenFlow.
+OpenFlow is the first mechanism that specified the communication between the controller and the network hardware.
+The reference implementation provides a software switch.
+Optimization of that switch's matching engine is the main focus of this thesis.
 
 \section{Basic Concepts}
 \subsection{Internet Packets}
