@@ -202,6 +202,7 @@ main (int argc, char **argv)
   do {
     size_t packet_count;
     for (packet_count = 0; packet_count < input->num_packets; ++packet_count) {
+    //for (packet_count = 0; packet_count < input->num_packets;) {
       //strcpy (dst_ip, argv[1]);
 
       // UDP data
