@@ -54,13 +54,13 @@ def main():
         fdes.close()
         lines = content.split("\n")
         for case in ["a", "b", "w"]:
-            packet_dict = {50:[], 100:[], 150:[], 200:[], 250:[], 300:[], 350:[], 
-                            400:[], 450:[], 500:[], 550:[], 600:[], 650:[], 700:[], 
-                            750:[], 800:[], 850:[], 900:[], 950:[], 1000:[]}
-            time_dict = {50:[], 100:[], 150:[], 200:[], 250:[], 300:[], 350:[], 
-                            400:[], 450:[], 500:[], 550:[], 600:[], 650:[], 700:[], 
-                            750:[], 800:[], 850:[], 900:[], 950:[], 1000:[]}
-            for key in range(50, 1001, 50):
+            packet_dict = {100:[], 300:[], 500:[], 700:[], 900:[], 1100:[], 1300:[], 
+                            1500:[], 1700:[], 1900:[], 2100:[], 2300:[], 2500:[], 2700:[], 
+                            2900:[], 3100:[], 3300:[], 3500:[]}
+            time_dict = {100:[], 300:[], 500:[], 700:[], 900:[], 1100:[], 1300:[], 
+                            1500:[], 1700:[], 1900:[], 2100:[], 2300:[], 2500:[], 2700:[], 
+                            2900:[], 3100:[], 3300:[], 3500:[]}
+            for key in range(100, 3501, 200):
                 for line in lines:
                     if line == "":
                         continue
@@ -75,17 +75,18 @@ def main():
             pd_list.append(packet_dict)
             td_list.append(time_dict)
 
+    print pd_list
     #generate R data files
     for case in range(0, 3):
-        output_string = "\"x\",\"JIT\",\"Simple_Bitvector\",\"List\",\"JIT_error\",\"Simple_Bitvector_error\",\"List_error\"\n"
-        for i in range(50, 1001, 50):
-            output_string += str(i) + "," #indicate our sample size
-            output_string += str(pd_list[0 + case][i][0]) + "," #get algorithm 1
-            output_string += str(pd_list[1 + case][i][0]) + "," #get algorithm 2
-            output_string += str(pd_list[2 + case][i][0]) + "," #get algorithm 3
-            output_string += str(pd_list[0 + case][i][1]) + "," #get algorithm 1 error
-            output_string += str(pd_list[1 + case][i][1]) + "," #get algorithm 2 error
-            output_string += str(pd_list[2 + case][i][1])       #get algorithm 3 error
+        output_string = "#\"x\",\"JIT\",\"Simple_Bitvector\",\"List\",\"JIT_error\",\"Simple_Bitvector_error\",\"List_error\"\n"
+        for i in range(100, 3501, 200):
+            output_string += str(i) + " " #indicate our sample size
+            output_string += str(pd_list[0 + case][i][0]) + " " #get algorithm 1
+            output_string += str(pd_list[3 + case][i][0]) + " " #get algorithm 2
+            output_string += str(pd_list[6 + case][i][0]) + " " #get algorithm 3
+            output_string += str(pd_list[0 + case][i][1]) + " " #get algorithm 1 error
+            output_string += str(pd_list[3 + case][i][1]) + " " #get algorithm 2 error
+            output_string += str(pd_list[6 + case][i][1])       #get algorithm 3 error
             output_string += "\n"
         case_s = ""
         if case == 0:
