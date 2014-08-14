@@ -405,7 +405,9 @@ The evaluation of the performance of the newly implemented matching algorithm ha
 It creates two new local interfaces and connects them through a local OpenFlow switch.
 This switch can be configured with \textsf{dpctl}, a tool included in the toolchain of the OpenFlow reference implementation.
 Rule set updates thus are done via a command line call of that tool.
-The evaluation system is a computer with an Intel Xeon E3-1270 v3 CPU running at 3.5 GHz and 16 GB of memory running Ubuntu Linux 14.04 LTS.
+The evaluation system is a computer with a quadcore Intel Xeon E3-1270 v3 CPU 
+running at 3.5 GHz and 16 GB of memory with an Ubuntu Linux 14.04 LTS operating system.
+This computer was idle when performing the tests.
 
 \subsubsection{Matching Performance}
 The matching performance evaluation was setup in the following way.
@@ -423,6 +425,14 @@ A packet trace consists of packet header data like IP source and destination add
 Every trace entry can be translated into a packet that is sent into the OpenFlow switch's matching engine.
 The performace was tested by looping through every generated trace for ten seconds and sending packets through the switch.
 After that time the number of received packets was measured on the destination host with the \textsf{netstat} command.
+
+The results in figures \ref{fig:eval_good_case}, \ref{fig:eval_average_case} and \ref{fig:eval_bad_case} show that the List implementation
+clearly suffers from hard performance losses when inserting more rules.
+Both bitvector implementations outperform the linear search algorithm after inserting about 300 rules.
+The initial negative peak just as the dent at 500 inserted rules can be caused by an unfortunate rule set and trace combination.
+However, it is not likely that these performance holes are caused by other active processes on the computer during the evaluation.
+All evaluation tasks were distributed over the time, so that the ten runs 
+for one value guarantee some independence of external factors over the time.
 
 \begin{figure}
 \centering
@@ -450,6 +460,22 @@ Figure TODO shows the significant loss in efficiency when inserting rules. %TODO
 The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
 Because of the requirement that the matching engine has to be operable immediately after every update operation, every update implies a complete regeneration of the JIT code.
 That behaviour explains the additional update time seen in the measured data. 
+
+\subsubsection{Implementation Complexity}
+The three algorithms are implemented in C.
+To give a rough estimate of complexity table \ref{table:loc} shows the approximate size of the implementation sizes measured in lines of code.
+
+\begin{table}
+  \centering
+  \begin{tabularx}{\textwidth}{l|XXX}
+  &List&Simple Bitvector&JIT Bitvector\\
+  \hline
+  Insertion&&&\\
+  Lookup&&&\\
+  \end{tabularx}
+  \caption{Lines of code for all three implementations.}
+  \label{table:loc}
+\end{table}
 
 \subsubsection{Memory Usage}
 \newpage
