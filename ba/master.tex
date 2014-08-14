@@ -16,6 +16,8 @@
 \usepackage{csquotes}
 \usepackage{scrpage2} %use this instead of headings due to bug in KOMA-script
 \usepackage[draft=false,babel,tracking=true,kerning=true,spacing=true]{microtype}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \usepackage{paralist}
 \usepackage[section]{placeins} %don't float to next section
@@ -384,6 +386,17 @@ Implementing that functionality has lead to a just in time generated function wr
 language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 
 The algorithm used in this implementation is a slightly modified binary search.
+\begin{algorithm}
+\begin{algorithmic}
+\Function{JIT\_creation}{Array of int}
+
+    \State $mid\_index\gets \frac{len(array)}{2}$
+    \Return Array[i]
+\EndFunction
+\end{algorithmic}
+\caption{The algorithm used to create the JIT-compiled function.}
+\label{alg:jit}
+\end{algorithm}
 %TODO: Pseudocode hier einfügen
 
 \section{Evaluation}
