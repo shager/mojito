@@ -120,9 +120,9 @@ Range_borders* range_borders_ctor() {
     object->insert_element = Rb_insert_element;
     object->insert_element_at_index = Rb_insert_element_at_index;
     object->delete_element = Rb_delete_element;
-    object->add_rule = Rb_add_rule_jit;
+    object->add_rule = Rb_add_rule;
     object->find_element = Rb_find_element;
-    object->match_packet = Rb_match_packet_jit;
+    object->match_packet = Rb_match_packet;
 
     // This section has to be added in order to create some executable
     // because OpenFlow does lookups at startup
@@ -256,15 +256,12 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
         
         free(new_begin_entry);
         new_begin_entry = NULL;
-        
-        //indicate point from where we can continue to extend the bitvectors
-        position_begin++;
     }
     
     // determine end of insertion area
     int position_end = find_free_position(this, end_index);
     
-    for (int i = position_begin; i < position_end; ++i) {
+    for (int i = position_begin + 1; i < position_end; ++i) {
         this->range_borders[i].bitvector->insert_rule_at_position(&(this->range_borders[i].bitvector), rule_index, 1);
     }
     
@@ -291,12 +288,9 @@ int Rb_add_rule(Range_borders* this, uint64_t begin_index, uint64_t end_index, u
         
         free(new_end_entry);
         new_end_entry = NULL;
-        
-        //indicate point from where we can continue to extend the bitvectors
-        position_end++;
     }
     
-    for (int i = position_end; i < this->range_borders_current; ++i) {
+    for (int i = position_end + 1; i < this->range_borders_current; ++i) {
         this->range_borders[i].bitvector->insert_rule_at_position(&(this->range_borders[i].bitvector), rule_index, 0);
     }
     return 0;
@@ -364,11 +358,7 @@ int Rb_add_rule_jit(Range_borders* this, uint64_t begin_index, uint64_t end_inde
         
         new_end_entry->bitvector = end_bitvector;
         this->insert_element_at_index(&this, new_end_entry, position_end);
-        
-        if (end_bitvector != this->range_borders[position_end].bitvector) {
-            free(end_bitvector);
-            end_bitvector = NULL;
-        }
+
         free(new_end_entry);
         new_end_entry = NULL;
     }
