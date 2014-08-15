@@ -5,15 +5,6 @@ import subprocess, time, os, signal
 
 process = 0
 
-"""def execute_on_host(hostname, call_string):
-    try:
-        #print "../../mininet/util/m " + str(hostname) + " " + str(call_string)
-        retval = os.system("../../mininet/util/m " + str(hostname) + " " + str(call_string))
-    except subprocess.CalledProcessError:
-        print "Error with command " + str(call_string) + " on host " + str(hostname) + "."
-        retval = ""
-    return retval"""
-
 def insert_rules_in_switch(ruleset, case):
     ruleset = ruleset[:-12]
     print "Ruleset = " + ruleset
