@@ -275,20 +275,26 @@ Therefore, an algorithm used for matching packets has to be capable of longest p
 %TODO: Openflow/SDN
 \subsection{Software Defined networks}
 \label{sec:SDN}
-\subsubsection{OpenFlow}
-Software Defined Networking (SDN) describes the general idea to decouple the two tasks of network hardware and to introduce a new layer of abstraction in networking. %quote: sdn-whitepaper
-These networks are separated into two logical units: the control and the data plane.
+Software Defined Networking (SDN) describes the general idea to decouple 
+the configuration of network parameters from the actual hardware and to 
+introduce a new layer of abstraction in corporate networking\cite{onf_whitepaper}.
+These networks can be separated into two logical units: the control and the data plane.
 The control plane is used for configuring and updating the network hardware, e.g. inserting new rules into a firewall.
 The data plane handles the incoming traffic and acts accordingly to the objectives defined in the control plane.
 
+\subsubsection{OpenFlow}
 One popular instance of an SDN is OpenFlow.
 This project is intended to establish a virtual network system on real hardware for educational and research use cases.
 A key feature of OpenFlow is the control channel system.
 One controller has connections to all existing hard- and software switches and can define their behaviour from a central position.
 The controlled SDN switch then acts accordingly and handles the traffic as required.
 
-Another key feature of SDN marks the ability to change the underlying hardware transparently.
-The abstraction layer hides the details of the different systems so that the configuration on controller level can remain regardless of the hardware used.
+Another key feature of OpenFlow marks the ability to change the underlying hardware transparently.
+The abstraction layer hides the details of the different systems so that 
+the configuration on controller level can remain the same regardless of the hardware used.
+Additionally, network design changes can be implemented faster due to the central configuration plane.
+Even automatic processes can alter the network layout dynamically, for instance when load balancing 
+or in distributed database setups.
 
 The main objective of this work is to implement a faster matching engine in the software switch of the OpenFlow 1.0 reference implementation.
 Currently, that matching engine uses a linear search in the specified rule set when classifying packets.
@@ -299,9 +305,11 @@ This approach may be fast enough in cases of small rule sets but with a growing 
 Speeding up packet classification is one of the current research topics in the computer network community.
 Therefore, several algorithms have been developed in the last years.
 The bitvector algorithm is not the only promising idea to speed up packet matching in modern network hardware.
-An overview over these algorithms can be gained from \cite{algorithms_survey}.%TODO
-Approaches to this problem include the usage of tries, hash maps or geometric algorithms\cite{hicuts}
-in order to perform significantly faster than searching in a linear list.
+An overview over these algorithms can be gained from \cite{algorithms_survey}.
+The authors compare a detailed list of algorithms and discuss their advantages and downsides.
+Approaches to the packet classification problem include the usage of tries, 
+hash maps or geometric algorithms\cite{hicuts} in order to perform significantly 
+faster than searching the matching rule in a linear list.
 
 Real-world applications of these theoretical concepts are numerous and have been evaluated in different projects.
 Following, there is an overview over different projects using a software packet filter environment.
@@ -323,7 +331,6 @@ The ABV algorithm \cite{abv} implements a hierarchical system of bitvectors with
 However, more memory space is needed to store the bitvectors of the respective hierarchies.
 
 Another approach to improve matching performance in a packet filter is to reorganize the rule set.
-
 One way to perform such a reorganization is the compression of the rule set as introduced in \cite{firewall_compressor} and \cite{redundancy_removal}.
 They reduce the number of the rules significantly whilst persisting its semantics.
 These optimizations can be done offline and before the rule set is loaded into the firewall.
@@ -332,7 +339,19 @@ Additionally, the firewall can perform a heuristic analysis of the traffic patte
 The advantage of that strategy is that the matching engine itself has not to be changed and can be left untouched.
 This can be useful in black box scenarios, where the matching engine's source code is not open to the end user.
 However, that idea requires to reorganize the desired rule set and makes updating more complex.
-In case of high-frequent updates this strategy will hit its limitations, as the optimization steps often require the consideration of the entire rule set and not only the updated part.
+In case of high-frequent updates this strategy will hit its limitations, 
+as the optimization steps often require the consideration of the entire rule set and not only the updated part.
+
+A JIT compiled ruleset has been implemented in \cite{bpfplus}.
+The general idea is to compile the rule set to an executable written in a virtual machine intermediate language.
+That bytecode is automatically generated from a high-level rule matching language.
+The matching process is done linearly and by jumping to different execution points in the executable (but only in forward direction).
+For instance a packet might be checked if it is an IP packet, then relayed to the next section where the source and destination addresses are checked.
+From there, a jump might go out to a section where transport protocols are checked and so on.
+Generally, that process is considerably faster than a classic search for matches in a list.
+However, it is impossible to parallelize that lookup process, because each matching step relies on the outcomes of the ones before.
+In the algorithm used in this work the different matching dimensions are 
+completely independant and much more distributable.
 
 \section{The Bitvector Algorithm}
 \subsection{General Description}
@@ -379,25 +398,33 @@ This lookup process over the entire delimiter space requires several memory acce
 The general idea to speed up this operation is to precompute a function that is specific for each dimension and returns the bitvector's index in one dimension when given the header value to be matched.
 
 The function is designed to have zero memory accesses when looking up header values.
-Therefore it performs the binary search only on precomputed values, which leads to the necessity of rebuilding the function at every rule set update.
+Therefore it performs the binary search only on precomputed values, which 
+leads to the necessity of rebuilding the function at every rule set update.
 Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
 
 Implementing that functionality has lead to a just in time generated function written in machine 
 language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
+Every assembly instruction was split up into its respective opcodes following the 
+Intel 64 and IA-32 Architectures Software Developer Manuals.
+For example, the opcodes for the instruction 
+\textsf{mov \%rsp,\%rbp} (Copying the value of the stack pointer to the base pointer) 
+are $\texttt{0x48}, \texttt{0x89}, \texttt{0xE5}$.
+After that, these generated opcodes were copied into an executable memory block and a function pointer to that block has been returned.
 
-The algorithm used in this implementation is a slightly modified binary search.
+The algorithm for constructing the JIT used in this implementation produces a slightly modified binary search.
 \begin{algorithm}
 \begin{algorithmic}
 \Function{JIT\_creation}{Array of int}
 
     \State $mid\_index\gets \frac{len(array)}{2}$
+    
     \Return Array[i]
 \EndFunction
 \end{algorithmic}
 \caption{The algorithm used to create the JIT-compiled function.}
 \label{alg:jit}
 \end{algorithm}
-%TODO: Pseudocode hier einfügen
+%TODO: Pseudocode erweitern
 
 \section{Evaluation}
 \subsection{Unit Tests}
@@ -471,7 +498,8 @@ for one value guarantee some independence of external factors over the time.
 \subsubsection{Insertion Time}
 Figure TODO shows the significant loss in efficiency when inserting rules. %TODO: Grafik
 The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
-Because of the requirement that the matching engine has to be operable immediately after every update operation, every update implies a complete regeneration of the JIT code.
+Because of the requirement that the matching engine has to be operable 
+immediately after every update operation, every update implies a complete regeneration of the JIT code.
 That behaviour explains the additional update time seen in the measured data. 
 
 \subsubsection{Implementation Complexity}
@@ -491,6 +519,25 @@ To give a rough estimate of complexity table \ref{table:loc} shows the approxima
 \end{table}
 
 \subsubsection{Memory Usage}
+
+\section{Future Work}
+Future work in this particular area can steer in manifold directions.
+One of the main objectives is further optimization of the matching algorithm.
+One possibility to speed up the switch is to lower the time used for the JIT code generation.
+Modifying the existing JIT function instead of deleting the old one and building 
+a new one from scratch might be a worthwhile task.
+This should save some time when updating the ruleset.
+Especially in environments with fast-changing rulesets this idea may offer 
+a significant advantage over the current implementation.
+
+Another idea that comes to mind is to implement a heuristic that detects 
+the most popular flows of the last timespan in an operating switch.
+After gathering traffic data for a while it might prove beneficial to tune 
+the JIT function in such a way that the search for packet header data in a popular flow returns faster.
+Depending on the type of traffic, this optimization may either cause a massive performance boost or no real advantage.
+The latter case enters if there are no real flows recognisable in the traffic because it is very sparse.
+But in most real world cases there exist observable traffic patterns.
+
 \newpage
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{acm}
