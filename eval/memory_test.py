@@ -19,6 +19,11 @@ def start_mininet():
 
 def stop_mininet():
     global process
+    with open('/tmp/s1-ofd.log', 'r') as f:
+        first_line = f.readline()
+    tmppid = first_line.split("==")[1]
+    subprocess.Popen( 'kill -TERM ' + str(tmppid), shell=True )
+    time.sleep(1)
     devnull = open('/dev/null', 'w')
     process2 = subprocess.Popen("killall ofdatapath", stdout=devnull, stderr=devnull, shell=True)
     process2.wait()
@@ -63,11 +68,21 @@ def main():
         duration = str(time.time() - start)
         stop_mininet()
         time.sleep(2)
-        memsize = subprocess.check_output("tail -n1 /tmp/s1-ofd.log", shell=True).strip()
+        #memsize = subprocess.check_output("tail -n1 /tmp/s1-ofd.log", shell=True).strip()
+        memsize = 0
+        with open('/tmp/massif.out', 'r') as content_file:
+            mem_file_content = content_file.read()
+        mem_file_lines = mem_file_content.split("\n")
+        for mem_file_line in mem_file_lines:
+            if mem_file_line.startswith("mem_heap_B="):
+                cur_size = int(mem_file_line[11:])
+                if memsize < cur_size:
+                    memsize = cur_size
         devnull = open('/dev/null', 'w')
         process3 = subprocess.Popen("mn -c", stdout=devnull, stderr=devnull, shell=True)
         process3.wait()
 
+        memsize = str(memsize)
         print "memsize = " + memsize
         print "duration = " + duration
         mem_data.append(memsize)
