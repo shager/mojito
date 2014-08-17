@@ -246,31 +246,29 @@ With this notation, the entire Internet becomes 0.0.0.0/0 and one single host is
 \subsection{Longest Prefix Matching}
 CIDR opens the opportunity to route different parts of a subnet to different places.
 For example, a rule set can contain a rule for the address space 141.20.0.0/16 and another rule for the included subnet 141.20.33.0/24.
-Packet matchers therefore need to have capabilities to match a packet to its longest matching prefix, as more special rules are normally higher prioritized.
-Usually, CIDR leads to an increasing size of rule sets in the respective Internet traffic handlers. 
-%TODO: Grafik zum Beispiel, mehr Text
+These prefixes overlap and if for example a packet with the address 141.20.33.123 arrives, both rules match this packet.
+Longest prefix matching signifies the idea that shorter prefixes are less favorable when matching packets, so that rule 141.20.33.0/24 matches.
+Packet matchers need to have capabilities to match a packet to its longest matching prefix.
+Usually, this property of CIDR leads to an increasing size of rule sets in the respective Internet traffic handlers. %TODO: Grafik zum Beispiel, mehr Text
+Subnets can be divided into numerous smaller subnets and each network split has to be mapped in routing tables and rule sets.
+Therefore, an algorithm used for matching Internet packets has to be capable of longest prefix matching.
 
 \subsection{Affected Internet Infrastructure}
-One main point in optimization therefore lies in the matching algorithms executing this process. %TODO: überarbeiten ab hier
+One main point in optimization thus lies in the matching algorithms executing this process.
 Many traditional rule sets require five header fields for matching: Source IP address, destination IP address, transport protocol, source port and destination port.
-The last two fields imply the usage of TCP or UDP as transport protocol, as other protocols may not know the concept of ports (e.g. ICMP). %TODO: quote RFCs
-But there can be other relevant header fields, too, for example VLAN tags, QoS information or MAC source and destination addresses.%bis hier
+The last two fields imply the usage of TCP or UDP as transport protocol, as other protocols may be ignorant of the concept of ports (e.g. ICMP).
+Modern packet filters often need to match or even modify more than these five header fields.
+These include for example VLAN tags, QoS information or MAC source and destination addresses.
 
-Matching algorithms become slower the more header fields they have to match.
-Additionally, some fields require rules that imply certain ranges or prefixes, for example IP addresses.
-These constraints make it more difficult to implement simple matching algorithms and in order to match with high speed, more sophisticated
-algorithms have to be used for these fields.
+Matching algorithms become slower the more header fields they have to match because more data is relevant per packet.
+Additionally, some fields require rules that imply certain ranges or prefixes, for example IP or hardware addresses.
+These constraints make it less attractive to implement simple matching algorithms and in order to match with high speed, more sophisticated
+algorithms have to be used for use in these fields.
 
-A common example for non-trivial matchable fields are IP forwarding tables, where rules are normally defined as IP prefixes.
-
-
-Therefore, an algorithm used for matching packets has to be capable of longest prefix matching.
-
-%An example for a prefix of an IPv4 address can look as follows:
-%0110 1011 0001...
-%This means that the first 12 bit of the address space are fixed and that the remaining 20 bits may be choosen freely.
-%Now, that rule has to match packets with addresses from 0110 1011 0001 0000 0000 0000 0000 0000 up to
-%0110 1011 0001 1111 1111 1111 1111 1111. %TODO: unschön? evtl umformulieren
+Another undesired result of the growth of the Internet is the increasing size of routing tables and the problems that are introduced by this.
+Recently, more than approximately 500.000 routes were announced via the Border Gateway Protocol, the Internet's top-tier routing protocol.
+This lead to outages of network connectivity at some providers due to a default limit in older Cisco routers being too small\cite{outage}.
+Rebooting solves this problem for a while, but in future there certainly are limits that might not be as easily circumventible as this one.
 
 %TODO: Openflow/SDN
 \subsection{Software Defined networks}
@@ -280,10 +278,11 @@ the configuration of network parameters from the actual hardware and to
 introduce a new layer of abstraction in corporate networking\cite{onf_whitepaper}.
 These networks can be separated into two logical units: the control and the data plane.
 The control plane is used for configuring and updating the network hardware, e.g. inserting new rules into a firewall.
-The data plane handles the incoming traffic and acts accordingly to the objectives defined in the control plane.
+More sophisticated tasks like network monitoring, intrusion detection or automatic reconfiguration in certain events also require a control infrastructure.
+The data plane handles the incoming network traffic and acts accordingly to the objectives defined in the control plane.
 
 \subsubsection{OpenFlow}
-One popular instance of an SDN is OpenFlow.
+One popular instance of an SDN is OpenFlow\cite{openflow_spec10}.
 This project is intended to establish a virtual network system on real hardware for educational and research use cases.
 A key feature of OpenFlow is the control channel system.
 One controller has connections to all existing hard- and software switches and can define their behaviour from a central position.
@@ -298,8 +297,7 @@ or in distributed database setups.
 
 The main objective of this work is to implement a faster matching engine in the software switch of the OpenFlow 1.0 reference implementation.
 Currently, that matching engine uses a linear search in the specified rule set when classifying packets.
-This approach may be fast enough in cases of small rule sets but with a growing number of rule in its database, the efficiency of a linear search decreases.
-
+This approach may be fast enough in cases of small rule sets but with a growing number of rules in its database, the efficiency of a linear search decreases.
 
 \section{Related Work}
 Speeding up packet classification is one of the current research topics in the computer network community.
@@ -355,15 +353,14 @@ completely independant and much more distributable.
 
 \section{The Bitvector Algorithm}
 \subsection{General Description}
-The bitvector algorithm \cite{bv} is an efficient solution to the packet classification problem, which explained in the introduction section.
+The bitvector algorithm \cite{bv} is an efficient solution to the packet classification problem, as described in the introduction section.
 This algorithm is designed for matching multi-dimensional header data in a short time.
 The basic idea of this algorithm is to think of the ruleset as a set of multi-dimensional hypercubes.
 Each header field represents one dimension in this geometric object, so that every hypercube (which represents exactly one rule) has as many dimensions as the packet matching engine is operating on.
 The extent of one rule in one dimension is therefore an interval between two integers.
-They are determined by projecting the hypercube onto the relevant dimension.
+These delimiting integers are determined by projecting the hypercube onto the relevant dimension.
 If cubes (and their respective rules) are overlapping, one point on the dimension can be the target of multiple cubes' projections. 
 This property leads to a model, where for any given point in a matching dimension, there is a set of cubes (and therefore rules) that are projected on intervals containing this point.
-
 If there are no matching rules for a point there is no cube projecting an interval to the relevant dimension.
 
 The bitvector algorithm collects these projected rules for every dimension.
@@ -373,6 +370,40 @@ For each original rule $r$ in the rule set with $n$ rules this bit vector stores
 If $r$ is not projected on the current interval, a $0$ bit is stored.
 This construction is done in every dimension for every edge.
 
+For better understanding of his algorithm, consider packet headers consisting only of a source and a destination address.
+These addresses are four bit wide each.
+For example, the rule set defined in table \ref{table:bv_ruleset} is a valid rule set in this scenario.
+Figure \ref{fig:bv-normal} holds a graphical representation of this rule set.
+Each rectangle (a two-dimensional hypercube) represents one of the defined rules.
+Corresponding bit vectors are displayed at every intersection of a rule border and the axis of the coordinate system.
+These vectors store the information which rules are matching right or above the delimiter where the bit vector's scope begins.
+The first bit in a vector determines whether Rule 1 is matching, the second determines that for Rule 2 et cetera.
+
+When two or more rules are overlapping (in this example rules 1 and 2 happen 
+to overlap in a section) the bit vectors display the validity of both rules in the affected area.
+Therefore, Longest Prefix Matching is easily supportable in this approach, 
+as the shorter prefixes can be inserted firstly and thus have a higher matching priority than longer ones.
+
+\begin{table}
+  \centering
+  \begin{tabularx}{\textwidth}{l|X|X}
+  Rule&Source Addresses&Destination Addresses\\
+  \hline
+  1&3 -- 11&4 -- 13\\
+  2&1 -- 5&2 -- 5\\
+  3&8 -- 13&0 -- 3\\
+  \end{tabularx}
+  \caption{Example rule set for the bitvector algorithm.}
+  \label{table:bv_ruleset}
+\end{table}
+
+\begin{figure}
+\centering
+\includegraphics[height=0.8\textwidth]{images/bitvector-L1-2}
+\caption{The rules and the resulting bit vectors.}
+\label{fig:bv-normal}
+\end{figure}
+
 \subsection{Lookup}
 When looking up a packet with the bitvector algorithm, one has to determine a point to look up in every matching dimension.
 These points are header data, for example one point is the source IP address, another one is the destination IP address or the VLAN ID.
@@ -381,18 +412,41 @@ Firstly, there is a search for the target point in every dimension.
 In this implementation, binary search returns the nearest left edge (constructed when inserting the rules) of the search space.
 This edge contains the bitvector with $n$ bits length, where $n$ is the size of the ruleset.
 
-Secondly, all bitvectors from all dimensions are joined by a bitwise AND.
+Again, the example from figure \ref{fig:bv-normal} will be considered.
+Furthermore, assume that packets P1 with header data $(4, 4)$ and P2 with header data $(14, 7)$ arrive at the switch.
+For P1, the source address bit vector can be looked up by finding the bit vector left of the point $4$ on the source address axis.
+The same process applies for the destination address.
+In case of P1, the algorithm thus returns the bitvector $(1, 1, 0)$ in the source address dimension and the bitvector $(1, 1, 0)$ in the destination address dimension.
+Figure \ref{fig:bv-lookup} holds a graphical representation of this process.
+
+\begin{figure}
+\centering
+\includegraphics[height=0.8\textwidth]{images/bitvector-L1_3}
+\caption{Looking up packets P1 and P2.}
+\label{fig:bv-lookup}
+\end{figure}
+
+The same lookup process can be done for P2, which returns the $(0, 0, 0)$ and $(1, 0, 0)$ bit vectors.
+As one can easily see, in case of P2 there exists no matching rule for both dimensions.
+This will also be determined by the next step of the algorithm.
+
+After that, all bitvectors from all dimensions are joined by a bitwise AND.
 The resulting vector then indicates by a $1$ at position $p$ that the packet has matched rule $p$.
 Generally, there can be one or more matching rules, for example when default rules exist, that match every packet.
-In order to determine the highest priority matching rule, the resulting bitvector is then scanned for the leftmost set 1-bit.
+In the example from above, this case occurs with packet P1, where rules R1 and R2 are matching.
+In order to determine the highest priority matching rule, the resulting bitvector is then scanned for the leftmost set 1-bit, which is the first bit standing for R1 in the example.
 The index of this bit in the bitvector then determines the best matching rule in the ruleset.
+
 After that, the actions defined in the rule can be executed by the network device and the next packet in the queue can be matched.
+In case of no matching rule (for example when matching P2), the resulting bit vector for all dimensions is entirely filled with zeroes.
+How this is handled is implementation dependant, however in most cases some default action wil be executed.
+Often the packet is just dropped when resulting in no match.
 
 \subsection{JIT lookup}
 To further speed up the lookup process, another optimization has been implemented.
 At each lookup, the algorithm has to perform a binary search on the bitvectors' locations in each dimension in order to find the matching bitvector for the current packet.
 These locations can be interpreted as delimiters between the realms of the bitvectors.
-In the above example, if the lookup process receives a packet with a source IP address value of 10.0.0.3, the algorithm has to find the first bitvector in the source IP dimension. %TODO: example abgleichen!
+In the above example, if the lookup process receives a packet with a source IP address value of 3, the algorithm has to find the first bitvector in the source IP dimension. %TODO: example abgleichen!
 For every header field in the 12-dimensional OpenFlow header the algorithm has to yield exactly one bitvector.
 This lookup process over the entire delimiter space requires several memory accesses for every lookup.
 The general idea to speed up this operation is to precompute a function that is specific for each dimension and returns the bitvector's index in one dimension when given the header value to be matched.
@@ -412,19 +466,59 @@ are $\texttt{0x48}, \texttt{0x89}, \texttt{0xE5}$.
 After that, these generated opcodes were copied into an executable memory block and a function pointer to that block has been returned.
 
 The algorithm for constructing the JIT used in this implementation produces a slightly modified binary search.
+Note that in the generated function, the matchable packet header data point is stored in the register \textsf{\%rax}.
+The first call of the recursive algorithm \ref{alg:jit} is invoked with the entire array of delimiter values, a freshly generated area of executable memory, 
+zero as the lower bound of operation and the last index in the delimiters array as last argument.
+Its return value is the length of newly written bytes to the executable memory in order to perform relative jumps over entire code blocks.
+
+Every time \textsf{Insert} is called in algorithm \ref{alg:jit} the opcodes 
+of the corresponding assembler instruction are looked up and appended to the executable memory.
+Due to working in an Intel microprocessor, numeral arguments have to be 
+transformed into little-endian byte order in the \textsf{Insert} function.
+
 \begin{algorithm}
 \begin{algorithmic}
-\Function{JIT\_creation}{Array of int}
-
-    \State $mid\_index\gets \frac{len(array)}{2}$
+\Function{JIT\_creation}{delimiters[], *executable\_memory, low\_index, high\_index}
     
-    \Return Array[i]
+    \If{$(hi\_index - low\_index) == -1$} 
+    
+        \State $executable\_memory \gets 0$
+        
+        \Return 0
+        
+    \EndIf
+    
+    \If{($hi\_index == low\_index$}
+    
+        Insert cmpq delimiter[low\_index]
+        
+        Insert jb 0x7 //offset = len(mov) + len(pop\_ret)
+        
+        Insert mov low\_index
+        
+        Insert pop\_ret
+        
+        \If{$low\_index == 0$}
+        
+            Insert mov 0
+            
+            Insert pop\_ret
+            
+        \Else
+            
+            Insert mov low\_index
+            
+            Insert pop\_ret
+            
+        \EndIf
+        
+        \Return memory\_len
+    \EndIf
 \EndFunction
 \end{algorithmic}
 \caption{The algorithm used to create the JIT-compiled function.}
 \label{alg:jit}
 \end{algorithm}
-%TODO: Pseudocode erweitern
 
 \section{Evaluation}
 \subsection{Unit Tests}
@@ -432,7 +526,6 @@ An important goal in every software project is to ensure that the program operat
 The first step in this quality assurance process is to design unit tests for the modules in the software.
 In this project the matching engines have been tested separately before integrating them into the OpenFlow switch.
 Additionally, the just in time generated code has been tested to work properly.
-%Erroneous behaviour in that part of the code is not easily debuggable.
 
 \subsection{Acceptance Test}
 In order to guarantee the correctness of the two new implementations a predefined acceptance test was developed.
