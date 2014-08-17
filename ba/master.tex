@@ -147,7 +147,7 @@ nor a similar work has been presented to an examination committee.
 \section{Introduction}
 The growth of the Internet constantly poses new challenges to the producers of network equipment.
 Today's applications like Multimedia, Peer-to-Peer data exchange, Web and Voice over IP are dependent on a transport network with
-high data rates, low latency, soft realtime properties and quality of service mechanisms.
+high data rates, low latency, soft real time properties and quality of service mechanisms.
 This catalogue of network parameters is already implemented in the Internet protocol stack\cite{rfc3260, rfc3261, rfc5694, rfc3550}.
 Another growing segment of Internet traffic is triggered by the outsourcing of 
 enterprise IT infrastructure to Cloud computing companies like Amazon or Heroku.
@@ -171,7 +171,7 @@ Optimization of that switch's matching engine is the main focus of this thesis.
 \subsection{Internet Packets}
 The Internet is a global network of packet switched networks\cite[Chapter 1.1]{kurose_ross} for exchanging data. 
 The stream of data that is transported from its source to its destination is broken down into small chunks of bytes.
-In packet switched networks, packets are the smallest independant unit of data transported.
+In packet switched networks, packets are the smallest independent unit of data transported.
 A packet usually consists of header and payload data.
 The packet header transports meta information for directing the packet to the correct host.
 Depending on the protocol, headers may also contain meta data for congestion control or data order.
@@ -179,8 +179,8 @@ For instance, the TCP protocol transports additional information like sequence n
 Payload data is a chunk of bytes from the original data stream.
 
 When sending data over the Internet every packet is routed separately.
-This can lead to differently chosen paths for one transmission, if it sonsists of more than one packet.
-A router or switch has to inspect every incoming packet seperately and then decide what action to apply.
+This can lead to differently chosen paths for one transmission, if it consists of more than one packet.
+A router or switch has to inspect every incoming packet separately and then decide what action to apply.
 
 \subsection{The Packet Classification Problem}
 Due to the characteristics of packet switched networks, every station in the path of a data transmission on the Internet 
@@ -211,46 +211,46 @@ Firstly, an overview over the classful Internet and its consequences on routing 
 
 Very large networks were called Class A networks.
 These networks were located in the address range of 0.0.0.0 to 127.255.255.255 and each network could include up to about 16 million hosts.
-This means that only the first of the four bytes structuring an IPv4 address is fixed, the rest is freely choosable for each host by the owner of the address block.
+This means that only the first of the four bytes structuring an IPv4 address is fixed, the rest is freely selectable for each host by the owner of the address block.
 Due to their size, the entire IPv4 address space can only contain 128 of these networks.
-Class A networks were assigned to big companies and organisations in the early days of the Internet.
+Class A networks were assigned to big companies and organizations in the early days of the Internet.
 
-A more common class especially for smaller organisations like German universities were Class B networks.
+A more common class especially for smaller organizations like German universities were Class B networks.
 These networks had two of the four bytes in an IPv4 address fixed.
 This lead to 16384 possible Class B networks with up to about 65000 hosts each.
-Similarly, Class C networks were alloted to small entities.
+Similarly, Class C networks were allotted to small entities.
 Each Class C network contains up to 254 hosts and has the first three of the four address bytes set.
 
-This layout faciliated the routing problem.
-Rule sets could be relatively organised and small.
+This layout facilitated the routing problem.
+Rule sets could be relatively organized and small.
 For example, an entire Class An network only needed one routing rule to have its traffic routed there.
 Additionally, the first byte of a network address already determined the affiliation in its net class.
 On the other hand, this system had major disadvantages.
 Firstly, there are only three sizes for networks.
 This automatically leads to networks too big for the purpose and an enormous waste of addresses.
 Another problem is the lack of flexibility.
-Consider a network that has to be shrinked or enlargened.
+Consider a network that has to be shrinked or enlarged.
 That operation could only properly be executed by moving into another network class instead of extending the 
 previously used address space into its \enquote{neighbouring} area.
 
 In 1993, the IETF introduced Classless Inter Domain Routing\cite{rfc1518} \cite{rfc4632}.
 The main idea is to give up the three static classes and to introduce dynamic subnet sizes.
 In principle, an address can be part of a network of any size and is not bound to be in a certain class.
-This flexibility leads to the necessity of defining the size of the subnet for every subnet.
+This flexibility leads to the necessity of defining the size of the sub net for every sub net.
 In the old scheme, the address 1.2.3.4 was definitely in the Class A network 1.0.0.0 -- 1.255.255.255.
-With CIDR, the containing address space must be determined by defining a fixed prefix for each of the addresses in the subnet.
-Usually, this is done by adding a slash followed the number of fixed bits after the subnet's first address.
-For example, the previous Class A network becomes 1.0.0.0/8, because the first 8 bit are fixed and the rest is part of the subnet.
+With CIDR, the containing address space must be determined by defining a fixed prefix for each of the addresses in the sub net.
+Usually, this is done by adding a slash followed the number of fixed bits after the sub net's first address.
+For example, the previous Class A network becomes 1.0.0.0/8, because the first 8 bit are fixed and the rest is part of the sub net.
 With this notation, the entire Internet becomes 0.0.0.0/0 and one single host is for example 141.20.33.1/32.
 
 \subsection{Longest Prefix Matching}
-CIDR opens the opportunity to route different parts of a subnet to different places.
-For example, a rule set can contain a rule for the address space 141.20.0.0/16 and another rule for the included subnet 141.20.33.0/24.
+CIDR opens the opportunity to route different parts of a sub net to different places.
+For example, a rule set can contain a rule for the address space 141.20.0.0/16 and another rule for the included sub net 141.20.33.0/24.
 These prefixes overlap and if for example a packet with the address 141.20.33.123 arrives, both rules match this packet.
 Longest prefix matching signifies the idea that shorter prefixes are less favorable when matching packets, so that rule 141.20.33.0/24 matches.
 Packet matchers need to have capabilities to match a packet to its longest matching prefix.
 Usually, this property of CIDR leads to an increasing size of rule sets in the respective Internet traffic handlers. %TODO: Grafik zum Beispiel, mehr Text
-Subnets can be divided into numerous smaller subnets and each network split has to be mapped in routing tables and rule sets.
+Sub nets can be divided into numerous smaller sub nets and each network split has to be mapped in routing tables and rule sets.
 Therefore, an algorithm used for matching Internet packets has to be capable of longest prefix matching.
 
 \subsection{Affected Internet Infrastructure}
@@ -268,7 +268,7 @@ algorithms have to be used for use in these fields.
 Another undesired result of the growth of the Internet is the increasing size of routing tables and the problems that are introduced by this.
 Recently, more than approximately 500.000 routes were announced via the Border Gateway Protocol, the Internet's top-tier routing protocol.
 This lead to outages of network connectivity at some providers due to a default limit in older Cisco routers being too small\cite{outage}.
-Rebooting solves this problem for a while, but in future there certainly are limits that might not be as easily circumventible as this one.
+Rebooting solves this problem for a while, but in future there certainly are limits that might not be as easily circumventable as this one.
 
 %TODO: Openflow/SDN
 \subsection{Software Defined networks}
@@ -340,7 +340,7 @@ However, that idea requires to reorganize the desired rule set and makes updatin
 In case of high-frequent updates this strategy will hit its limitations, 
 as the optimization steps often require the consideration of the entire rule set and not only the updated part.
 
-A JIT compiled ruleset has been implemented in \cite{bpfplus}.
+A just in time (JIT) compiled ruleset has been implemented in \cite{bpfplus}.
 The general idea is to compile the rule set to an executable written in a virtual machine intermediate language.
 That bytecode is automatically generated from a high-level rule matching language.
 The matching process is done linearly and by jumping to different execution points in the executable (but only in forward direction).
@@ -348,8 +348,8 @@ For instance a packet might be checked if it is an IP packet, then relayed to th
 From there, a jump might go out to a section where transport protocols are checked and so on.
 Generally, that process is considerably faster than a classic search for matches in a list.
 However, it is impossible to parallelize that lookup process, because each matching step relies on the outcomes of the ones before.
-In the algorithm used in this work the different matching dimensions are 
-completely independant and much more distributable.
+In the algorithm used in this work, the different matching dimensions are 
+completely independent and much more distributable.
 
 \section{The Bitvector Algorithm}
 \subsection{General Description}
@@ -410,7 +410,7 @@ These points are header data, for example one point is the source IP address, an
 When all relevant points are determined the lookup process works as follows:
 Firstly, there is a search for the target point in every dimension.
 In this implementation, binary search returns the nearest left edge (constructed when inserting the rules) of the search space.
-This edge contains the bitvector with $n$ bits length, where $n$ is the size of the ruleset.
+This edge contains the bitvector with $n$ bits length, where $n$ is the size of the rule set.
 
 Again, the example from figure \ref{fig:bv-normal} will be considered.
 Furthermore, assume that packets P1 with header data $(4, 4)$ and P2 with header data $(14, 7)$ arrive at the switch.
@@ -435,11 +435,11 @@ The resulting vector then indicates by a $1$ at position $p$ that the packet has
 Generally, there can be one or more matching rules, for example when default rules exist, that match every packet.
 In the example from above, this case occurs with packet P1, where rules R1 and R2 are matching.
 In order to determine the highest priority matching rule, the resulting bitvector is then scanned for the leftmost set 1-bit, which is the first bit standing for R1 in the example.
-The index of this bit in the bitvector then determines the best matching rule in the ruleset.
+The index of this bit in the bitvector then determines the best matching rule in the rule set.
 
 After that, the actions defined in the rule can be executed by the network device and the next packet in the queue can be matched.
 In case of no matching rule (for example when matching P2), the resulting bit vector for all dimensions is entirely filled with zeroes.
-How this is handled is implementation dependant, however in most cases some default action wil be executed.
+How this is handled is implementation dependant, however in most cases some default action will be executed.
 Often the packet is just dropped when resulting in no match.
 
 \subsection{JIT lookup}
@@ -459,7 +459,7 @@ Clearly, that leads to a performance disadvantage for fast changing rule sets at
 Implementing that functionality has lead to a just in time generated function written in machine 
 language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 Every assembly instruction was split up into its respective opcodes following the 
-Intel 64 and IA-32 Architectures Software Developer Manuals.
+Intel 64 and IA-32 Architectures Software Developer Manuals. %TODO: cite???
 For example, the opcodes for the instruction 
 \textsf{mov \%rsp,\%rbp} (Copying the value of the stack pointer to the base pointer) 
 are $\texttt{0x48}, \texttt{0x89}, \texttt{0xE5}$.
@@ -531,14 +531,18 @@ Additionally, the just in time generated code has been tested to work properly.
 In order to guarantee the correctness of the two new implementations a predefined acceptance test was developed.
 A reasonable assumption is that, if given a rule set and a corresponding trace, the old and new implementations are behaving the same.
 This was tested by deriving traces from randomly generated rule sets with the Classbench\cite{classbench_website} tool \textsf{trace\_generator}.
+For each implementation, there was a virtual network set up with ten hosts and a switch connecting them in a star topology.
+The generated traces were then converted into packets and fed into the switch with 50\ ms delay between each packet from a particular host.
+After finishing this process, each host was queried on how many packets arrived there.
+All implementations generated the same packet statistics on the hosts, therefore it is assumed they are behaving correctly.
 
 \subsection{Performance Evaluation}
-The evaluation of the performance of the newly implemented matching algorithm has been executed in a virtualized environment.
+The evaluation of the performance of the newly implemented matching algorithm has been executed in a virtual environment.
 \textsf{mininet}\cite{mininet} provides an easily usable and lightweight virtual network on a local computer.
 It creates two new local interfaces and connects them through a local OpenFlow switch.
-This switch can be configured with \textsf{dpctl}, a tool included in the toolchain of the OpenFlow reference implementation.
+This switch can be configured with \textsf{dpctl}, a tool included in the tool chain of the OpenFlow reference implementation.
 Rule set updates thus are done via a command line call of that tool.
-The evaluation system is a computer with a quadcore Intel Xeon E3-1270 v3 CPU 
+The evaluation system is a computer with a quad core Intel Xeon E3-1270 v3 CPU 
 running at 3.5 GHz and 16 GB of memory with an Ubuntu Linux 14.04 LTS operating system.
 This computer was idle when performing the tests.
 
@@ -546,9 +550,9 @@ This computer was idle when performing the tests.
 The matching performance evaluation was setup in the following way.
 \begin{itemize}
     \item Creation of different sized rule sets from 100 to 3500 rules.
-        For measuring average performances there are 10 rule sets created for every rule set size.
+        For measuring average performances there are ten different rule sets created for every rule set size.
     \item Generating good, average and bad case sub-rule sets. 
-        Each original rule set is split into thirds and these are saved separately.
+        Each original rule set is split into thirds and each of them is saved separately.
     \item Generating traces for every sub-rule set.
         Using the Classbench\cite{classbench_website} tool, a packet trace is generated for every previously generated rule set.
         That means that for every rule set three traces are produced: 
@@ -556,7 +560,7 @@ The matching performance evaluation was setup in the following way.
 \end{itemize}
 A packet trace consists of packet header data like IP source and destination addresses, transport and Internet protocols et cetera.
 Every trace entry can be translated into a packet that is sent into the OpenFlow switch's matching engine.
-The performace was tested by looping through every generated trace for ten seconds and sending packets through the switch.
+The performance was tested by looping through every generated trace for ten seconds and sending packets through the switch.
 After that time the number of received packets was measured on the destination host with the \textsf{netstat} command.
 
 The results in figures \ref{fig:eval_good_case}, \ref{fig:eval_average_case} and \ref{fig:eval_bad_case} show that the List implementation
@@ -619,16 +623,16 @@ One of the main objectives is further optimization of the matching algorithm.
 One possibility to speed up the switch is to lower the time used for the JIT code generation.
 Modifying the existing JIT function instead of deleting the old one and building 
 a new one from scratch might be a worthwhile task.
-This should save some time when updating the ruleset.
-Especially in environments with fast-changing rulesets this idea may offer 
+This should save some time when updating the rule set.
+Especially in environments with fast-changing rule sets this idea may offer 
 a significant advantage over the current implementation.
 
 Another idea that comes to mind is to implement a heuristic that detects 
-the most popular flows of the last timespan in an operating switch.
+the most popular flows of the last time span in an operating switch.
 After gathering traffic data for a while it might prove beneficial to tune 
 the JIT function in such a way that the search for packet header data in a popular flow returns faster.
 Depending on the type of traffic, this optimization may either cause a massive performance boost or no real advantage.
-The latter case enters if there are no real flows recognisable in the traffic because it is very sparse.
+The latter case enters if there are no real flows recognizable in the traffic because it is very sparse.
 But in most real world cases there exist observable traffic patterns.
 
 \newpage
