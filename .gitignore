@@ -64,3 +64,5 @@ docs/_build/
 *.pdf
 *.blg
 *.out
+*.nav
+*.snm

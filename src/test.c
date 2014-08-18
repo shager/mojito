@@ -1,8 +1,9 @@
 #include "bv_types.h"
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
-int main() {
+int main(int argc, char** argv) {
     Range_borders* obj = range_borders_ctor();
     
     /* TEST:
@@ -38,10 +39,18 @@ int main() {
     /* 
      * test add_rule(struct Range_borders* this, uint64_t begin_index, uint64_t end_index, uint32_t rule_index)
      */
-    for (int i = 0; i < 1025; ++i) {
-        printf("Adding rule %d\n", i);
+    
+    if (argc < 1) {
+        printf("No number of rules to insert provided! Aborting...\n");
+        return 1;
+    }
+    
+    for (int i = 0; i < atoi(argv[1]); ++i) {
+        //printf("Adding rule %d\n", i);
         assert((obj->add_rule(obj, i, i + 1, i) == 0) || printf("Error adding rule %d\n", i));
     }
+    
+    return 0;
     
     /*obj->add_rule(obj, 5, 6, 5);
     obj->add_rule(obj, 6, 7, 6);

@@ -180,7 +180,8 @@ The packet header transports meta information for directing the packet to the co
 Due to the complexity of the Internet, a layered model is used for transporting 
 packets from one host to another, as illustrated in Figure~\ref{fig:layermodel}.
 Each of the layers is usually represented by one protocol, which adds its own header to a packet.
-Depending on the protocol, headers may also contain meta data for congestion control or data order.
+The encapsulated protocols headers are treated as payload to the enclosing protocol.
+Depending on the protocol, headers may also contain meta data for services like congestion control or data order.
 The composition of a packet from its headers and payload is shown in Figure~\ref{fig:packet-headers}.
 For instance, the TCP protocol transports additional information like sequence numbers in the packet headers~\cite[Chapter 3.5]{kurose_ross}.
 Payload data is a chunk of bytes from the original data stream.
@@ -655,7 +656,7 @@ All evaluation tasks were distributed over the time, so that the ten runs
 for one value guarantee some independence of external factors over the time.
 The relative performance of the two bitvector implementations can be seen in
 Figures~\ref{fig:eval_good_case_relative},~\ref{fig:eval_average_case_relative} and~\ref{fig:eval_bad_case_relative}.
-With growing rule sets, the performance boost is clearly visible.
+With growing rule sets, the performance boost is clearly increasing.
 
 \begin{figure}
     \centering
@@ -708,24 +709,29 @@ With growing rule sets, the performance boost is clearly visible.
 \end{figure}
 
 \subsubsection{Insertion Time}
-Figure TODO shows the significant loss in efficiency when inserting rules. %TODO: Grafik
-The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional approach.
+Figure TODO shows the significant loss in efficiency when inserting rules into the code generating . %TODO: Grafik
+The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional bitvector approach.
+This test was executed on the two modules separately and in only one matching dimension.
+In order to compensate for the decreased complexity of this approach compared to the twelve dimensional OpenFlow matching,
+a greater number of rules was inserted into each matching engine.
 Because of the requirement that the matching engine has to be operable 
 immediately after every update operation, every update implies a complete regeneration of the JIT code.
-That behaviour explains the additional update time seen in the measured data. 
+That behaviour induces the additional update time seen in the measured data. 
 
 \subsubsection{Implementation Complexity}
 The three algorithms are implemented in C.
 To give a rough estimation of complexity, Table~\ref{table:loc} shows the 
 approximate size of the implementation sizes measured in lines of code.
+In comparison, the JIT implementation is smaller than the classic bitvector algorithm when performing a lookup.
+However, the added complexity of the code generation is clearly visible.
 
 \begin{table}
   \centering
   \begin{tabularx}{\textwidth}{l|XXX}
   &List&Simple Bitvector&JIT Bitvector\\
   \hline
-  Insertion&&&\\
-  Lookup&&&\\
+  Insertion&&140&310\\
+  Lookup&&100&67\\
   \end{tabularx}
   \caption{Lines of code for all three implementations.}
   \label{table:loc}
