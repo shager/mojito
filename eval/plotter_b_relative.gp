@@ -10,7 +10,7 @@ reset
 #set output 'eval_b.png'
 # svg
 set terminal svg size 500,400 fname 'Verdana, Helvetica, Arial, sans-serif' fsize '10'
-set output 'eval_b.svg'
+set output 'eval_b_relative.svg'
 
 # color definitions
 set border linewidth 1.5
@@ -23,15 +23,15 @@ set key
 
 set nologscale xy
 set xrange [100:]
-set yrange [-50:1300]
+set yrange [0:35]
 #set autoscale y
 
 set xlabel 'Number of rules' 
-set ylabel 'Packets processed'
+set ylabel 'Performace factor against List'
 
-set format y "%gk"
+set format y "%g"
 set xtics add ("100" 100)
 set xtics rotate
 
-plot 'eval.dat_b'  u 1:($2/1000) with linespoints t 'Bitvector with JIT' ls 1, '' u 1:($3/1000) with linespoints t 'Simple Bitvector' ls 2, ''  u 1:($4/1000) with linespoints t 'List' ls 3,\
-        '' u 1:($2/1000):($5/1000) w yerrorbars notitle ls 1, '' u 1:($3/1000):($6/1000) w yerrorbars notitle ls 2, '' u 1:($4/1000):($7/1000) w yerrorbars notitle ls 3
+plot 'eval.dat_b' u 1:(($2/1000)/($4/1000)) with linespoints t 'Bitvector with JIT' ls 1, '' u 1:(($3/1000)/($4/1000)) with linespoints t 'Simple Bitvector' ls 2#, ''  u 1:($4/1000) with linespoints t 'List' ls 3,\
+        #'' u 1:($2/1000):($5/1000) w yerrorbars notitle ls 1, '' u 1:($3/1000):($6/1000) w yerrorbars notitle ls 2, '' u 1:($4/1000):($7/1000) w yerrorbars notitle ls 3

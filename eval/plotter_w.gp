@@ -22,16 +22,18 @@ set style line 3 lc rgb '#32cd32' lt 3 lw 1 pt 9 ps 0.7 # --- green (List)
 set key
 
 set nologscale xy
-set title '10 seconds of operation, bad case'
 
 set xrange [100:]
-set yrange [-50000:1300000]
+set yrange [-50:1300]
 #set autoscale y
 
 set xlabel 'Number of rules' 
 set ylabel 'Packets processed'
 
-set xtics rotate 
+set format y "%gk"
+set xtics add ("100" 100)
+set xtics rotate
 
-plot 'eval.dat_w'  u 1:2:5 with linespoints t 'Bitvector with JIT' ls 1, '' u 1:3 with linespoints t 'Simple Bitvector' ls 2, ''  u 1:4 with linespoints t 'List' ls 3,\
-        '' u 1:2:5 w yerrorbars notitle ls 1, '' u 1:3:6 w yerrorbars notitle ls 2, '' u 1:4:7 w yerrorbars notitle ls 3
+plot 'eval.dat_w'  u 1:($2/1000) with linespoints t 'Bitvector with JIT' ls 1, '' u 1:($3/1000) with linespoints t 'Simple Bitvector' ls 2, ''  u 1:($4/1000) with linespoints t 'List' ls 3,\
+        '' u 1:($2/1000):($5/1000) w yerrorbars notitle ls 1, '' u 1:($3/1000):($6/1000) w yerrorbars notitle ls 2, '' u 1:($4/1000):($7/1000) w yerrorbars notitle ls 3
+        
