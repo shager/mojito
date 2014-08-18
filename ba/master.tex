@@ -265,7 +265,7 @@ Usually, this is done by adding a slash followed the number of fixed bits after 
 For example, the previous Class A network becomes 1.0.0.0/8, because the first 8 bit are fixed and the rest is part of the sub net.
 With this notation, the entire Internet becomes 0.0.0.0/0 and one single host is for example 141.20.33.1/32.
 
-\subsection{Longest Prefix Matching}
+%TODO: evtl kürzen
 CIDR opens the opportunity to route different parts of a sub net to different places.
 For example, a rule set can contain a rule for the address space 141.20.0.0/16 and another rule for the included sub net 141.20.33.0/24.
 These prefixes overlap and if for example a packet with the address 141.20.33.123 arrives, both rules match this packet.
@@ -541,6 +541,7 @@ of the corresponding assembler instruction are looked up and appended to the exe
 Due to working in an Intel microprocessor, numeral arguments have to be 
 transformed into little-endian byte order in the \textsf{Insert} function.
 
+%TODO: überarbeiten!
 \begin{algorithm}
 \begin{algorithmic}
 \Function{JIT\_creation}{delimiters[], *executable\_memory, low\_index, high\_index}
@@ -705,18 +706,20 @@ With growing rule sets, the performance boost is clearly increasing.
         \caption{Bad case.}
         \label{fig:eval_bad_case_relative}
     \end{subfigure}
-    \caption{Matching performance relative against the List algorithm.}
+    \caption{Relative matching performance (measured against the List algorithm).}
 \end{figure}
 
 \subsubsection{Insertion Time}
 Figure TODO shows the significant loss in efficiency when inserting rules into the code generating . %TODO: Grafik
 The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional bitvector approach.
-This test was executed on the two modules separately and in only one matching dimension.
+Unfortunately, adding rules with the \textsf{dpctl} tool is relatively slow itself, so that measurements using this tool
+are uncertain and adding overhead to the algorithms' insertion performance.
+Therefore, this test was executed on the two newl implemented modules separately and in only one matching dimension.
 In order to compensate for the decreased complexity of this approach compared to the twelve dimensional OpenFlow matching,
 a greater number of rules was inserted into each matching engine.
 Because of the requirement that the matching engine has to be operable 
 immediately after every update operation, every update implies a complete regeneration of the JIT code.
-That behaviour induces the additional update time seen in the measured data. 
+That behaviour induces the additional update time seen in the measured data.
 
 \subsubsection{Implementation Complexity}
 The three algorithms are implemented in C.

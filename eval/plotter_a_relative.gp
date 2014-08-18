@@ -33,5 +33,5 @@ set ylabel 'Performace factor against List'
 set xtics add ("100" 100)
 set xtics rotate
 
-plot 'eval.dat_a' u 1:(($2/1000)/($4/1000)) with linespoints t 'Bitvector with JIT' ls 1, '' u 1:(($3/1000)/($4/1000)) with linespoints t 'Simple Bitvector' ls 2#, ''  u 1:($4/1000) with linespoints t 'List' ls 3,\
-        #'' u 1:($2/1000):($5/1000) w yerrorbars notitle ls 1, '' u 1:($3/1000):($6/1000) w yerrorbars notitle ls 2, '' u 1:($4/1000):($7/1000) w yerrorbars notitle ls 3
+plot 'eval.dat_a' u 1:($2/$4) with linespoints t 'Bitvector with JIT' ls 1, '' u 1:($3/$4) with linespoints t 'Simple Bitvector' ls 2\
+        #'' u 1:($2):($5) w yerrorbars notitle ls 1, '' u 1:($3/1000):($6/1000) w yerrorbars notitle ls 2, '' u 1:($4/1000):($7/1000) w yerrorbars notitle ls 3
