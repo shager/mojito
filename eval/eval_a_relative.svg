@@ -126,7 +126,7 @@
 	<g transform="translate(422.4,47.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>Simple Bitvector</text>
 	</g>
-	<path stroke='rgb(221,  24,  31)'  d='M429.4,44.1 L464.9,44.1 M53.5,327.9 L78.5,275.5 L103.5,322.0 L128.6,248.2 L153.6,260.4 L178.6,264.1 
+	<path stroke='rgb(221,  24,  31)' stroke-dasharray=' 5,8'  d='M429.4,44.1 L464.9,44.1 M53.5,327.9 L78.5,275.5 L103.5,322.0 L128.6,248.2 L153.6,260.4 L178.6,264.1 
 		L203.6,210.9 L228.7,279.8 L253.7,191.1 L278.7,250.5 L303.7,169.5 L328.8,263.5 L353.8,156.6 L378.8,194.2 
 		L403.8,108.1 L428.9,113.3 L453.9,182.8 L478.9,108.7  '/>	<use xlink:href='#gpPt6' transform='translate(53.5,327.9) scale(2.62)' color='rgb(221,  24,  31)'/>
 	<use xlink:href='#gpPt6' transform='translate(78.5,275.5) scale(2.62)' color='rgb(221,  24,  31)'/>

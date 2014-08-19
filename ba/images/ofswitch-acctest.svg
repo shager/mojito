@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="ofswitch-perftest.svg">
+   sodipodi:docname="ofswitch-acctest.svg">
   <defs
      id="defs4">
     <marker
@@ -57,7 +57,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -149,14 +149,14 @@
     </g>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.96162868px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 296.14602,417.91391 31.05942,0"
+       d="m 296.14602,422.62102 31.05942,0"
        id="path3809"
        inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
        id="path4255"
-       d="m 484.14602,417.91391 78.34247,0"
-       style="fill:none;stroke:#000000;stroke-width:0.962;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend);stroke-miterlimit:4;stroke-dasharray:none" />
+       d="m 484.14602,422.61958 78.34247,0"
+       style="fill:none;stroke:#000000;stroke-width:0.96200001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Lend)" />
     <g
        transform="translate(376.18735,-592.2153)"
        id="g4276">
