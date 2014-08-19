@@ -292,7 +292,6 @@ Recently, more than approximately 500.000 routes were announced via the Border G
 This lead to outages of network connectivity at some providers due to a default limit in older Cisco routers being too small\cite{outage}.
 Rebooting solves this problem for a while, but in future there certainly are limits that might not be as easily circumventable as this one.
 
-%TODO: Openflow/SDN
 \subsection{Software Defined Networks}
 \label{sec:SDN}
 Software Defined Networking (SDN) describes the general idea to decouple 
@@ -448,6 +447,7 @@ When all relevant points are determined the lookup process works as follows:
 Firstly, there is a search for the target point in every dimension.
 In this implementation, binary search returns the nearest left edge (constructed when inserting the rules) of the search space.
 This edge contains the bitvector with $n$ bits length, where $n$ is the size of the rule set.
+If no bitvector is matching, a null vector is returned.
 
 Again, the example from Figure~\ref{fig:bv-normal} will be considered.
 Furthermore, assume that packets P1 with header data $(4, 4)$ and P2 with header data $(14, 7)$ arrive at the switch.
@@ -473,14 +473,13 @@ This will also be determined by the next step of the algorithm.
 \Function{lookup\_matching\_rule}{Packet p}
     \State result\_bitvector $\gets 111\ldots 11$
     \ForAll{Header fields h $\in$ p}
-        %\Comment{Join all bitvectors to get the result}
         \State result\_bitvector $\gets$ result\_bitvector $\bigwedge$ \Call{lookup\_bitvector}{h}
     \EndFor
     \State matching\_rule $\gets$ \Call{index\_of\_leftmost\_set\_bit}{result\_bitvector}
     \State \Return matching\_rule
 \EndFunction
 \end{algorithmic}
-\caption{The algorithm used to look up the matching rules.}
+\caption{The algorithm used to look up the matching rule.}
 \label{alg:bv-join}
 \end{algorithm}
 
@@ -509,14 +508,62 @@ default action will be executed, which is most often a drop of the packet as def
 
 \subsection{JIT lookup}
 To further speed up the lookup process, another optimization has been implemented.
-At each lookup, the algorithm has to perform a binary search on the bitvectors' locations in each dimension in order to find the matching bitvector for the current packet.
-These locations can be interpreted as delimiters between the realms of the bitvectors.
-In the above example, if the lookup process receives a packet with a source IP address value of 3, the algorithm has to find the first bitvector in the source IP dimension. %TODO: example abgleichen!
-For every header field in the 12-dimensional OpenFlow header the algorithm has to yield exactly one bitvector.
-This lookup process over the entire delimiter space requires several memory accesses for every lookup.
-The general idea to speed up this operation is to precompute a function that is specific for each dimension and returns the bitvector's index in one dimension when given the header value to be matched.
+In theory, packet classification is handled by a function that depends on the packet $p$ and the rule set $r$: $class(p, r)$.
+The rule set is static when a packet is classified and does not change.
+Thus, with partial evaluation~\cite{partial_eval}, a function $f'(p)$ can be constructed that depends only on the packet as input.
+$f'$ differs from $f$ because each operation in $f$ that depends on the 
+rule set $r$ is exchanged by an operation with the specific values that $r$ currently holds.
+This mapping from $f$ to $f'$ is called the First Futamura projection~\cite{DBLP:journals/ngc/MogensenH88}.
+For a simple example for a Futamura projection consider the function $\textsc{F}$ described in Algorithm~\ref{alg:futamura-f}.
+Now a special case for this algorithm occurs and the expression $y = 3$ is always valid.
+With that knowledge, the compiler can produce the function $\textsc{F}'(x)$, as listed in Algorithm~\ref{alg:futamura-f-optimized}.
 
-The function is designed to have zero memory accesses when looking up header values.
+\begin{algorithm}
+\begin{algorithmic}
+\Function{f}{int x, int y}
+    \State \Return x + y
+\EndFunction
+\end{algorithmic}
+\caption{Example function that will be optimized by a Futamura projection.}
+\label{alg:futamura-f}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}
+\Function{f'}{int x}
+    \State \Return x + 3
+\EndFunction
+\end{algorithmic}
+\caption{Example function that has been optimized by a Futamura projection.}
+\label{alg:futamura-f-optimized}
+\end{algorithm}
+
+In this work this optimization can be applied, too.
+At each lookup, the algorithm has to perform a binary search on the bitvectors' 
+locations in each dimension in order to find the matching bitvector for the current packet.
+These locations can be interpreted as delimiters between the realms of the bitvectors.
+The decision tree for the example from above is illustrated in Figure~\ref{fig:bv-tree}.
+In circles are the values that a packet is matched against, the resulting bitvectors are reached at the end of each search. 
+The delimiting locations (i.e. the values in the circles) depend on the 
+rule set and not on the packet that is matched at that moment.
+In the above example, if the lookup process receives a packet with a source IP 
+address value of 2, the algorithm has to find the bitvector $(0 1 0)$ in the source IP dimension.
+For every header field in the 12-dimensional OpenFlow header the algorithm has to yield exactly one bitvector.
+Therefore, there exists a similar tree for each matchin dimension.
+This lookup process over the entire delimiter space requires several memory accesses for every lookup.
+The general idea to speed up this operation is to precompute a function that 
+is specific for each dimension and returns the index of the bitvector in one 
+dimension when given the header value to be matched.
+
+\begin{figure}
+\centering
+\includegraphics[height=0.25\textheight]{images/bv-tree}
+\caption{A desicion tree used for matching the Source IP Address.}
+\label{fig:bv-tree}
+\end{figure}
+
+The function is designed to have zero memory accesses when looking up header 
+values after it is loaded into the computer's processor.
 Therefore it performs the binary search only on precomputed values, which 
 leads to the necessity of rebuilding the function at every rule set update.
 Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
@@ -524,7 +571,7 @@ Clearly, that leads to a performance disadvantage for fast changing rule sets at
 Implementing that functionality has lead to a just in time generated function written in machine 
 language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
 Every assembly instruction was split up into its respective opcodes following the 
-Intel 64 and IA-32 Architectures Software Developer Manuals. %TODO: cite???
+Intel 64 and IA-32 Architectures Software Developer Manuals~\cite{intelsys}.
 For example, the opcodes for the instruction 
 \textsf{mov \%rsp,\%rbp} (Copying the value of the stack pointer to the base pointer) 
 are $\texttt{0x48}, \texttt{0x89}, \texttt{0xE5}$.
@@ -545,24 +592,28 @@ transformed into little-endian byte order in the \textsf{Insert} function.
 \begin{algorithm}
 \begin{algorithmic}
 \Function{JIT\_creation}{delimiters[], *executable\_memory, low\_index, high\_index}
-    \If{$hi\_index - low\_index == -1$} 
-        \State $executable\_memory \gets 0$
-        \State \Return 0
+    \State mid\_index $\gets$ low\_index + $\frac{\textsf{high\_index} - \textsf{low\_index}}{2}$
+    
+    \Comment{Handle the base case of the recursion}
+    \If{hi\_index $==$ low\_index}
+        \State \Call{Insert}{Compare: \textsf{\%rax} $<$ delimiters[low\_index]}
+        \State \Call{Insert}{Jump: case2}
+        \State \Call{Insert}{Return: low\_index}
+        \State \Call{Insert}{Return: low\_index - 1} \Comment{case2}
+        \State \Return{}
     \EndIf
-    \If{$hi\_index == low\_index$}
-        \State \Call{Insert}{cmpq delimiter[low\_index]}
-        \State \Call{Insert}{jb 0x7} \Comment offset = len(mov) + len(pop\_ret)
-        \State \Call{Insert}{mov low\_index}
-        \State \Call{Insert}{pop\_ret}
-        \If{$low\_index == 0$}
-            \State \Call{Insert}{mov 0}
-            \State \Call{Insert}{pop\_ret}
-        \Else
-            \State \Call{Insert}{mov low\_index}
-            \State \Call{Insert}{pop\_ret}
-        \EndIf
-        \State \Return memory\_len
-    \EndIf
+    
+    \State $left\_tree \gets$ \Call{JIT\_creation}{delimiters[], *executable\_memory, low\_index, mid\_index - 1}
+    \State $right\_tree \gets$ \Call{JIT\_creation}{delimiters[], *executable\_memory, mid\_index + 1, high\_index}
+    
+    \State \Call{Insert}{Compare: $x <$ delimiters[mid\_index]}
+    \State \Call{Insert}{Jump: LEFT}
+    \State \Call{Insert}{Compare: delimters[mid\_index + 1] $< x$}
+    \State \Call{Insert}{Jump: RIGHT}
+    \State \Call{Insert}{Return: mid\_index}
+    \State \Call{Insert}{LEFT: left\_tree}
+    \State \Call{Insert}{RIGHT: right\_tree}
+    \State \Return{}
 \EndFunction
 \end{algorithmic}
 \caption{The algorithm used to create the JIT-compiled function.}
