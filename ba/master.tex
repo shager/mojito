@@ -136,7 +136,26 @@ nor a similar work has been presented to an examination committee.
 
 \begin{abstract}
 \section*{Abstract}
-The packet classification problem has been 
+A packet filter is a function that returns a filtering action given a network 
+packet following a predefined rule set.
+This work focuses on implementing a faster packet filter in the reference 
+implementation of the Software Defined Network OpenFlow.
+The algorithm chosen for this task follows a divide and conquer approach
+instead of searching in a linear list.
+Further optimization with just in time compiled native code proved to increase 
+matching performance at the cost of consumed memory and insertion time. %TODO: memory correct?
+This strategy is new compared to current packet filters, that are using 
+data structures in memory instead of specially compiled code.
+
+This work introduces the following concepts:
+\begin{enumerate}
+    \item Just In Time code generation of native assembly code for a 
+        faster lookup process in packet filters.
+    \item A parallelizable infrastructure for matching packets in the OpenFlow
+        reference implementation.
+    \item A detailed performance evaluation of these concepts.
+\end{enumerate}
+
 \end{abstract}
 
 \addcontentsline{toc}{section}{Contents}
@@ -272,7 +291,7 @@ For example, a rule set can contain a rule for the address space 141.20.0.0/16 a
 These prefixes overlap and if for example a packet with the address 141.20.33.123 arrives, both rules match this packet.
 Longest prefix matching signifies the idea that shorter prefixes are less favorable when matching packets, so that rule 141.20.33.0/24 matches.
 Packet matchers need to have capabilities to match a packet to its longest matching prefix.
-Usually, this property of CIDR leads to an increasing size of rule sets in the respective Internet traffic handlers. %TODO: Grafik zum Beispiel, mehr Text
+Usually, this property of CIDR leads to an increasing size of rule sets in the respective Internet traffic handlers. %TODO: Grafik zum Beispiel?
 Sub nets can be divided into numerous smaller sub nets and each network split has to be mapped in routing tables and rule sets.
 Therefore, an algorithm used for matching Internet packets has to be capable of longest prefix matching.
 
@@ -332,33 +351,44 @@ Currently, that matching engine uses a linear search in the specified rule set w
 This approach may be fast enough in cases of small rule sets but it does not scale
 with a growing number of inserted rules.
 
-%TODO: rework
+%TODO: rework!!!
 \section{Related Work}
-Speeding up packet classification is one of the current research topics in the computer network community.
+Speeding up packet classification is a research topic in the computer network community since the 1990s.
 Therefore, several algorithms have been developed in the last years.
-The bitvector algorithm is not the only promising idea to speed up packet matching in modern network hardware.
 An overview over these algorithms can be gained from~\cite{algorithms_survey}.
 The authors compare a detailed list of algorithms and discuss their advantages and downsides.
 Approaches to the packet classification problem include the usage of tries, 
-hash maps or divide and conquer~\cite{hicuts} in order to perform significantly 
+hash maps or divide and conquer strategies~\cite{hicuts, efficuts} in order to perform significantly 
 faster than searching the matching rule in a linear list.
+One of the algorithms from the category of divide and conquer-approaches is the bitvector~\cite{bv} algorithm.
+It builds a separate matching structure for each packet header dimension and 
+then performs a binary search in each of these structures.
+Every dimension returns a bit vector with $n$ bit, where $n$ is the number of rules in the rule set.
+A $1$ indicates that the rule represented by that index has matched, a $0$ is returned otherwise.
+After retrieving all matching dimensions the result vectors are aggregated by a bitwise AND.
+This algorithm will be used in this work, a more detailed description can be found in Section~\ref{sec:bv-general}.
 
 Real-world applications of these theoretical concepts are numerous and have been evaluated in different projects.
-Following, there is an overview over different projects using a software packet filter environment.
-
-The Iptables~\cite{iptables} packet filter was improved in the HiPAC project~\cite{hipac}, which was founded in a diploma thesis~\cite{heinzhigh}.
+Following, there is an overview over examples where a software packet filter environment was used.
+The Iptables~\cite{iptables} packet filter was improved in the HiPAC project~\cite{hipac}, 
+which was founded in a diploma thesis~\cite{heinzhigh}. %TODO: erklären
 Another project focuses on the implementation of EffiCuts in an OpenFlow environment~\cite{stimpfling2013optimal}.
-They also faced the challenge to improve the efficiency of packet classification on more than the usual five-tuple of header fields.
+EffiCuts~\cite{efficuts} constructs a decision tree from a given rule set.
+Compared to the HiCuts algorithm~\cite{hicuts}, EffiCuts handles wildcarded rules more efficiently.
+The authors of that paper also faced the challenge to improve the efficiency 
+of packet classification on more than the usual five-tuple of header fields.
 OpenFlow 1.0.0~\cite{openflow_spec10} requires at least 12 header fields to be matched, later versions are operating on even larger sets.
-To address this problem, they extended the original EffiCuts algorithm in order to achieve a lower memory usage profile.
+To address this problem, the original EffiCuts algorithm was extended in order to achieve a lower memory usage profile.
 
 Other research groups focus on implementing wire speed packet matching in (programmable) hardware instead of software.
-The bitvector approach~\cite{bv} has been evaluated in FPGAs~\cite{bitvector_fpga, qu2013fast}.
-However, these papers mainly focus on five-tuple rule sets, which decreases the complexity of the problem compared to an OpenFlow 12-tuple.
+The bitvector approach has been evaluated in FPGAs~\cite{bitvector_fpga, qu2013fast}.
+However, these papers mainly focus on five-tuple rule sets, which decreases 
+the complexity of the problem compared to an OpenFlow 12-tuple.
 
 Further improvement on the bitvector algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
-When all dimensions are matched and the resulting bitvectors are retrieved, these vectors have to be ANDed bit per bit until a one bit is found.
-This obviously results in an $\mathcal O(n)$ worst case runtime.
+When all dimensions are matched and the resulting bit vectors are retrieved, 
+these vectors have to be ANDed bit per bit until a one bit is found.
+This obviously results in an $\mathcal O(n)$ worst case runtime, where $n$ is the number of inserted rules.
 The aggregated bitvector algorithm~\cite{abv} implements a hierarchical system 
 of bitvectors with fixed length and runs in $\mathcal O(log\ n)$.
 However, more memory space is needed to store the bitvectors of the respective hierarchies.
