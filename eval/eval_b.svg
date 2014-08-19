@@ -123,7 +123,7 @@
 	<g transform="translate(422.4,47.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>Simple Bitvector</text>
 	</g>
-	<path stroke='rgb(221,  24,  31)'  d='M429.4,44.1 L464.9,44.1 M67.5,297.5 L91.7,122.3 L115.9,299.2 L140.1,92.0 L164.3,199.6 L188.5,163.1 
+	<path stroke='rgb(221,  24,  31)' stroke-dasharray=' 5,8'  d='M429.4,44.1 L464.9,44.1 M67.5,297.5 L91.7,122.3 L115.9,299.2 L140.1,92.0 L164.3,199.6 L188.5,163.1 
 		L212.7,100.7 L236.9,179.8 L261.1,117.5 L285.3,167.1 L309.5,103.9 L333.7,150.1 L357.9,143.4 L382.1,172.2 
 		L406.3,115.1 L430.5,163.2 L454.7,150.0 L478.9,106.1  '/>	<use xlink:href='#gpPt6' transform='translate(67.5,297.5) scale(2.62)' color='rgb(221,  24,  31)'/>
 	<use xlink:href='#gpPt6' transform='translate(91.7,122.3) scale(2.62)' color='rgb(221,  24,  31)'/>
@@ -151,7 +151,7 @@
 	<g transform="translate(422.4,62.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>List</text>
 	</g>
-	<path stroke='rgb( 50, 205,  50)'  d='M429.4,59.1 L464.9,59.1 M67.5,242.6 L91.7,273.1 L115.9,285.4 L140.1,290.4 L164.3,300.1 L188.5,298.8 
+	<path stroke='rgb( 50, 205,  50)' stroke-dasharray=' 2,4'  d='M429.4,59.1 L464.9,59.1 M67.5,242.6 L91.7,273.1 L115.9,285.4 L140.1,290.4 L164.3,300.1 L188.5,298.8 
 		L212.7,302.4 L236.9,297.7 L261.1,298.6 L285.3,306.9 L309.5,307.6 L333.7,307.4 L357.9,311.7 L382.1,309.6 
 		L406.3,311.6 L430.5,312.0 L454.7,312.3 L478.9,311.3  '/>	<use xlink:href='#gpPt8' transform='translate(67.5,242.6) scale(2.62)' color='rgb( 50, 205,  50)'/>
 	<use xlink:href='#gpPt8' transform='translate(91.7,273.1) scale(2.62)' color='rgb( 50, 205,  50)'/>
@@ -210,7 +210,7 @@
 </g>
 	</g>
 	<g id="gnuplot_plot_5" ><title>gnuplot_plot_5</title>
-<g style="fill:none; color:green; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
+<g style="fill:none; color:red; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
 	<path stroke='rgb(221,  24,  31)'  d='M67.5,320.9 L67.5,274.0 M67.5,320.9 L71.2,320.9 M67.5,274.0 L71.2,274.0 M91.7,151.3 L91.7,93.4 
 		M88.0,151.3 L95.4,151.3 M88.0,93.4 L95.4,93.4 M115.9,314.1 L115.9,284.3 M112.2,314.1 L119.6,314.1 
 		M112.2,284.3 L119.6,284.3 M140.1,116.5 L140.1,67.4 M136.4,116.5 L143.8,116.5 M136.4,67.4 L143.8,67.4 
@@ -245,7 +245,7 @@
 </g>
 	</g>
 	<g id="gnuplot_plot_6" ><title>gnuplot_plot_6</title>
-<g style="fill:none; color:blue; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
+<g style="fill:none; color:red; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
 	<path stroke='rgb( 50, 205,  50)'  d='M67.5,288.1 L67.5,197.1 M67.5,288.1 L71.2,288.1 M67.5,197.1 L71.2,197.1 M91.7,282.9 L91.7,263.2 
 		M88.0,282.9 L95.4,282.9 M88.0,263.2 L95.4,263.2 M115.9,290.6 L115.9,280.1 M112.2,290.6 L119.6,290.6 
 		M112.2,280.1 L119.6,280.1 M140.1,302.0 L140.1,278.8 M136.4,302.0 L143.8,302.0 M136.4,278.8 L143.8,278.8 

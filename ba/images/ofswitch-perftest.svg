@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="Neues Dokument 1">
+   sodipodi:docname="ofswitch-perftest.svg">
   <defs
      id="defs4">
     <marker
@@ -57,7 +57,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -148,13 +148,13 @@
     </g>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.96162868px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 179.95868,908.12921 31.05942,0"
+       d="m 179.95868,912.83632 31.05942,0"
        id="path3809"
        inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
        id="path4255"
-       d="m 367.95868,908.12921 31.05942,0"
+       d="m 367.95868,912.83621 31.05942,0"
        style="fill:none;stroke:#000000;stroke-width:0.96162868px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
   </g>
 </svg>

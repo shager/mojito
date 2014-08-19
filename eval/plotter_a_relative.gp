@@ -9,7 +9,7 @@ reset
 #set terminal pngcairo size 500,400 enhanced font 'Verdana,10'
 #set output 'eval_a.png'
 # svg
-set terminal svg size 500,400 fname 'Verdana, Helvetica, Arial, sans-serif' fsize '10'
+set terminal svg size 500,400 fname 'Verdana, Helvetica, Arial, sans-serif' fsize '10' dashed
 set output 'eval_a_relative.svg'
 
 # color definitions
