@@ -1,34 +1,19 @@
 #!/bin/sh
 
-# test list
-cd ../../openflow
-cp list_chain.c udatapath/chain.c
-make clean
-make
-sudo make install
-
-cd ../mojito/eval
-sudo ./memory_test.py -a "list"
-
 # test bitvector
-cd ../../openflow
-cp bv_chain.c udatapath/chain.c
-cp bv_nojit.c udatapath/bv_types.c
+cd ../src
+cp bv_nojit.c bv_types.c
 make clean
 make
-sudo make install
 
-cd ../mojito/eval
-sudo ./memory_test.py -a "simple_bv"
+cd ../eval
+./memory_executor.py "simple_bv"
 
 # test jit
-cd ../../openflow
-cp bv_chain.c udatapath/chain.c
-cp bv_jit.c udatapath/bv_types.c
+cd ../src
+cp bv_jit.c bv_types.c
 make clean
 make
-sudo make install
 
-cd ../mojito/eval
-sudo ./memory_test.py -a "jit"
-
+cd ../eval
+./memory_executor.py "jit"
