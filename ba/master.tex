@@ -137,7 +137,7 @@ nor a similar work has been presented to an examination committee.
 \begin{abstract}
 \section*{Abstract}
 This work focuses on implementing a faster packet filter in the reference 
-implementation of the Software Defined Network OpenFlow.
+implementation of the Software Defined Network OpenFlow. %TODO: OpenFLow is not "a" SDN!
 The algorithm chosen for this task follows a divide and conquer approach
 instead of searching in a linear list.
 A clear performance boost at lookup is the result of this new implementation.
@@ -152,7 +152,7 @@ The main contributions of this work are:
         OpenFlow reference implementation.
     \item Just In Time code generation of native assembly code for a 
         faster lookup process in packet filters.
-    \item A detailed performance evaluation of these concepts in comparison 
+    \item A detailed evaluation of performance regarding these concepts in comparison 
         with the existing classification scheme.
 \end{itemize}
 
@@ -182,13 +182,13 @@ In general, these machines inspect the header data of every incoming IP packet a
 following a rule set that has been specified before.
 A recent trend in the networking community are Software Defined Networks (SDNs).
 SDNs simplify the central and dynamic configuration of network hardware~\cite{onf_whitepaper}.
-Administrators can define network parameters and rules and the configuration on the end hosts is then managed by the SDN controller
-This topic is discussed in detail in Section~\ref{sec:SDN}.
+Administrators can define network parameters and rules; the configuration 
+on the end hosts is then managed by the SDN controller\footnote{For a detailed discussion of that topic refer to Section~\ref{sec:SDN}.}.
 
-In this work the focus lies on the reference implementation of the SDN protocol suite OpenFlow.
+In this work, the focus lies on the reference implementation of the SDN protocol suite OpenFlow.
 OpenFlow is the first mechanism that specified the communication between the controller and the network hardware~\cite{onf_whitepaper}.
 The reference implementation provides a software switch.
-Optimization of that switch's matching engine is the main focus of this thesis.
+Optimization of that switch's matching engine is the main contribution of this thesis.
 
 \section{Basic Concepts}
 \subsection{The Internet}
@@ -377,14 +377,14 @@ which was founded in a diploma thesis~\cite{heinzhigh}. %TODO: erklären
 Another project focuses on the implementation of EffiCuts in an OpenFlow environment~\cite{stimpfling2013optimal}.
 EffiCuts~\cite{efficuts} constructs a decision tree from a given rule set.
 Compared to the HiCuts algorithm~\cite{hicuts}, EffiCuts handles wildcarded rules more efficiently.
-The authors of that work also faced the challenge to improve the efficiency 
+The authors of that publication also faced the challenge to improve the efficiency 
 of packet classification on more than the usual five-tuple of header fields.
 OpenFlow 1.0.0~\cite{openflow_spec10} requires at least 12 header fields to be matched, later versions are operating on even larger sets.
 To address this problem, the original EffiCuts algorithm was extended in order to achieve a lower memory usage profile.
 
 Other research groups focus on implementing wire speed packet matching in (programmable) hardware instead of software.
 The bitvector approach has been evaluated in FPGAs~\cite{bitvector_fpga, qu2013fast}.
-However, those works mainly focus on five-tuple rule sets, which decreases 
+However, those publictions mainly focus on five-tuple rule sets, which decreases 
 the complexity of the problem compared to an OpenFlow 12-tuple.
 
 Further improvement on the bitvector algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
@@ -411,7 +411,7 @@ That means, that they can be combined with the approach presented in this paper 
 gain an even bigger advantage compared to the existing implementations.
 
 A just in time (JIT) compiled rule set has been implemented in~\cite{dpf}.
-The general idea of the first work is to design an algorithm that processes a rule set
+The general idea of that work is to design an algorithm that processes a rule set
 written in a special grammar and returns executable code.
 The use case is a packet filter in an operating system kernel.
 The developers of the BSD packet filter~\cite{bpf, bpfplus} concentrate on compiling the rule set to an executable written in 
@@ -882,3 +882,5 @@ Nevertheless, in most real world cases there exist observable traffic patterns~\
 \bibliography{references,paper-build/conferences-crossref,rfc}
 
 \end{document}
+
+%Englischtipps: furthermore, whereas
