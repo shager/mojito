@@ -26,7 +26,7 @@ def mean_and_95_confidence_interval(values):
     return mean_value, error
 
 def main():
-    inputfiles = ["jit.mem_eval", "simple_bv.mem_eval", "list.mem_eval"]
+    inputfiles = ["jit.mem_eval", "simple_bv.mem_eval"]
     
     #sort files
     for filename in inputfiles:
@@ -47,56 +47,38 @@ def main():
         
     #generate intermediate data with average and std dev
     md_list = []
-    td_list = []
     for filename in inputfiles:
         fdes = open(filename, 'r')
         content = fdes.read()
         fdes.close()
         lines = content.split("\n")
-        for case in ["a", "b", "w"]:
-            mem_dict = {100:[], 300:[], 500:[], 700:[], 900:[], 1100:[], 1300:[], 
-                            1500:[], 1700:[], 1900:[], 2100:[], 2300:[], 2500:[], 2700:[], 
-                            2900:[], 3100:[], 3300:[], 3500:[]}
-            time_dict = {100:[], 300:[], 500:[], 700:[], 900:[], 1100:[], 1300:[], 
-                            1500:[], 1700:[], 1900:[], 2100:[], 2300:[], 2500:[], 2700:[], 
-                            2900:[], 3100:[], 3300:[], 3500:[]}
-            for key in range(100, 3501, 200):
-                for line in lines:
-                    if line == "":
-                        continue
-                    if line.split(",")[1] == str(key) and line.split(",")[0] == str(case):
-                        mem_dict[key].append(line.split(",")[3])
-                        time_dict[key].append(line.split(",")[4])
-                        
-            for value in mem_dict:
-                mem_dict[value] = mean_and_95_confidence_interval(map(int, mem_dict[value]))
-            for value in time_dict:
-                time_dict[value] = mean_and_95_confidence_interval(map(float, time_dict[value]))
-            md_list.append(mem_dict)
-            td_list.append(time_dict)
+        mem_dict = {1000:[], 3000:[], 5000:[], 7000:[], 9000:[], 11000:[], 13000:[], 
+                        15000:[], 17000:[], 19000:[], 21000:[], 23000:[], 25000:[], 27000:[], 
+                        29000:[], 31000:[], 33000:[], 35000:[], 37000:[]}
+        for key in range(1000, 37001, 2000):
+            for line in lines:
+                if line == "":
+                    continue
+                if line.split(",")[0] == str(key):
+                    mem_dict[key].append(line.split(",")[2])
+                    
+        for value in mem_dict:
+            mem_dict[value] = mean_and_95_confidence_interval(map(float, mem_dict[value]))
+        md_list.append(mem_dict)
 
     #generate R data files
-    for case in range(0, 3):
-        output_string = "#\"x\",\"JIT\",\"Simple_Bitvector\",\"List\",\"JIT_error\",\"Simple_Bitvector_error\",\"List_error\"\n"
-        for i in range(100, 3501, 200):
-            output_string += str(i) + " " #indicate our sample size
-            output_string += str(md_list[0 + case][i][0]) + " " #get algorithm 1
-            output_string += str(md_list[3 + case][i][0]) + " " #get algorithm 2
-            output_string += str(md_list[6 + case][i][0]) + " " #get algorithm 3
-            output_string += str(md_list[0 + case][i][1]) + " " #get algorithm 1 error
-            output_string += str(md_list[3 + case][i][1]) + " " #get algorithm 2 error
-            output_string += str(md_list[6 + case][i][1])       #get algorithm 3 error
-            output_string += "\n"
-        case_s = ""
-        if case == 0:
-            case_s = "a"
-        if case == 1:
-            case_s = "b"
-        if case == 2:
-            case_s = "w"
-        fdes = open("mem_eval.dat_" + case_s, 'w')
-        fdes.write(output_string)
-        fdes.close()
+    output_string = "#\"x\",\"JIT\",\"Simple_Bitvector\",\"JIT_error\",\"Simple_Bitvector_error\"\n"
+    for i in range(1000, 37001, 2000):
+        output_string += str(i) + " " #indicate our sample size
+        output_string += str(md_list[0][i][0]) + " " #get algorithm 1
+        output_string += str(md_list[1][i][0]) + " " #get algorithm 2
+        output_string += str(md_list[0][i][1]) + " " #get algorithm 1 error
+        output_string += str(md_list[1][i][1]) + " " #get algorithm 2 error
+        output_string += "\n"
+    print output_string
+    fdes = open("mem_eval.dat", 'w')
+    fdes.write(output_string)
+    fdes.close()
     
 
 if __name__ == '__main__':
