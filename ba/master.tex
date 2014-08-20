@@ -563,7 +563,7 @@ the header data point is located.
 This bitvector has a length of $n$ bit, where $n$ is the size of the rule set.
 If no bitvector is matching, a null vector is returned.
 
-\subsection{JIT lookup}
+\subsection{JIT Lookup}
 To further speed up the lookup process, another optimization has been implemented.
 In theory, packet classification is handled by a function that depends on the packet $p$ and the rule set $r$: $class(p, r)$.
 The rule set is static when a packet is classified and does not change.
@@ -816,7 +816,7 @@ With growing rule sets, the performance boost is clearly increasing.
 \end{figure}
 
 \subsubsection{Insertion Time}
-Figure TODO shows the significant loss in efficiency when inserting rules into the code generating . %TODO: Grafik
+Figure~\ref{fig:eval-times} shows the significant loss in efficiency when inserting rules into the code generating .
 The two graphs show the duration of an update with different sized rule sets in the JIT implementation and in the conventional bitvector approach.
 Unfortunately, adding rules with the \textsf{dpctl} tool is relatively slow itself, so that measurements using this tool
 are uncertain and adding overhead to the algorithms' insertion performance.
@@ -825,7 +825,14 @@ In order to compensate for the decreased complexity of this approach compared to
 a greater number of rules was inserted into each matching engine.
 Because of the requirement that the matching engine has to be operable 
 immediately after every update operation, every update implies a complete regeneration of the JIT code.
-That behaviour induces the additional update time seen in the measured data.
+That behaviour induces the massive additional update time seen in the measured data.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{images/eval_time}
+\caption{Time needed to insert rules into the switch.}
+\label{fig:eval-times}
+\end{figure}
 
 \subsubsection{Implementation Complexity}
 The three algorithms are implemented in C.
