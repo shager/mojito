@@ -20,6 +20,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{subcaption}
+\usepackage{multicol,listings}
 
 \usepackage{paralist}
 \usepackage[section]{placeins} %don't float to next section
@@ -517,7 +518,7 @@ As one can easily see, in case of P2 there exists no matching rule for both dime
 This will also be determined by the next step of the algorithm.
 
 \begin{algorithm}
-\begin{algorithmic}
+\begin{algorithmic}[1]
 \Function{lookup\_matching\_rule}{Packet p}
     \State result\_bitvector $\gets 111\ldots 11$
     \ForAll{Header fields h $\in$ p}
@@ -578,7 +579,7 @@ Now a special case for this algorithm occurs and the expression $y = 3$ is alway
 With that knowledge, the compiler can produce the function $\textsc{F}'(x)$, as listed in Algorithm~\ref{alg:futamura-f-optimized}.
 
 \begin{algorithm}
-\begin{algorithmic}
+\begin{algorithmic}[1]
 \Function{f}{int x, int y}
     \State \Return x + y
 \EndFunction
@@ -588,7 +589,7 @@ With that knowledge, the compiler can produce the function $\textsc{F}'(x)$, as 
 \end{algorithm}
 
 \begin{algorithm}
-\begin{algorithmic}
+\begin{algorithmic}[1]
 \Function{f'}{int x}
     \State \Return x + 3
 \EndFunction
@@ -625,7 +626,15 @@ The function is designed to have zero memory accesses when looking up header
 values after it is loaded into the computer's processor.
 Therefore it performs the binary search only on precomputed values, which 
 leads to the necessity of rebuilding the function at every rule set update.
+The assembly code generated from the example rule set is printed in Listing~\ref{lst:jit}.
 Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
+
+\begin{figure}
+\centering
+\lstinputlisting[language={[x86masm]Assembler},breaklines=true,basicstyle=\footnotesize,multicols=2,numbers=left]{jit_listing.asm}
+\caption{Generated assembly code by the JIT compiler.}
+\label{lst:jit}
+\end{figure}
 
 Implementing that functionality has lead to a just in time generated function written in machine 
 language\footnote{The x86\_64 architecture with Intel assembly language has been used.}.
@@ -642,34 +651,35 @@ The first call of the recursive algorithm~\ref{alg:jit} is invoked with the enti
 zero as the lower bound of operation and the last index in the delimiters array as last argument.
 Its return value is the length of newly written bytes to the executable memory in order to perform relative jumps over entire code blocks.
 
-Every time \textsc{Insert} is called in Algorithm~\ref{alg:jit} the opcodes 
+Every time \textsc{Generate\_Opcode} is called in Algorithm~\ref{alg:jit} the opcodes 
 of the corresponding assembler instruction are looked up and appended to a segment of executable memory.
 Due to working in an Intel microprocessor, numeral arguments have to be 
 transformed into little-endian byte order in the \textsf{Insert} function.
 
 \begin{algorithm}
-\begin{algorithmic}
+\begin{algorithmic}[1]
 \Function{JIT\_creation}{delimiters[], low\_index, high\_index}
-    \State mid\_index $\gets$ low\_index + $\frac{\textsf{high\_index} - \textsf{low\_index}}{2}$
+    \State mid\_index $\gets$ low\_index + $\lfloor\frac{\textrm{high\_index} - \textrm{low\_index}}{2}\rfloor$
     
-    \If{hi\_index $==$ low\_index} \Comment{Handle base case of the recursion}
-        \State \Call{Insert}{Compare: \textsf{\%rax} $<$ delimiters[low\_index]}
-        \State \Call{Insert}{Jump: CASE2}
-        \State \Call{Insert}{Return: low\_index}
-        \State \Call{Insert}{Return: low\_index - 1} \Comment{CASE2}
+    \State \Comment{Handle base case of the recursion}
+    \If{hi\_index $==$ low\_index}
+        \State \Call{Generate\_Opcode}{Compare: \textsf{\%rax} $<$ delimiters[low\_index]}
+        \State \Call{Generate\_Opcode}{Jump: CASE2}
+        \State \Call{Generate\_Opcode}{Return: low\_index}
+        \State \Call{Generate\_Opcode}{Return: low\_index - 1} \Comment{CASE2}
         \State \Return{Number of written bytes in \textsc{Insert}}
     \EndIf
     
     \State left\_tree $\gets$ \Call{JIT\_creation}{delimiters[], low\_index, mid\_index - 1}
     \State right\_tree $\gets$ \Call{JIT\_creation}{delimiters[], mid\_index + 1, high\_index}
     
-    \State \Call{Insert}{Compare: \textsf{\%rax} $<$ delimiters[mid\_index]}
-    \State \Call{Insert}{Jump: LEFT}
-    \State \Call{Insert}{Compare: delimiters[mid\_index + 1] $<$ \textsf{\%rax}}
-    \State \Call{Insert}{Jump: RIGHT}
-    \State \Call{Insert}{Return: mid\_index}
-    \State \Call{Insert}{LEFT: left\_tree}
-    \State \Call{Insert}{RIGHT: right\_tree}
+    \State \Call{Generate\_Opcode}{Compare: \textsf{\%rax} $<$ delimiters[mid\_index]}
+    \State \Call{Generate\_Opcode}{Jump: LEFT}
+    \State \Call{Generate\_Opcode}{Compare: delimiters[mid\_index + 1] $<$ \textsf{\%rax}}
+    \State \Call{Generate\_Opcode}{Jump: RIGHT}
+    \State \Call{Generate\_Opcode}{Return: mid\_index}
+    \State \Call{Generate\_Opcode}{LEFT: left\_tree}
+    \State \Call{Generate\_Opcode}{RIGHT: right\_tree}
     \State \Return{Number of written bytes in \textsc{Insert}}
 \EndFunction
 \end{algorithmic}
@@ -871,6 +881,8 @@ similar to Section~\ref{sec:eval-ins}.
 The memory consumption of the list implementation bases on source code analysis of 
 the data structures generated by the list functions.
 Even though this method implies an uncertainty, it is sufficient to recognize the differnce in magnitudes.
+The small overhead of the JIT implementation in comparison with the simple bitvector approach
+arises from the size of the actual JIT function.
 
 \begin{figure}
 \centering
