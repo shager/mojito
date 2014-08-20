@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="Neues Dokument 1">
+   sodipodi:docname="ofswitch.svg">
   <defs
      id="defs4">
     <marker
@@ -92,9 +92,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="299.15818"
-     inkscape:cy="933.53064"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="394.47479"
+     inkscape:cy="809.51329"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -111,7 +111,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -156,81 +156,77 @@
            id="tspan4763"
            sodipodi:role="line">Packet stream</tspan></text>
     </g>
-    <g
-       id="g4771">
-      <rect
-         y="199.36218"
-         x="197.5"
-         height="59.5"
-         width="91"
-         id="rect4765"
-         style="fill:#ffffff;stroke:#000000;stroke-width:1.09424329;stroke-miterlimit:4;stroke-dasharray:none" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text4767"
-         y="254.86218"
-         x="200.5"
-         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-         xml:space="preserve"><tspan
-           y="254.86218"
-           x="200.5"
-           id="tspan4769"
-           sodipodi:role="line">List Algorithm</tspan></text>
-    </g>
-    <g
-       id="g5016">
-      <rect
-         style="fill:#ffffff;stroke:#000000;stroke-width:1.09424329;stroke-miterlimit:4;stroke-dasharray:none"
-         id="rect4778"
-         width="91"
-         height="59.5"
-         x="347.5"
-         y="199.36218" />
-      <text
-         xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-         x="350.5"
-         y="224.86218"
-         id="text4780"
-         sodipodi:linespacing="125%"><tspan
-           sodipodi:role="line"
-           id="tspan4782"
-           x="350.5"
-           y="224.86218">Simple </tspan><tspan
-           sodipodi:role="line"
-           x="350.5"
-           y="239.86218"
-           id="tspan4794">Bitvector</tspan><tspan
-           sodipodi:role="line"
-           x="350.5"
-           y="254.86218"
-           id="tspan4792">Algorithm</tspan></text>
-    </g>
-    <g
-       id="g5010">
-      <rect
-         y="199.36218"
-         x="455.5"
-         height="59.5"
-         width="91"
-         id="rect4786"
-         style="fill:#ffffff;stroke:#000000;stroke-width:1.09424329;stroke-miterlimit:4;stroke-dasharray:none" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text4788"
-         y="238.86218"
-         x="458.5"
-         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-         xml:space="preserve"><tspan
-           y="238.86218"
-           x="458.5"
-           sodipodi:role="line"
-           id="tspan4796">JIT Bitvector </tspan><tspan
-           y="253.86218"
-           x="458.5"
-           sodipodi:role="line"
-           id="tspan4798">Algorithm</tspan></text>
-    </g>
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:1.09424329;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect4765"
+       width="91"
+       height="59.5"
+       x="197.5"
+       y="199.36218" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       x="201.13477"
+       y="232.42273"
+       id="text4767"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4769"
+         x="201.13477"
+         y="232.42273">List Algorithm</tspan></text>
+    <rect
+       y="199.36218"
+       x="347.5"
+       height="59.5"
+       width="91"
+       id="rect4778"
+       style="fill:#ffffff;stroke:#000000;stroke-width:1.09424329;stroke-miterlimit:4;stroke-dasharray:none" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text4780"
+       y="217.42273"
+       x="392.90625"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       xml:space="preserve"><tspan
+         y="217.42273"
+         x="364.0752"
+         id="tspan4782"
+         sodipodi:role="line"
+         style="text-anchor:middle;text-align:center">Simple </tspan><tspan
+         id="tspan4794"
+         y="232.42273"
+         x="364.0752"
+         sodipodi:role="line"
+         style="text-anchor:middle;text-align:center">Bitvector</tspan><tspan
+         id="tspan4792"
+         y="247.42273"
+         x="364.0752"
+         sodipodi:role="line"
+         style="text-anchor:middle;text-align:center">Algorithm</tspan></text>
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:1.09424329;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect4786"
+       width="91"
+       height="59.5"
+       x="455.5"
+       y="199.36218" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       x="501.62109"
+       y="224.92273"
+       id="text4788"
+       sodipodi:linespacing="125%"><tspan
+         id="tspan4796"
+         sodipodi:role="line"
+         x="465.01758"
+         y="224.92273"
+         style="text-anchor:middle;text-align:center">JIT Bitvector </tspan><tspan
+         id="tspan4798"
+         sodipodi:role="line"
+         x="465.01758"
+         y="239.92273"
+         style="text-anchor:middle;text-align:center">Algorithm</tspan></text>
     <path
        inkscape:connector-curvature="0"
        id="path4997"
