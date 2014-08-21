@@ -66,3 +66,7 @@ docs/_build/
 *.out
 *.nav
 *.snm
+
+#rulesets
+*_trace
+*.random.rules*
