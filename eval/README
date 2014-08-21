@@ -8,7 +8,8 @@ GENERAL SETUP
 Generating rule sets
 ====================
 $> cd rulesets/
-$> for rules in {100..3500..200}; do for i in {0..9}; do ./ruleset_generator.py -r "$i" -o -n "$rules" -h 2 .random.rules; done; done; done
+$> for rules in {100..3500..200}; do for i in {0..9}; do ./ruleset_generator.py -t 167772162 -r "$i" -n "$rules" -H 2 -o .random.rules; done; done; done
+$> cd ../
 
 Generating traces
 =================
