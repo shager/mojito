@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="599.71285"
+     inkscape:cx="416.14142"
      inkscape:cy="477.48064"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -91,58 +91,58 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-       x="154.45181"
+       x="157.67465"
        y="413.98639"
        id="text3002"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3004"
-         x="154.45181"
+         x="157.67465"
          y="413.98639">Application Layer</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="173.42064"
+       x="175.702"
        y="538.61298"
        id="text3006"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3008"
-         x="173.42064"
+         x="175.702"
          y="538.61298">Transport Layer</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean;font-stretch:normal;font-variant:normal"
-       x="179.78683"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       x="186.21957"
        y="892.73779"
        id="text3010"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3012"
-         x="179.78683"
+         x="186.21957"
          y="892.73779"
-         style="-inkscape-font-specification:Clean;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Physical Layer</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Clean">Physical Layer</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="219.10156"
+       x="226.64926"
        y="775.56006"
        id="text3014"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3016"
-         x="219.10156"
+         x="226.64926"
          y="775.56006">Link Layer</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="179.78685"
+       x="184.07114"
        y="655.37219"
        id="text3018"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3020"
-         x="179.78685"
+         x="184.07114"
          y="655.37219">Network Layer</tspan></text>
     <text
        xml:space="preserve"

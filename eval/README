@@ -1,6 +1,11 @@
 This file contains directions for regenerating the testing scenario.
 At the begin of each task it is assumed you are in the eval/ directory.
 
+Note: 
+-The wrapper*.sh-scripts use sudo, it might be a good idea to either run them with sudo
+ or give the user sudoers rights without a password for automatic tests.
+-In the test_executor.py script line 35 has to be changed to the correct absolute path
+
 +++++++++++++
 GENERAL SETUP
 +++++++++++++
