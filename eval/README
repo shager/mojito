@@ -1,0 +1,103 @@
+This file contains directions for regenerating the testing scenario.
+At the begin of each task it is assumed you are in the eval/ directory.
+
++++++++++++++
+GENERAL SETUP
++++++++++++++
+
+Generating rule sets
+====================
+$> cd rulesets/
+$> for rules in {100..3500..200}; do for i in {0..9}; do ./ruleset_generator.py -r "$i" -o -n "$rules" -h 2 .random.rules; done; done; done
+
+Generating traces
+=================
+$> for rules in {100..3500..200}; do for r in {0..9}; do ./ruleset_to_trace.py -c b -i rulesets/2_${rules}_${r}.random.rules; done; done
+$> for rules in {100..3500..200}; do for r in {0..9}; do ./ruleset_to_trace.py -c a -i rulesets/2_${rules}_${r}.random.rules; done; done
+$> for rules in {100..3500..200}; do for r in {0..9}; do ./ruleset_to_trace.py -c w -i rulesets/2_${rules}_${r}.random.rules; done; done
+
+Building Mininet
+================
+$> cd ../../oldrepo/mininet
+$> sudo make install
+
++++++++++++++++++++++++
+LOOKUP PERFORMANCE TEST
++++++++++++++++++++++++
+
+Executing lookup performance test
+=================================
+The following command prints the results in three files:
+jit.eval
+list.eval
+simple_bv.eval
+$> ./wrapper.sh
+
+Generating data files for Gnuplot
+=================================
+The resulting files are then
+eval_a.dat
+eval_b.dat
+eval_w.dat
+$> ./data_to_rdat.py
+
+Calling the plotter
+===================
+Each of these three files is now ready to be plotted
+The svg files are
+eval_a.svg
+eval_b.svg
+eval_w.svg
+$> ./plotter_a.gp
+$> ./plotter_b.gp
+$> ./plotter_w.gp
+
+Relative plots are done with the "relative" plotters in the same directory
+For example:
+$> ./plotter_a_relative.gp
+
++++++++++++++++++++
+INSERTION TIME TEST
++++++++++++++++++++
+
+Executing insertion time test
+=============================
+The following command prints the results in two files:
+jit.time_eval
+simple_bv.time_eval
+$> ./wrapper_time.sh
+
+Generating data files for Gnuplot
+=================================
+The resulting file is then
+time_eval.dat
+$> ./time_data_to_rdat.py
+
+Calling the plotter
+===================
+The svg file is
+eval_time.svg
+$> ./plotter_time.gp
+
++++++++++++++++++++++
+INSERTION MEMORY TEST
++++++++++++++++++++++
+
+Executing memory test
+=====================
+The following command prints the results in two files:
+jit.mem_eval
+simple_bv.mem_eval
+$> ./wrapper_memory.sh
+
+Generating data files for Gnuplot
+=================================
+The resulting files is then
+mem_eval.dat
+$> ./mem_data_to_rdat.py
+
+Calling the plotter
+===================
+The svg file is
+eval_mem.svg
+$> ./plotter_mem.gp

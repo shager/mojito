@@ -13,7 +13,7 @@ cmpq %rax, $8
 ;Goto Node C
 jae $70
 ;Return Bitvector 2
-mov $2, %eax
+mov $2, %rax
 pop %rbp
 retq
 ;Node B in tree:
@@ -26,7 +26,7 @@ cmpq %rax, $3
 ;Jump over return statement
 jae $7
 ;Return Bitvector 0
-mov $0, %eax
+mov $0, %rax
 pop %rbp
 retq
 ;Node D in tree:
@@ -35,11 +35,11 @@ cmpq %rax, $3
 ;Jump over return statement
 jb $7
 ;Return Bitvector 1
-mov $1, %eax
+mov $1, %rax
 pop %rbp
 retq
 ;Return Bitvector 1
-mov $1, %eax
+mov $1, %rax
 pop %rbp
 retq
 ;Node C in tree:
@@ -53,7 +53,7 @@ cmpq %rax, $13
 ;Goto return statement
 jae $35
 ;Return Bitvector 4
-mov $4, %eax
+mov $4, %rax
 pop %rbp
 retq
 ;Node E in tree:
@@ -62,11 +62,11 @@ cmpq %rax, $8
 ;Jump over return statement
 jb $7
 ;Return Bitvector 3
-mov $3, %eax
+mov $3, %rax
 pop %rbp
 retq
 ;Return Bitvector 3
-mov $3, %eax
+mov $3, %rax
 pop %rbp
 retq
 ;Node F in tree:
@@ -75,10 +75,10 @@ cmpq %rax, $13
 ;Jump over return statement
 jb $7
 ;Return Bitvector 5
-mov $5, %eax
+mov $5, %rax
 pop %rbp
 retq 
 ;Return Bitvector 5
-mov $5, %eax
+mov $5, %rax
 pop %rbp
 retq

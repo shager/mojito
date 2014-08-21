@@ -148,7 +148,7 @@ implementation of the Software Defined Network protocol OpenFlow.
 The algorithm chosen for this task follows a divide and conquer approach
 instead of searching in a linear list.
 A clear performance boost at lookup is the result of this new implementation.
-Further optimization with Just In Time compiled native code proved to increase 
+Further optimization with just in time compiled native code proved to increase 
 matching performance at the cost of consumed memory and insertion time.
 This strategy is new compared to current packet filters, which are using 
 dynamic data structures in memory instead of specially compiled code.
@@ -567,7 +567,7 @@ $k$ the number of header fields in a packet header and $w$ the width of an integ
 An integer is used as a single bitvector, so that for every memory access $w$ bit can be retrieved at once.
 The complexity of the bitvector lookup process is $\mathcal O(k \cdot \frac{n}{w})$.
 Note that using wider integer types saves memory accesses and therefore speeds up the algorithm.
-The implementation in this theses uses 64 bit wide integers.
+The implementation in this thesis uses 64 bit wide integers.
 
 \begin{figure}
 \centering
@@ -972,11 +972,13 @@ Nevertheless, in most real world cases there exist observable traffic patterns~\
     breaklines=true,
     basicstyle=\footnotesize,
     numbers=left,
+    texcl=true,
     xleftmargin=5.0ex,
     basicstyle=\footnotesize\ttfamily,
     keywordstyle=\bfseries\color{red},
     commentstyle=\itshape\color{grey},
     identifierstyle=\color{blue},
+    %deletekeywords{movl},
     morekeywords={retq,cmpq},
     ]
     {jit_listing.asm}

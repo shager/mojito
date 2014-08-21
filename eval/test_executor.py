@@ -7,7 +7,7 @@ process = 0
 
 def fetch_remote_udp_count():
     tmp_name = "____________SOME_CRAZY_NAME___________________"
-    cmd = "../../mininet/util/m h2 netstat -s -u | grep Udp: -A 2 | grep -o -E [0-9]+ | awk '{sum = sum + $1} END {print sum}' > %s" % tmp_name
+    cmd = "../../oldrepo/mininet/util/m h2 netstat -s -u | grep Udp: -A 2 | grep -o -E [0-9]+ | awk '{sum = sum + $1} END {print sum}' > %s" % tmp_name
     os.system(cmd)
     with open(tmp_name, "r") as tmp:
         content = tmp.read()
@@ -17,7 +17,7 @@ def fetch_remote_udp_count():
 def execute_on_host(hostname, call_string):
     try:
         #print "../../mininet/util/m " + str(hostname) + " " + str(call_string)
-        retval = os.system("../../mininet/util/m " + str(hostname) + " " + str(call_string))
+        retval = os.system("../../oldrepo/mininet/util/m " + str(hostname) + " " + str(call_string))
     except subprocess.CalledProcessError:
         print "Error with command " + str(call_string) + " on host " + str(hostname) + "."
         retval = ""
@@ -28,11 +28,10 @@ def set_routing_table():
     execute_on_host("h2", "route add default gw 10.0.0.1 h2-eth0")
 
 def run_sender(tracefile):
-    #print "timeout 10s /home/samuel/mojito/eval/sender /home/samuel/mojito/eval/" + str(tracefile) + " yes" + " no"
     execute_on_host("h1", "timeout 10s /home/samuel/mojito/eval/sender /home/samuel/mojito/eval/" + str(tracefile) + " yes" + " no")
 
 def get_netstat(host):
-    netstat_output = execute_on_host(host, "echo hallo")
+    netstat_output = execute_on_host(host, "netstat -s -u")
 #    print netstat_output
     lines = netstat_output.split("\n")
     for line in lines:
