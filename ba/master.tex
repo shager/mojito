@@ -22,6 +22,7 @@
 \usepackage{subcaption}
 \usepackage{multicol,listings}
 \usepackage[numbers,sort&compress]{natbib}
+\usepackage{dsfont}
 
 \definecolor{grey}{RGB}{105,105,105}
 
@@ -172,7 +173,6 @@ The main contributions of this work are:
 
 \pagestyle{scrheadings}
 
-%TODO: Bitvector or bitvector?   entire document!
 \section{Introduction}
 The growth of the Internet constantly poses new challenges to the producers of network equipment.
 Recent applications like Multimedia, Peer-to-Peer data exchange, Web and Voice over IP are dependent on a transport network with
@@ -202,7 +202,7 @@ Optimization of the matching engine as part of the switching software is the mai
 The Internet is a global network of packet switched networks~\cite[Chapter 1.1]{kurose_ross} for exchanging data. 
 The stream of data that is transported from its source to its destination is broken down into small chunks of bytes.
 In packet switched networks, packets are the smallest independent unit of data transported.
-A packet usually consists of header and payload data. %TODO: evtl transparente schichten + jedes layer hat ne aufgabe
+A packet usually consists of header and payload data.
 The packet header transports meta information for directing the packet to the correct host.
 Due to the complexity of the Internet, a layered model is used for transporting 
 packets from one host to another, as illustrated in Figure~\ref{fig:layermodel}.
@@ -235,7 +235,15 @@ A router or switch has to inspect every incoming packet separately and then deci
 Due to the characteristics of packet switched networks, every station in the path of a data transmission on the Internet 
 has to decide for each packet which action to execute.
 Typical actions are DROP, REJECT, OUTPUT(\textit{port}), MODIFY and ACCEPT, as explained in Table~\ref{table:actions}.
-%TODO: problem statement
+The packet classification problem can be modeled by the following formal description.
+A packet header $H$ compromises of a $k$-tuple of non-negative integers, with $k \in \mathds{N}$.
+These integers are elements from a set $S_i,\ 1 \leq i \leq k$, which describes the range of possible values for a header field.
+A rule is constituted of a set $R$ of $k$ integer pairs from $S_1,\dots,S_k$ and an action $A$.
+That means that each rule holds an interval for every header field.
+If $H_i \in R_i,\ 1 \leq i \leq k$ for a packet header $H$, the packet with header $H$ matches the rule and action $A$ will be executed.
+A rule set is a set $C$ of rules $R$.
+Finding the first rule $R \in C$ so that $H$ matches 
+$R$ for a given $C$ is called the packet classification problem.
 
 \begin{table}
   \centering
@@ -262,7 +270,7 @@ Initially, an overview over the classful Internet and its consequences on routin
 Very large networks were called Class A networks.
 These networks were located in the address range of 0.0.0.0 to 127.255.255.255 and each network could include up to about 16 million hosts.
 This means that only the first of the four bytes structuring an IPv4 address 
-is is used for network identification, the rest is freely selectable for each host by the owner of the address block.
+is used for network identification, the rest is freely selectable for each host by the owner of the address block.
 Due to their size, the entire IPv4 address space can only contain 128 of these networks.
 Class A networks were assigned to big companies and organizations in the early days of the Internet.
 
@@ -554,6 +562,13 @@ bitvector is then searched for the leftmost set 1-bit, which is the first bit st
 The leftmost set bit represents the highest priority rule as explained in Section~\ref{sec:bv-general}.
 The index of this bit in the bitvector then determines the first matching rule in the rule set.
 
+For a brief runtime analysis, let $n$ be the number of rules in the rule set, 
+$k$ the number of header fields in a packet header and $w$ the width of an integer on the matching system.
+An integer is used as a single bitvector, so that for every memory access $w$ bit can be retrieved at once.
+The complexity of the bitvector lookup process is $\mathcal O(k \cdot \frac{n}{w})$.
+Note that using wider integer types saves memory accesses and therefore speeds up the algorithm.
+The implementation in this theses uses 64 bit wide integers.
+
 \begin{figure}
 \centering
 \includegraphics[height=0.3\textheight]{images/matching}
@@ -582,11 +597,13 @@ If no bitvector is matching, a null vector is returned.
 To further speed up the lookup process, another optimization has been implemented.
 In theory, packet classification is handled by a function that depends on the packet $p$ and the rule set $r$: $class(p, r)$.
 The rule set is static when a packet is classified and does not change.
-Thus, with partial evaluation~\cite{partial_eval}, a function $f'(p)$ can be constructed that depends only on the packet as input.
-$f'$ differs from $f$ because each operation in $f$ that depends on the 
+Thus, with partial evaluation~\cite{partial_eval}, a function $class'(p)$ can be constructed that depends only on the packet as input.
+Otherwise, $class'(p)$ behaves exactly like $class(p, r)$ for a specific $\tilde{r}$:
+$$class(p, \tilde{r}) = class'(p),\ \forall p$$
+$class'$ differs from $class$ because each operation in $class$ that depends on the 
 rule set $r$ is exchanged by an operation with the specific values that $r$ currently holds.
-This mapping from $f$ to $f'$ is called the First Futamura projection~\cite{DBLP:journals/ngc/MogensenH88}.
-For a simple example for a Futamura projection consider the function $\textsc{F}$ described in Algorithm~\ref{alg:futamura-f}.
+This mapping from $class$ to $class'$ is called the First Futamura projection~\cite{DBLP:journals/ngc/MogensenH88}.
+For a simple example of a Futamura projection consider the function $\textsc{F}$ described in Algorithm~\ref{alg:futamura-f}.
 Now a special case for this algorithm occurs and the expression $y = 3$ is always valid.
 With that knowledge, the compiler can produce the function $\textsc{F}'(x)$, as listed in Algorithm~\ref{alg:futamura-f-optimized}.
 
@@ -638,7 +655,7 @@ The function is designed to have zero memory accesses when looking up header
 values after it is loaded into the computer's processor.
 Therefore it performs the binary search only on precomputed values, which 
 leads to the necessity of rebuilding the function at every rule set update.
-The assembly code generated from the example rule set is printed in Listing~\ref{lst:jit}.
+The assembly code generated from the example rule set is printed in Listing~\ref{lst:jit} in the Appendix.
 Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
 
 Implementing that functionality has lead to a just in time generated function written in machine 
@@ -653,28 +670,8 @@ After that, these generated opcodes were copied into an executable memory block 
 In Future, the generated function can be optimized itself, for example there exist multiple 
 return statements with the same value that are redundant.
 The example shows that bitvector $-1$ is never returned by the JIT compiled code.
-A separate check if a match is the first existing bitvector or the null 
+In this implementation, a separate check if a match is the first existing bitvector or the null 
 vector is done by the calling function.
-
-\begin{multicols}{2}
-\lstinputlisting[
-    language={[x86masm]Assembler},
-    breaklines=true,
-    basicstyle=\footnotesize,
-    numbers=left,
-    xleftmargin=5.0ex,
-    basicstyle=\footnotesize\ttfamily,
-    keywordstyle=\bfseries\color{red},
-    commentstyle=\itshape\color{grey},
-    identifierstyle=\color{blue},
-    morekeywords={retq,cmpq},
-    ]
-    {jit_listing.asm}
-\end{multicols}
-\vspace{-2ex}
-\captionof{lstlisting}{Assembly code generated by the JIT compiler.}
-\label{lst:jit}
-\vspace{2ex}
 
 The algorithm for constructing the JIT used in this implementation produces a slightly modified binary search.
 Note that in the generated function, the matchable packet header data point is stored in the register \textsf{\%rax}.
@@ -682,10 +679,10 @@ The first call of the recursive algorithm~\ref{alg:jit} is invoked with the enti
 zero as the lower bound of operation and the last index in the delimiters array as last argument.
 Its return value is the length of newly written bytes to the executable memory in order to perform relative jumps over entire code blocks.
 
-Every time \textsc{Generate\_Opcode} is called in Algorithm~\ref{alg:jit}, the opcodes 
+Every time \textsc{Emit\_Opcode} is called in Algorithm~\ref{alg:jit}, the opcodes 
 of the corresponding assembler instruction are looked up and appended to a segment of executable memory.
 Due to working in an Intel microprocessor, numeral arguments have to be 
-transformed into little-endian byte order in the \textsf{Insert} function.
+transformed into little-endian byte order in the \textsf{Emit\_Opcode} function.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -694,23 +691,23 @@ transformed into little-endian byte order in the \textsf{Insert} function.
     
     \State \Comment{Handle base case of the recursion}
     \If{hi\_index $==$ low\_index}
-        \State \Call{Generate\_Opcode}{Compare: \textsf{\%rax} $<$ delimiters[low\_index]}
-        \State \Call{Generate\_Opcode}{Jump: CASE2}
-        \State \Call{Generate\_Opcode}{Return: low\_index}
-        \State \Call{Generate\_Opcode}{Return: low\_index - 1} \Comment{CASE2}
+        \State \Call{Emit\_Opcode}{Compare: \textsf{\%rax} $<$ delimiters[low\_index]}
+        \State \Call{Emit\_Opcode}{Jump: CASE2}
+        \State \Call{Emit\_Opcode}{Return: low\_index}
+        \State \Call{Emit\_Opcode}{Return: low\_index - 1} \Comment{CASE2}
         \State \Return{Number of written bytes in \textsc{Insert}}
     \EndIf
     
     \State left\_tree $\gets$ \Call{JIT\_creation}{delimiters[], low\_index, mid\_index - 1}
     \State right\_tree $\gets$ \Call{JIT\_creation}{delimiters[], mid\_index + 1, high\_index}
     
-    \State \Call{Generate\_Opcode}{Compare: \textsf{\%rax} $<$ delimiters[mid\_index]}
-    \State \Call{Generate\_Opcode}{Jump: LEFT}
-    \State \Call{Generate\_Opcode}{Compare: delimiters[mid\_index + 1] $<$ \textsf{\%rax}}
-    \State \Call{Generate\_Opcode}{Jump: RIGHT}
-    \State \Call{Generate\_Opcode}{Return: mid\_index}
-    \State \Call{Generate\_Opcode}{LEFT: left\_tree}
-    \State \Call{Generate\_Opcode}{RIGHT: right\_tree}
+    \State \Call{Emit\_Opcode}{Compare: \textsf{\%rax} $<$ delimiters[mid\_index]}
+    \State \Call{Emit\_Opcode}{Jump: LEFT}
+    \State \Call{Emit\_Opcode}{Compare: delimiters[mid\_index + 1] $<$ \textsf{\%rax}}
+    \State \Call{Emit\_Opcode}{Jump: RIGHT}
+    \State \Call{Emit\_Opcode}{Return: mid\_index}
+    \State \Call{Emit\_Opcode}{LEFT: left\_tree}
+    \State \Call{Emit\_Opcode}{RIGHT: right\_tree}
     \State \Return{Number of written bytes in \textsc{Insert}}
 \EndFunction
 \end{algorithmic}
@@ -923,6 +920,19 @@ arises from the size of the actual JIT function.
 \label{fig:eval-mem}
 \end{figure}
 
+\section{Conclusion}
+Speeding up matching in the OpenFlow reference implementation switch has been implemented successfully.
+The bitvector algorithm itself achieves an impressive gain in classification performance.
+Further optimization resulted in the development of a just in time compiler 
+that generates a special function for looking up values in a defined rule set.
+Evaluation results show another increase of lookup performance for the JIT optimized algorithm.
+However, the insertion time grows dramatically for larger rule sets because 
+of the time needed to regenerate the JIT for each new rule.
+The prize to pay for faster classification is an increasing usage of memory 
+compared to the list implementation.
+However, the JIT solution is in the same magnitude of memory consumption 
+compared to the simple bitvector implementation. 
+
 \section{Future Work}
 Future work in this particular area can steer in manifold directions.
 One of the main objectives is further optimization of the matching algorithm.
@@ -950,5 +960,29 @@ Nevertheless, in most real world cases there exist observable traffic patterns~\
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{acm}
 \bibliography{references,paper-build/conferences-crossref,rfc}
+
+\appendix
+\section{Appendix}
+\pagestyle{empty}
+\thispagestyle{scrheadings}
+\begin{algorithm}
+\begin{multicols}{2}
+\lstinputlisting[
+    language={[x86masm]Assembler},
+    breaklines=true,
+    basicstyle=\footnotesize,
+    numbers=left,
+    xleftmargin=5.0ex,
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\bfseries\color{red},
+    commentstyle=\itshape\color{grey},
+    identifierstyle=\color{blue},
+    morekeywords={retq,cmpq},
+    ]
+    {jit_listing.asm}
+\end{multicols}
+\captionof{lstlisting}{Assembly code generated by the JIT compiler.}
+\label{lst:jit}
+\end{algorithm}
 
 \end{document}
