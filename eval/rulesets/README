@@ -1,0 +1,5 @@
+This directory contains rulesets for evaluation.
+
+Format:
+
+src_ip/netmask dst_ip/netmask src_port dst_port in_port transport_protocol actions
