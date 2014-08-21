@@ -37,22 +37,22 @@
 </g>
 <g style="fill:none; color:black; stroke:currentColor; stroke-width:1.50; stroke-linecap:butt; stroke-linejoin:miter">
 	<path stroke='black'  d='M74.5,325.0 L82.0,325.0 M478.9,325.0 L471.4,325.0  '/>	<g transform="translate(67.5,328.7)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>0 Mb</text>
+		<text>0 MB</text>
 	</g>
 	<path stroke='black'  d='M74.5,262.8 L82.0,262.8 M478.9,262.8 L471.4,262.8  '/>	<g transform="translate(67.5,266.5)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>50 Mb</text>
+		<text>50 MB</text>
 	</g>
 	<path stroke='black'  d='M74.5,200.6 L82.0,200.6 M478.9,200.6 L471.4,200.6  '/>	<g transform="translate(67.5,204.3)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>100 Mb</text>
+		<text>100 MB</text>
 	</g>
 	<path stroke='black'  d='M74.5,138.5 L82.0,138.5 M478.9,138.5 L471.4,138.5  '/>	<g transform="translate(67.5,142.2)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>150 Mb</text>
+		<text>150 MB</text>
 	</g>
 	<path stroke='black'  d='M74.5,76.3 L82.0,76.3 M478.9,76.3 L471.4,76.3  '/>	<g transform="translate(67.5,80.0)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>200 Mb</text>
+		<text>200 MB</text>
 	</g>
 	<path stroke='black'  d='M74.5,14.1 L82.0,14.1 M478.9,14.1 L471.4,14.1  '/>	<g transform="translate(67.5,17.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>250 Mb</text>
+		<text>250 MB</text>
 	</g>
 	<path stroke='black'  d='M74.5,325.0 L74.5,317.5 M74.5,14.1 L74.5,21.6  '/>	<g transform="translate(78.2,332.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>1000</text>

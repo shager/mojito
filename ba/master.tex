@@ -349,7 +349,7 @@ automatic reconfiguration in certain events also require a control infrastructur
 The data plane handles the incoming network traffic and acts accordingly to the objectives defined in the control plane.
 
 \subsubsection{OpenFlow}
-One popular instance of an SDN protocol is called OpenFlow~\cite{openflow_spec10}. %TODO: hässlicher satz
+The first specification for an SDN protocol is called OpenFlow~\cite{openflow_spec10}.
 This project is intended to establish a virtual network system on real hardware 
 for educational, enterprise and research use cases.
 A key feature of OpenFlow is the control channel system.
@@ -382,8 +382,8 @@ with a growing number of inserted rules.
 \section{Related Work}
 Speeding up packet classification is an important research topic in the computer network community since the 1990s.
 Therefore, several algorithms have been developed in the last years~\cite{algorithms_survey}.
-Approaches to the packet classification problem include the usage of tries, 
-hash maps, decision trees or divide and conquer strategies~\cite{hicuts, efficuts}. %TODO: mehr quotes
+Approaches to the packet classification problem include the usage of tries~\cite{tries}, 
+hash maps, decision trees~\cite{hicuts, efficuts, hypercuts} or divide and conquer strategies~\cite{bv}.
 Most of these algorithms perform significantly faster than searching the matching rule in a linear list.
 One of the algorithms from the category that uses the paradigm of divide and conquer is the bitvector~\cite{bv} algorithm.
 It builds a separate matching structure for each packet header dimension and 
@@ -417,8 +417,8 @@ Further improvement on the bitvector algorithm includes the elimination of the l
 When all dimensions are matched and the resulting bitvectors are retrieved, 
 these vectors have to be ANDed bit per bit until a one bit is found.
 This results in a worst case time complexity of $\mathcal O(n)$, with $n$ being the number of inserted rules.
-The aggregated bitvector algorithm~\cite{abv} implements a hierarchical system 
-of bitvectors with fixed length and performs lookups in $\mathcal O(log\ n)$. %TODO: ABV lookup perf. rausfinden
+The aggregated bitvector algorithm implements a hierarchical system 
+of bitvectors with fixed length and performs lookups in less memory accesses~\cite{abv}.
 However, more memory space is needed to store the bitvectors of the respective hierarchies.
 
 Another approach to improve matching performance in a packet filter is to reorganize the rule set.
@@ -426,16 +426,17 @@ One way to perform such a reorganization is the compression of the rule set as
 introduced in~\cite{redundancy_removal} and ~\cite{firewall_compressor}.
 The number of rules is reduced significantly whilst persisting their semantics.
 These optimizations can be done offline and before the rule set is loaded into the firewall.
-Additionally, the rule generator can perform a heuristic analysis of the 
+Additionally, the rule generator can perform a heuristic analysis of  
 traffic patterns and re-order the rule set accordingly while operating.
+Sophisticated algorithms can detect network flows after inspecting only a few packets~\cite{trafficonthefly}.
 The advantage of this strategy is that the matching engine itself does not need to be changed and can be left untouched.
 This can be useful in black box scenarios, i.e. the matching engine's source code is not open to the end user.
 However, that idea requires to reorganize the desired rule set and makes updating more complex.
 In case of high-frequent updates this strategy will hit its limitations, 
 as the optimization steps often require the consideration of the entire rule set and not only the updated part.
 These optimizations are done before the rule set is loaded into the matching engine.
-That means, that they can be combined with the approach presented in this paper to
-gain an even bigger advantage compared to the existing implementations. %TODO: quotes
+That means, that they can be combined with the approach presented in this work to
+gain an even bigger advantage compared to the existing implementations.
 
 An implementation of a just-in-time (JIT) compiled rule set can be found in~\cite{dpf}.
 The general idea of that work is to design an algorithm that processes a rule set
@@ -482,6 +483,7 @@ Thus $\mathcal O(n)$ bits are stored per bitvector.
 As an illustrating example, consider packet headers consisting only of a source and a destination address.
 These addresses are four bit wide each.
 For example, the rule set defined in Table~\ref{table:bv_ruleset} is a possible rule set in this scenario.
+This example will be used several times in the entire work.
 Figure~\ref{fig:bv-normal} sketches a graphical representation of this rule set.
 Each rectangle (a two-dimensional hyper cube) represents one of the defined rules.
 Corresponding bitvectors are displayed at every interval on the axis of the coordinate system.
@@ -583,7 +585,7 @@ Let $C_s$ be the complexity of the search operation in one dimension.
 The complexity of the bitvector lookup process is $\mathcal O(k \cdot C_s + \frac{n}{w})$.
 The last step of aggregating the bitvectors and finding the first set bit depends on the width of one integer.
 Note that using wider integer types saves memory accesses and therefore speeds up the algorithm.
-The implementation in this thesis uses 64 bit wide integers.
+The implementation in this thesis uses 64 bit wide integers and a binary search with $C_s = \mathcal O(log\ n)$.
 
 After that, the actions defined in the rule can be executed by the network device.
 In case of no matching rule (for example when matching P2), the resulting bitvector for all dimensions is entirely filled with zeroes.
@@ -593,9 +595,11 @@ which is most often a drop of the packet as defined in Table~\ref{table:actions}
 
 \section{Implementation}
 \subsection{Bitvector Implementation Details}
-%TODO: bisschen mehr (was wurde getan)
-In this implementation, the bitvectors themselves are stored at the delimiting edge
-between rules.
+In this thesis, the bitvector algorithm has been implemented in C.
+The bitvectors themselves are stored in a structure that points to the delimiting edge
+between rule intervals.
+On insertion of a new rule, all existing bitvectors are extended to the new length and new bitvectors 
+are created, if necessary.
 The search algorithm used for locating a match in a dimension in the bitvector 
 data structure is a binary search, which returns the nearest left bitvector from the point where 
 the header data point is located.
@@ -614,7 +618,7 @@ rule set $r$ is exchanged by an operation with the specific values that $r$ curr
 This mapping from $class$ to $class'$ is called the First Futamura projection~\cite{DBLP:journals/ngc/MogensenH88}.
 For a simple example of a Futamura projection consider the function $\textsc{F}$ described in Algorithm~\ref{alg:futamura-f}.
 Now a special case for this algorithm occurs and the expression $y = 3$ is always valid.
-With that knowledge, the compiler can produce a function $\textsc{F}'(x)$, as listed in Algorithm~\ref{alg:futamura-f-optimized}.
+With that knowledge, the compiler can emit a function $\textsc{F}'(x)$, as listed in Algorithm~\ref{alg:futamura-f-optimized}.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -933,10 +937,9 @@ The small overhead of the JIT implementation in comparison with the simple bitve
 arises from the size of the actual JIT compiled function.
 
 \section{Conclusion}
-The implementation of sophisticated algorithms in the OpenFlow reference 
-implementation switch indicates a gain in packet classification performance.
+The implementation of sophisticated algorithms in the OpenFlow reference switch indicates a gain in packet classification performance.
 The bitvector algorithm itself achieves an impressive gain in classification 
-performance in comparison to the linear lookup.
+performance in comparison to the previously used linear lookup.
 Further optimization resulted in the development of a just-in-time compiler 
 that generates a special function for looking up values in a given rule set.
 Evaluation results show another increase of lookup performance for the JIT optimized algorithm.
@@ -964,18 +967,18 @@ At the moment, there can exist multiple return statements with the same value.
 
 Another idea that comes to mind is to implement a heuristic which detects 
 the most popular flows of the last time span in an operating switch.
-After gathering traffic data for a while it might prove beneficial to tune 
+After gathering traffic data for a while, it might prove beneficial to tune 
 the JIT function in such a way that the search for packet header data in a popular flow returns faster.
 Also, the chronology of the stored bitvectors can be optimized in certain boundaries:
-the order of bitvectors that do not overlap with each other is indifferent.
+the order of bitvectors that do not overlap with each other is indifferent~\cite{abv}.
 If often used bitvectors are placed closer to the front, the matching process 
 can be sped up because it scans the result bitvector from left to right for the first set bit.
-However, if bitvectors overlap, their relative order must remain.
+If bitvectors overlap, their relative order must remain.
 Depending on the type of traffic, these optimizations may cause a massive performance boost.
-However, no real advantage is gained if there are no real flows recognizable in the traffic because it is very sparse.
+However, no real advantage is gained if there are no flows recognizable in the traffic.
 Nevertheless, in most real world cases there exist observable traffic patterns.
 Often, there are few big flows that make up a large amount of traffic and a bigger number of
-small flows, that are very small.
+small flows.
 This phenomenon is called elephant and mice traffic patterns~\cite{elephantmice}.
 
 \appendix

@@ -34,7 +34,7 @@ set autoscale y
 set xlabel 'Number of rules' 
 set ylabel 'Memory needed for insertion'
 
-set format y "%g Mb"
+set format y "%g MB"
 set xtics add ("1000" 1000)
 set xtics rotate
 
