@@ -144,22 +144,23 @@ nor a similar work has been presented to an examination committee.
 
 \begin{abstract}
 \section*{Abstract}
-This work focuses on implementing a faster packet filter in the reference 
-implementation of the Software Defined Network protocol OpenFlow.
+This work focuses on the design, implementation and evaluation of a faster 
+packet filter in the reference implementation of OpenFlow.
 The algorithm chosen for this task follows a divide and conquer approach
-instead of searching in a linear list.
-A clear performance boost at lookup is the result of this new implementation.
+instead of searching in a linear list, which can lead to
+a significant performance boost at lookup by over a magnitude.
+
 Further optimization with just-in-time compiled native code proved to increase 
-matching performance at the cost of consumed memory and insertion time.
-This strategy is new compared to current packet filters, which are using 
-dynamic data structures in memory instead of specially compiled code.
+matching performance by a factor of over 30 at the cost of consumed memory and insertion time.
+This strategy is new as it combines an advanced filtering algorithm with the
+lookup speed of specially compiled code.
 
 The main contributions of this work are:
 \begin{itemize}
-    \item The implementation of the bitvector matching algorithm in the 
+    \item The integration of the bitvector matching algorithm in the 
         OpenFlow reference implementation.
-    \item Just-in-time code generation of native assembly code for a 
-        faster lookup process in packet filters.
+    \item Just-in-time code generation of native machine code for an 
+        even faster lookup process compared to the memory based bitvector implementation.
     \item A detailed evaluation of performance regarding these concepts in comparison 
         with the existing classification scheme.
 \end{itemize}
@@ -769,7 +770,7 @@ This switch can be configured with \textsf{dpctl}, a tool included in the tool c
 Rule set updates thus are done via a command line call of that tool.
 The evaluation system is a computer with a quad core Intel Xeon E3-1270 v3 CPU 
 running at 3.5 GHz and 16 GB of memory with an Ubuntu Linux 14.04 LTS operating system.
-This computer was idle when performing the tests.
+This computer was otherwise idle when performing the tests.
 
 \subsubsection{Matching Performance}
 The matching performance evaluation was set up in the following way.
@@ -975,7 +976,6 @@ Nevertheless, in most real world cases there exist observable traffic patterns~\
 \lstinputlisting[
     language={[x86masm]Assembler},
     breaklines=true,
-    basicstyle=\footnotesize,
     numbers=left,
     texcl=true,
     xleftmargin=5.0ex,
@@ -985,6 +985,7 @@ Nevertheless, in most real world cases there exist observable traffic patterns~\
     identifierstyle=\color{blue},
     %deletekeywords{movl},
     morekeywords={retq,cmpq},
+    numberstyle=\tiny
     ]
     {jit_listing.asm}
 \end{multicols}

@@ -34,12 +34,12 @@ set autoscale y
 set xlabel 'Number of rules' 
 set ylabel 'Memory needed for insertion'
 
-set format y "%g Kb"
+set format y "%g Mb"
 set xtics add ("1000" 1000)
 set xtics rotate
 
-f(x) = 0.5 * x
+f(x) = 0.0005 * x
 
-plot 'mem_eval.dat'  u 1:2 with linespoints t 'Bitvector with JIT' ls 1, '' u 1:3 with linespoints t 'Simple Bitvector' ls 2, f(x) with line t 'List (estimated)' ls 3,\
-        '' u 1:2:4 w yerrorbars notitle ls 4, '' u 1:3:5 w yerrorbars notitle ls 5
+plot 'mem_eval.dat'  u 1:($2/1000) with linespoints t 'Bitvector with JIT' ls 1, '' u 1:($3/1000) with linespoints t 'Simple Bitvector' ls 2, f(x) with line t 'List (estimated)' ls 3,\
+        '' u 1:($2/1000):($4/1000) w yerrorbars notitle ls 4, '' u 1:($3/1000):($5/1000) w yerrorbars notitle ls 5
         
