@@ -15,7 +15,8 @@
 \usepackage{color}
 \usepackage{tikz}
 \usepackage{tabularx}
-\usepackage[compatibility=false]{caption}
+\usepackage[skins]{tcolorbox}
+\usepackage{caption}
 %\usepackage{subcaption}
 \usepackage{multirow}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,7 +28,7 @@
 \usepackage{palatino}
 
 \setbeamertemplate{footline}[frame number]
-\setbeamertemplate{caption}[numbered]
+%\setbeamertemplate{caption}[numbered]
 \setbeamercolor{page number in head/foot}{fg=black}
 
 \setbeamerfont{title like}{shape=\scshape}
@@ -51,6 +52,8 @@
 
 \beamertemplatenavigationsymbolsempty
 \setcounter{tocdepth}{2}
+
+\tcbset{enhanced}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -88,25 +91,30 @@
   \tableofcontents
 \end{frame}
 
-\section{\scshape Einführende Begriffe}
-\subsection{Paketklassifikation}
+\section{\scshape Einführung}
+\subsection{\scshape Paketklassifikation}
 \begin{frame}
-  \frametitle{Paketklassifikation}
+  \frametitle{\insertsubsection}
   
 \end{frame}
-\subsection{OpenFlow}
+\subsection{\scshape OpenFlow}
 \begin{frame}
-  \frametitle{OpenFlow}
+  \frametitle{\insertsubsection}
   
 \end{frame}
 
 \section{\scshape Der Bitvector-Algorithmus}
+\subsection{\scshape Allgemeine Idee}
 \begin{frame}
-  Paketfilter sind häufig als Liste von Regeln implementiert.\\
-  Problem: Lineare Suche ist langsam, da nur in $\mathcal O(n)$.\\
+  Paketfilter sind häufig als einfache Liste von Regeln implementiert.\\
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Problem,drop fuzzy shadow]
+  Lineare Suche ist langsam, da nur in $\mathcal O(n)$.
+  \end{tcolorbox}
   \pause
-  Theoretisch beste Suche möglich in $\mathcal O(log\ n)$.\\ %TODO: quelle?
-  Lösung: Divide and conquer über die einzelnen Header-Felder.\\
+  \begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Mögliche Lösung,drop fuzzy shadow]
+  Binäre Suche möglich in $\mathcal O(log\ n)$.\\
+  Divide and conquer über die einzelnen Header-Felder.
+  \end{tcolorbox}
   \vspace{\baselineskip}
   \centering{Der Bitvector-Algorithmus}
 \end{frame}
@@ -125,16 +133,54 @@
   3&8 -- 13&0 -- 3\\
   \end{tabularx}
   \caption{Beispielhafter Regelsatz.}
-  \label{table:bv_ruleset}
   \end{table}
 \end{frame}
 
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics[height=0.7\textheight]{figures/bitvector-L1-2}
-  \caption{Geometrische Interpretation der Regeln aus Tabelle \ref{table:bv_ruleset}.}
-  \label{fig:bv-normal}
+  \includegraphics[height=0.7\textheight]{figures/bitvector-L1}
+  \caption{Geometrische Interpretation der Regeln aus voriger Tabelle.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+  \centering
+  \includegraphics[height=0.7\textheight]{figures/bitvector-L1-3}
+  \caption{Bitvectoren der Regeln aus voriger Tabelle.}
+  \end{figure}
+\end{frame}
+
+\subsection{\scshape Lookup von Paketen}
+\begin{frame}
+  \frametitle{\insertsubsection}
+  Pakete treffen ein und die jeweils passende Regel wird gesucht:
+  \begin{table}
+  \centering
+  \begin{tabularx}{0.6\textwidth}{c|c|c}
+  Paket&Quelladresse&Zieladresse\\
+  \hline
+  P\ 1&4&4\\
+  P\ 2&14&7\\
+  \end{tabularx}
+  \caption{Beim Paketfilter eingetroffene Pakete.}
+  \end{table}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+  \centering
+  \includegraphics[height=0.7\textheight]{figures/bitvector-L1_2_4}
+  \caption{Lookup von Paketen.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+  \centering
+  \includegraphics[height=0.7\textheight]{figures/matching}
+  \caption{Zusammenführen der Ergebnisse.}
   \end{figure}
 \end{frame}
 
@@ -145,15 +191,27 @@
   \centering
   \includegraphics[height=5.5cm]{figures/matching_process}
   \caption{Matching von Paketen bei statischem Regelsatz.}
-  \label{fig:matching-normal}
   \end{figure}
 \end{frame}
 
 \begin{frame}
-  Idee: Weitere Optimierung durch Vorausberechnung.\\
+  \begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Idee,drop fuzzy shadow]
+  Weitere Optimierung durch Vorausberechnung.\\
+  \pause
   Implementierung eines Suchbaumes pro Dimension in nativem Code.\\
   Bei Regel-Update erfolgt Neuberechnung des Suchbaumes.\\
   Lookup: Funktionsaufruf mit Paketdatum als Argument.
+  \end{tcolorbox}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.3\textwidth]{figures/array}
+  \vfill
+  \includegraphics[height=3cm]{figures/bv-tree-simple}
+  \caption{Generierter Suchbaum aus dem Regelsatz.}
+  \end{figure}
 \end{frame}
 
 \section{\scshape Auswertung}
@@ -162,6 +220,12 @@
 
 \section{\scshape Fazit und Ausblick}
 \begin{frame}
+\end{frame}
+
+\appendix
+\section{\scshape Backup}
+\begin{frame}[noframenumbering]
+Backupslide
 \end{frame}
 
 \end{document}
