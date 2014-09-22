@@ -17,6 +17,8 @@
 \usepackage{tabularx}
 \usepackage[skins]{tcolorbox}
 \usepackage{caption}
+\usepackage{csquotes}
+\usepackage{multicol,listings}
 %\usepackage{subcaption}
 \usepackage{multirow}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -51,9 +53,12 @@
 \renewcommand{\>}{\end{column}}
 
 \beamertemplatenavigationsymbolsempty
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 
 \tcbset{enhanced}
+
+% Set color for lstlisting
+\definecolor{grey}{RGB}{105,105,105}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -95,8 +100,42 @@
 \subsection{\scshape Paketklassifikation}
 \begin{frame}
   \frametitle{\insertsubsection}
-  
+  % Regelmenge
+  % Modellierung als Funktion mit P, R -> D
+  Paketklassifikation modellierbar als Funktion \textit{M}:
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Definition,drop fuzzy shadow]
+  \begin{tabularx}{\textwidth}{XX}
+    Eingabe&Paket \textit{P}, Regelmenge \textit{R}\\
+    Ausgabe&Entscheidung \textit{D}
+  \end{tabularx}
+  \end{tcolorbox}
 \end{frame}
+
+\begin{frame}
+  \begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/paketheader}
+  \caption{Beispielhafter Aufbau eines Netzwerkpakets.}
+  \end{figure}
+  \pause
+  \tiny
+  \begin{table}
+  \begin{tabularx}{\textwidth}{XXXXX|X}
+    IP-Quelle&IP-Ziel&Transport\-protokoll&Quellport&Zielport&Aktion\\
+    \hline
+    8.8.8.8/32&10.0.0.0/8&UDP&53&*&\textsc{DROP}\\
+    10.0.0.0/8&8.8.8.8/32&UDP&*&53&\textsc{DROP}\\
+    141.20.33.123/32&10.0.0.0/8&*&*&*&\textsc{DROP}\\
+    10.0.0.0/8&141.20.33.123/32&*&*&*&\textsc{DROP}\\
+    141.20.33.0/24&10.0.0.0/8&TCP&80&*&\textsc{ACCEPT}\\
+    10.0.0.0/8&141.20.33.0/24&TCP&*&80&\textsc{ACCEPT}\\
+    10.0.0.0/8&0.0.0.0/0&*&*&*&\textsc{DROP}
+  \end{tabularx}
+  \caption{Beispiel für eine Regelmenge mit fünf Header-Feldern.}
+  \end{table}
+  \normalsize
+\end{frame}
+
 \subsection{\scshape OpenFlow}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -111,12 +150,14 @@
   Lineare Suche ist langsam, da nur in $\mathcal O(n)$.
   \end{tcolorbox}
   \pause
-  \begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Mögliche Lösung,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Grundidee,drop fuzzy shadow]
   Binäre Suche möglich in $\mathcal O(log\ n)$.\\
   Divide and conquer über die einzelnen Header-Felder.
   \end{tcolorbox}
-  \vspace{\baselineskip}
-  \centering{Der Bitvector-Algorithmus}
+  \pause
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Mögliche Lösung,drop fuzzy shadow]
+  Der Bitvector-Algorithmus.
+  \end{tcolorbox}
 \end{frame}
 
 \begin{frame}
@@ -134,21 +175,19 @@
   \end{tabularx}
   \caption{Beispielhafter Regelsatz.}
   \end{table}
+  Im Folgenden: Beim ersten Treffer wird abgebrochen und diese Regel \enquote{gewinnt}.
 \end{frame}
 
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics[height=0.7\textheight]{figures/bitvector-L1}
+  \includegraphics<1>[height=0.7\textheight]{figures/bitvector-L1}
+  \includegraphics<2>[height=0.7\textheight]{figures/bitvector-L1-2}
+  \includegraphics<3>[height=0.7\textheight]{figures/bitvector-L1-3}
+  \includegraphics<4>[height=0.7\textheight]{figures/bitvector-L1-4}
+  \includegraphics<5>[height=0.7\textheight]{figures/bitvector-L1-5}
+  \includegraphics<6>[height=0.7\textheight]{figures/bitvector-L1-7}
   \caption{Geometrische Interpretation der Regeln aus voriger Tabelle.}
-  \end{figure}
-\end{frame}
-
-\begin{frame}
-  \begin{figure}
-  \centering
-  \includegraphics[height=0.7\textheight]{figures/bitvector-L1-3}
-  \caption{Bitvectoren der Regeln aus voriger Tabelle.}
   \end{figure}
 \end{frame}
 
@@ -171,7 +210,8 @@
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics[height=0.7\textheight]{figures/bitvector-L1_2_4}
+  \includegraphics<1>[height=0.7\textheight]{figures/bitvector-L1-4_6_8_10}
+  \includegraphics<2>[height=0.7\textheight]{figures/bitvector-L1-4_6_9_11}
   \caption{Lookup von Paketen.}
   \end{figure}
 \end{frame}
@@ -185,7 +225,9 @@
 \end{frame}
 
 \section{\scshape Die JIT-Komponente}
+\subsection{\scshape Motivation}
 \begin{frame}
+  \frametitle{\insertsubsection}
   Bei statischem Regelsatz erfolgt die binäre Suche stets im selben Array (pro Dimension).\\
   \begin{figure}
   \centering
@@ -195,12 +237,17 @@
 \end{frame}
 
 \begin{frame}
-  \begin{tcolorbox}[colback=green!5!white,colframe=green!75!black,title=Idee,drop fuzzy shadow]
-  Weitere Optimierung durch Vorausberechnung.\\
+  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Erinnerung,drop fuzzy shadow]
+  Die Klassifikationsfunktion \textit{M} hängt vom Regelsatz \textit{R} und dem Paket \textit{P} ab.
+  \end{tcolorbox}
   \pause
-  Implementierung eines Suchbaumes pro Dimension in nativem Code.\\
-  Bei Regel-Update erfolgt Neuberechnung des Suchbaumes.\\
-  Lookup: Funktionsaufruf mit Paketdatum als Argument.
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Idee,drop fuzzy shadow]
+  Weitere Optimierung durch Vorausberechnung einer Funktion $M_R$.\\
+  Implementierung eines Suchbaumes pro Dimension in nativem Code.
+  \end{tcolorbox}
+  \pause
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Nachteil,drop fuzzy shadow]
+  Bei Regel-Update erfolgt komplette Neuberechnung des Codes für den Suchbaum.
   \end{tcolorbox}
 \end{frame}
 
@@ -209,9 +256,44 @@
   \centering
   \includegraphics[width=0.3\textwidth]{figures/array}
   \vfill
+  \includegraphics[height=0.2\textheight]{figures/arrow_down}
+  \vfill
   \includegraphics[height=3cm]{figures/bv-tree-simple}
   \caption{Generierter Suchbaum aus dem Regelsatz.}
   \end{figure}
+\end{frame}
+
+\subsection{\scshape JIT-Lookup}
+\begin{frame}
+  \frametitle{\insertsubsection}
+  \begin{figure}
+  \centering
+  \includegraphics<1>[height=0.7\textheight]{figures/match_in_tree-L1-2}
+  \includegraphics<2>[height=0.7\textheight]{figures/match_in_tree-L1_3}
+  \includegraphics<3>[height=0.7\textheight]{figures/match_in_tree-L1_4}
+  \includegraphics<4>[height=0.7\textheight]{figures/match_in_tree-L1_5}
+  \caption{Matching eines Pakets im Suchbaum.}
+  \end{figure}
+\end{frame}
+
+\subsection{\scshape Generierter Code}
+\begin{frame}
+\begin{multicols}{3}
+\lstinputlisting[
+    language={[x86masm]Assembler},
+    breaklines=true,
+    numbers=left,
+    texcl=true,
+    xleftmargin=5.0ex,
+    basicstyle=\tiny\ttfamily,
+    keywordstyle=\bfseries\color{red},
+    commentstyle=\itshape\color{grey},
+    identifierstyle=\color{blue},
+    morekeywords={retq,cmpq},
+    numberstyle=\tiny
+    ]
+    {jit_listing.asm}
+\end{multicols}
 \end{frame}
 
 \section{\scshape Auswertung}
