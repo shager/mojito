@@ -19,8 +19,9 @@
 \usepackage{caption}
 \usepackage{csquotes}
 \usepackage{multicol,listings}
-%\usepackage{subcaption}
 \usepackage{multirow}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{transparent}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Beamer Layout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -278,26 +279,148 @@
 
 \subsection{\scshape Generierter Code}
 \begin{frame}
-\begin{multicols}{3}
-\lstinputlisting[
-    language={[x86masm]Assembler},
-    breaklines=true,
-    numbers=left,
-    texcl=true,
-    xleftmargin=5.0ex,
-    basicstyle=\tiny\ttfamily,
-    keywordstyle=\bfseries\color{red},
-    commentstyle=\itshape\color{grey},
-    identifierstyle=\color{blue},
-    morekeywords={retq,cmpq},
-    numberstyle=\tiny
-    ]
-    {jit_listing.asm}
-\end{multicols}
+  \only<2-5>{\begin{transparent}{0.4}}
+  \only<-5>{\begin{multicols}{3}
+  \lstinputlisting[
+      language={[x86masm]Assembler},
+      breaklines=true,
+      numbers=left,
+      texcl=true,
+      xleftmargin=5.0ex,
+      basicstyle=\tiny\ttfamily,
+      keywordstyle=\bfseries\color{red},
+      commentstyle=\itshape\color{grey},
+      identifierstyle=\color{blue},
+      morekeywords={retq,cmpq},
+      numberstyle=\tiny
+      ]
+      {jit_listing.asm}
+  \end{multicols}}
+  \only<2-5>{\end{transparent}}
+
+  \only<2>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Einstieg in die Funktion,drop fuzzy shadow]
+    \lstinputlisting[
+      language={[x86masm]Assembler},
+      breaklines=true,
+      numbers=left,
+      texcl=true,
+      xleftmargin=5.0ex,
+      basicstyle=\tiny\ttfamily,
+      keywordstyle=\bfseries\color{red},
+      commentstyle=\itshape\color{grey},
+      identifierstyle=\color{blue},
+      morekeywords={retq,cmpq},
+      numberstyle=\tiny,
+      linerange={3-5},
+      firstnumber=3
+      ]
+      {jit_listing.asm}
+    \end{tcolorbox}
+  \end{textblock*}}
+  
+  \only<3>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten A: Vergleich mit 5,drop fuzzy shadow]
+    \lstinputlisting[
+      language={[x86masm]Assembler},
+      breaklines=true,
+      numbers=left,
+      texcl=true,
+      xleftmargin=5.0ex,
+      basicstyle=\tiny\ttfamily,
+      keywordstyle=\bfseries\color{red},
+      commentstyle=\itshape\color{grey},
+      identifierstyle=\color{blue},
+      morekeywords={retq,cmpq},
+      numberstyle=\tiny,
+      linerange={8-10},
+      firstnumber=8
+      ]
+      {jit_listing.asm}
+    \end{tcolorbox}
+  \end{textblock*}}
+  
+  \only<4>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Vergleich mit 8,drop fuzzy shadow]
+    \lstinputlisting[
+      language={[x86masm]Assembler},
+      breaklines=true,
+      numbers=left,
+      texcl=true,
+      xleftmargin=5.0ex,
+      basicstyle=\tiny\ttfamily,
+      keywordstyle=\bfseries\color{red},
+      commentstyle=\itshape\color{grey},
+      identifierstyle=\color{blue},
+      morekeywords={retq,cmpq},
+      numberstyle=\tiny,
+      linerange={12-14},
+      firstnumber=12
+      ]
+      {jit_listing.asm}
+    \end{tcolorbox}
+  \end{textblock*}}
+  
+  \only<5>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: 2. Bitvector,drop fuzzy shadow]
+    \lstinputlisting[
+      language={[x86masm]Assembler},
+      breaklines=true,
+      numbers=left,
+      texcl=true,
+      xleftmargin=5.0ex,
+      basicstyle=\tiny\ttfamily,
+      keywordstyle=\bfseries\color{red},
+      commentstyle=\itshape\color{grey},
+      identifierstyle=\color{blue},
+      morekeywords={retq,cmpq},
+      numberstyle=\tiny,
+      linerange={16-18},
+      firstnumber=16
+      ]
+      {jit_listing.asm}
+    \end{tcolorbox}
+  \end{textblock*}}
+  
+  \only<6>{
+  \begin{multicols}{3}
+  \lstinputlisting[
+      language={[x86masm]Assembler},
+      breaklines=true,
+      numbers=left,
+      texcl=true,
+      xleftmargin=5.0ex,
+      basicstyle=\tiny\ttfamily,
+      keywordstyle=\bfseries\color{red},
+      commentstyle=\itshape\color{grey},
+      identifierstyle=\color{blue},
+      morekeywords={retq,cmpq},
+      numberstyle=\tiny
+      ]
+      {jit_listing.asm}
+  \end{multicols}}
+  %TODO: nur Teile des Codes highliten
 \end{frame}
 
 \section{\scshape Auswertung}
+\subsection{\scshape Akzeptanztest}
 \begin{frame}
+  \frametitle{\insertsubsection}
+  Modularer Aufbau des OpenFlow-Switches ermöglicht Test der Module \enquote{gegeneinander}.
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Annahme,drop fuzzy shadow]
+    Gleiche Eingabe von \textit{R} und \textit{P} ergibt das gleiche Verhalten.
+  \end{tcolorbox}
+  \begin{figure}
+  \centering
+  \includegraphics[height=3cm]{figures/ofswitch-acctest}
+  \caption{Testaufbau beim Akzeptanztest.}
+  \end{figure}
+\end{frame}
+
+\subsection{\scshape Performance-Analyse}
+\begin{frame}
+  \frametitle{\insertsubsection}
+  Messung der Performance durch einfachen Testaufbau auf virtuellem Netzwerk mit dem \textsf{mininet}-Tool.
 \end{frame}
 
 \section{\scshape Fazit und Ausblick}
