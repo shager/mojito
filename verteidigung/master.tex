@@ -101,8 +101,6 @@
 \subsection{\scshape Paketklassifikation}
 \begin{frame}
   \frametitle{\insertsubsection}
-  % Regelmenge
-  % Modellierung als Funktion mit P, R -> D
   Paketklassifikation modellierbar als Funktion \textit{M}:
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Definition,drop fuzzy shadow]
   \begin{tabularx}{\textwidth}{XX}
@@ -110,13 +108,16 @@
     Ausgabe&Entscheidung \textit{D}
   \end{tabularx}
   \end{tcolorbox}
+  \begin{figure}
+  \centering
+  \includegraphics<1>[height=0.4\textheight]{figures/matching_function}
+  \end{figure}
 \end{frame}
 
 \begin{frame}
   \begin{figure}
   \centering
   \includegraphics[width=0.8\textwidth]{figures/paketheader}
-  \caption{Beispielhafter Aufbau eines Netzwerkpakets.}
   \end{figure}
   \pause
   \tiny
@@ -132,7 +133,6 @@
     10.0.0.0/8&141.20.33.0/24&TCP&*&80&\textsc{ACCEPT}\\
     10.0.0.0/8&0.0.0.0/0&*&*&*&\textsc{DROP}
   \end{tabularx}
-  \caption{Beispiel für eine Regelmenge mit fünf Header-Feldern.}
   \end{table}
   \normalsize
 \end{frame}
@@ -146,7 +146,14 @@
 \section{\scshape Der Bitvector-Algorithmus}
 \subsection{\scshape Allgemeine Idee}
 \begin{frame}
-  Paketfilter sind häufig als einfache Liste von Regeln implementiert.\\
+  Paketfilter sind häufig als einfache Liste von Regeln implementiert.
+  \begin{figure}
+  \centering
+  \includegraphics<1>[width=\textwidth]{figures/list_workflow}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Problem,drop fuzzy shadow]
   Lineare Suche ist langsam, da nur in $\mathcal O(n)$.
   \end{tcolorbox}
@@ -174,7 +181,6 @@
   2&1 -- 5&2 -- 5\\
   3&8 -- 13&0 -- 3\\
   \end{tabularx}
-  \caption{Beispielhafter Regelsatz.}
   \end{table}
   Im Folgenden: Beim ersten Treffer wird abgebrochen und diese Regel \enquote{gewinnt}.
 \end{frame}
@@ -182,13 +188,12 @@
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics<1>[height=0.7\textheight]{figures/bitvector-L1}
-  \includegraphics<2>[height=0.7\textheight]{figures/bitvector-L1-2}
-  \includegraphics<3>[height=0.7\textheight]{figures/bitvector-L1-3}
-  \includegraphics<4>[height=0.7\textheight]{figures/bitvector-L1-4}
-  \includegraphics<5>[height=0.7\textheight]{figures/bitvector-L1-5}
-  \includegraphics<6>[height=0.7\textheight]{figures/bitvector-L1-7}
-  \caption{Geometrische Interpretation der Regeln aus voriger Tabelle.}
+  \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1}
+  \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-2}
+  \includegraphics<3>[height=0.9\textheight]{figures/bitvector-L1-3}
+  \includegraphics<4>[height=0.9\textheight]{figures/bitvector-L1-4}
+  \includegraphics<5>[height=0.9\textheight]{figures/bitvector-L1-5}
+  \includegraphics<6>[height=0.9\textheight]{figures/bitvector-L1-7}
   \end{figure}
 \end{frame}
 
@@ -204,16 +209,14 @@
   P\ 1&4&4\\
   P\ 2&14&7\\
   \end{tabularx}
-  \caption{Beim Paketfilter eingetroffene Pakete.}
   \end{table}
 \end{frame}
 
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics<1>[height=0.7\textheight]{figures/bitvector-L1-4_6_8_10}
-  \includegraphics<2>[height=0.7\textheight]{figures/bitvector-L1-4_6_9_11}
-  \caption{Lookup von Paketen.}
+  \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1-4_6_8_10}
+  \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-4_6_9_11}
   \end{figure}
 \end{frame}
 
@@ -221,7 +224,6 @@
   \begin{figure}
   \centering
   \includegraphics[height=0.7\textheight]{figures/matching}
-  \caption{Zusammenführen der Ergebnisse.}
   \end{figure}
 \end{frame}
 
@@ -233,7 +235,6 @@
   \begin{figure}
   \centering
   \includegraphics[height=5.5cm]{figures/matching_process}
-  \caption{Matching von Paketen bei statischem Regelsatz.}
   \end{figure}
 \end{frame}
 
@@ -255,12 +256,7 @@
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics[width=0.3\textwidth]{figures/array}
-  \vfill
-  \includegraphics[height=0.2\textheight]{figures/arrow_down}
-  \vfill
-  \includegraphics[height=3cm]{figures/bv-tree-simple}
-  \caption{Generierter Suchbaum aus dem Regelsatz.}
+  \includegraphics[scale=0.6]{figures/array_to_tree}
   \end{figure}
 \end{frame}
 
@@ -273,7 +269,6 @@
   \includegraphics<2>[height=0.7\textheight]{figures/match_in_tree-L1_3}
   \includegraphics<3>[height=0.7\textheight]{figures/match_in_tree-L1_4}
   \includegraphics<4>[height=0.7\textheight]{figures/match_in_tree-L1_5}
-  \caption{Matching eines Pakets im Suchbaum.}
   \end{figure}
 \end{frame}
 
@@ -413,7 +408,6 @@
   \begin{figure}
   \centering
   \includegraphics[height=3cm]{figures/ofswitch-acctest}
-  \caption{Testaufbau beim Akzeptanztest.}
   \end{figure}
 \end{frame}
 
@@ -421,6 +415,10 @@
 \begin{frame}
   \frametitle{\insertsubsection}
   Messung der Performance durch einfachen Testaufbau auf virtuellem Netzwerk mit dem \textsf{mininet}-Tool.
+  \begin{figure}
+  \centering
+  \includegraphics[height=1cm]{figures/ofswitch-perftest}
+  \end{figure}
 \end{frame}
 
 \section{\scshape Fazit und Ausblick}
