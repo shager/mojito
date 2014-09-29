@@ -22,6 +22,7 @@
 \usepackage{multirow}
 \usepackage[absolute,overlay]{textpos}
 \usepackage{transparent}
+\usepackage{enumitem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Beamer Layout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,16 +123,16 @@
   \pause
   \tiny
   \begin{table}
-  \begin{tabularx}{\textwidth}{XXXXX|X}
-    IP-Quelle&IP-Ziel&Transport\-protokoll&Quellport&Zielport&Aktion\\
+  \begin{tabularx}{\textwidth}{p{0.6cm}XXp{0.7cm}p{0.7cm}p{0.6cm}|X}
+    Priorität&IP-Quelle&IP-Ziel&Transport\-protokoll&Quellport&Zielport&Aktion\\
     \hline
-    8.8.8.8/32&10.0.0.0/8&UDP&53&*&\textsc{DROP}\\
-    10.0.0.0/8&8.8.8.8/32&UDP&*&53&\textsc{DROP}\\
-    141.20.33.123/32&10.0.0.0/8&*&*&*&\textsc{DROP}\\
-    10.0.0.0/8&141.20.33.123/32&*&*&*&\textsc{DROP}\\
-    141.20.33.0/24&10.0.0.0/8&TCP&80&*&\textsc{ACCEPT}\\
-    10.0.0.0/8&141.20.33.0/24&TCP&*&80&\textsc{ACCEPT}\\
-    10.0.0.0/8&0.0.0.0/0&*&*&*&\textsc{DROP}
+    1&8.8.8.8/32&10.0.0.0/8&UDP&53&*&\textsc{DROP}\\
+    2&10.0.0.0/8&8.8.8.8/32&UDP&*&53&\textsc{DROP}\\
+    3&141.20.33.123/32&10.0.0.0/8&*&*&*&\textsc{DROP}\\
+    4&10.0.0.0/8&141.20.33.123/32&*&*&*&\textsc{DROP}\\
+    5&141.20.33.0/24&10.0.0.0/8&TCP&80&*&\textsc{ACCEPT}\\
+    6&10.0.0.0/8&141.20.33.0/24&TCP&*&80&\textsc{ACCEPT}\\
+    7&10.0.0.0/8&0.0.0.0/0&*&*&*&\textsc{DROP}
   \end{tabularx}
   \end{table}
   \normalsize
@@ -140,7 +141,7 @@
 \subsection{\scshape OpenFlow}
 \begin{frame}
   \frametitle{\insertsubsection}
-  
+  OpenFlow ist eine Protokollspezifikation für Software Defined Networks.
 \end{frame}
 
 \section{\scshape Der Bitvector-Algorithmus}
@@ -149,11 +150,15 @@
   Paketfilter sind häufig als einfache Liste von Regeln implementiert.
   \begin{figure}
   \centering
-  \includegraphics<1>[width=\textwidth]{figures/list_workflow}
+  \includegraphics<1>[width=\textwidth]{figures/list_workflow-L1}
+  \includegraphics<2>[width=\textwidth]{figures/list_workflow-L1-2}
+  \includegraphics<3>[width=\textwidth]{figures/list_workflow-L1-3}
+  \includegraphics<4>[width=\textwidth]{figures/list_workflow-L1-4}
   \end{figure}
 \end{frame}
 
 \begin{frame}
+  $n:$ Anzahl der Regeln
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Problem,drop fuzzy shadow]
   Lineare Suche ist langsam, da nur in $\mathcal O(n)$.
   \end{tcolorbox}
@@ -225,6 +230,28 @@
   \centering
   \includegraphics[height=0.7\textheight]{figures/matching}
   \end{figure}
+\end{frame}
+
+\subsection{\scshape Laufzeitanalyse}
+\begin{frame}
+  \frametitle{\insertsubsection}
+  $k:$ Anzahl der Headerfelder, $n:$ Anzahl der Regeln,\\$w:$ Registerbreite des Systems in bit.
+  \pause
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Lineare Suche,drop fuzzy shadow]
+  Die lineare Suche liegt in $\mathcal O(k \cdot n)$.
+  \end{tcolorbox}
+  \pause
+  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Bitvector-Algorithmus,drop fuzzy shadow]
+  \begin{itemize}[leftmargin=0cm]
+    \item[]<3-> Binäre Suche auf $k$ Headerfeldern,
+    \item[]<4-> bitweises ver-UND-en der $n$ Bitvektoren,
+    \item[]<5-> Suche nach dem ersten gesetzten Bit im Ergebnisvektor.
+  \end{itemize}
+  \centering
+  \begin{equation*}
+  \mathcal O(k \cdot log\ n \onslide<4->{+ \frac{n}{w} \cdot (k - 1)} \onslide<5->{ + n})
+  \end{equation*}
+  \end{tcolorbox}
 \end{frame}
 
 \section{\scshape Die JIT-Komponente}
