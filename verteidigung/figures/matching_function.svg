@@ -38,14 +38,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="320.7419"
+     inkscape:zoom="0.99"
+     inkscape:cx="241.93223"
      inkscape:cy="542.18147"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="1032"
+     inkscape:window-width="1280"
+     inkscape:window-height="755"
      inkscape:window-x="-2"
      inkscape:window-y="-3"
      inkscape:window-maximized="1" />
@@ -57,7 +57,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -540,49 +540,42 @@
          x="251.63795"
          y="619.29071"
          style="font-size:18px">Paket P</tspan></text>
-    <g
-       id="g5706"
-       transform="translate(44,0)">
-      <text
-         xml:space="preserve"
-         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-         x="445.9032"
+    <text
+       sodipodi:linespacing="125%"
+       id="text5112"
+       y="517.70654"
+       x="489.9032"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       xml:space="preserve"><tspan
+         style="font-size:24px"
          y="517.70654"
-         id="text5112"
-         sodipodi:linespacing="125%"><tspan
-           sodipodi:role="line"
-           id="tspan5114"
-           x="445.9032"
-           y="517.70654"
-           style="font-size:24px">D</tspan></text>
-      <g
-         id="g5700">
-        <rect
-           style="opacity:0.95999995;fill:#ffffff;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
-           id="rect2985"
-           width="51.105087"
-           height="245.10056"
-           x="354.34772"
-           y="386.40823" />
-        <text
-           xml:space="preserve"
-           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-           x="369.54089"
-           y="517.70654"
-           id="text2987"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan2989"
-             x="369.54089"
-             y="517.70654"
-             style="font-size:24px">M</tspan></text>
-        <path
-           inkscape:connector-curvature="0"
-           id="path5592"
-           d="m 405.10101,508.97616 32.5798,0"
-           style="fill:none;stroke:#000000;stroke-width:1.00198019px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
-      </g>
-    </g>
+         x="489.9032"
+         id="tspan5114"
+         sodipodi:role="line">D</tspan></text>
+    <rect
+       style="opacity:0.95999995000000005;fill:#afc6e9;stroke:#0000bf;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2985"
+       width="51.105087"
+       height="245.10056"
+       x="398.34772"
+       y="386.40823" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       x="413.54089"
+       y="517.70654"
+       id="text2987"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2989"
+         x="413.54089"
+         y="517.70654"
+         style="font-size:24px;fill:#000000;fill-opacity:1">M</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       id="path5592"
+       d="m 449.10101,508.97616 32.5798,0"
+       style="fill:none;stroke:#000000;stroke-width:1.00198019px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
        d="m 213.14219,415.02194 183.84776,0"

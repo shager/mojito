@@ -81,7 +81,7 @@
   \end{figure}
 
 \title{\textbf{Measurements and Optimizations with Just-In-Time Code Generation on the OpenFlow Reference Implementation}}
-\subtitle{Verteidigung der Bachelorarbeit}
+%\subtitle{Verteidigung der Bachelorarbeit}
 
 \author{
   \vspace*{-1cm}
@@ -123,7 +123,8 @@
   \pause
   \tiny
   \begin{table}
-  \begin{tabularx}{\textwidth}{p{0.6cm}XXp{0.7cm}p{0.7cm}p{0.6cm}|X}
+  \begin{tabular}
+      {p{0.6cm}p{1.4cm}p{1.4cm}p{0.7cm}p{0.7cm}p{0.6cm}|p{0.7cm}}
     Priorität&IP-Quelle&IP-Ziel&Transport\-protokoll&Quellport&Zielport&Aktion\\
     \hline
     1&8.8.8.8/32&10.0.0.0/8&UDP&53&*&\textsc{DROP}\\
@@ -133,20 +134,31 @@
     5&141.20.33.0/24&10.0.0.0/8&TCP&80&*&\textsc{ACCEPT}\\
     6&10.0.0.0/8&141.20.33.0/24&TCP&*&80&\textsc{ACCEPT}\\
     7&10.0.0.0/8&0.0.0.0/0&*&*&*&\textsc{DROP}
-  \end{tabularx}
+  \end{tabular}
   \end{table}
   \normalsize
 \end{frame}
 
+%TODO: aufzählung mit punkten oder sowas in der Art!
 \subsection{\scshape OpenFlow}
 \begin{frame}
   \frametitle{\insertsubsection}
-  OpenFlow ist eine Protokollspezifikation für Software Defined Networks.
+  OpenFlow ist eine Protokollspezifikation für Software Defined Networks:
+  \begin{itemize}
+    \item[-] Zentrale Konfiguration von Netzwerkhardware.
+    \item[--] Abstraktion der Aufgaben im Netzwerk von der eigentlichen Hardware.
+    \item[] Einfache Möglichkeit Netzwerke automatisch zu optimieren.
+  \end{itemize}
+  \pause
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Ziel der Arbeit,drop fuzzy shadow]
+  Verbesserung der Matching-Performance im Software-Switch der OpenFlow-Referenzimplementierung 1.0.
+  \end{tcolorbox}
 \end{frame}
 
 \section{\scshape Der Bitvector-Algorithmus}
 \subsection{\scshape Allgemeine Idee}
 \begin{frame}
+  \frametitle{\insertsubsection}
   Paketfilter sind häufig als einfache Liste von Regeln implementiert.
   \begin{figure}
   \centering
@@ -235,9 +247,9 @@
 \subsection{\scshape Laufzeitanalyse}
 \begin{frame}
   \frametitle{\insertsubsection}
-  $k:$ Anzahl der Headerfelder, $n:$ Anzahl der Regeln,\\$w:$ Registerbreite des Systems in bit.
+  $n:$ Anzahl der Regeln, $k:$ Anzahl der Headerfelder,\\$w:$ Registerbreite des Systems in bit.
   \pause
-  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Lineare Suche,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Erinnerung: Lineare Suche,drop fuzzy shadow]
   Die lineare Suche liegt in $\mathcal O(k \cdot n)$.
   \end{tcolorbox}
   \pause
@@ -274,9 +286,9 @@
   Weitere Optimierung durch Vorausberechnung einer Funktion $M_R$.\\
   Implementierung eines Suchbaumes pro Dimension in nativem Code.
   \end{tcolorbox}
-  \pause
+  \pause %TODO: Nachteil weiter hinten?
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Nachteil,drop fuzzy shadow]
-  Bei Regel-Update erfolgt komplette Neuberechnung des Codes für den Suchbaum.
+  Bei jedem einzelnen Regel-Update erfolgt komplette Neuberechnung des Codes für den Suchbaum.
   \end{tcolorbox}
 \end{frame}
 
@@ -318,6 +330,7 @@
       ]
       {jit_listing.asm}
   \end{multicols}}
+  
   \only<2-5>{\end{transparent}}
 
   \only<2>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
@@ -338,11 +351,13 @@
       firstnumber=3
       ]
       {jit_listing.asm}
+      \tcblower
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1}}
     \end{tcolorbox}
   \end{textblock*}}
   
   \only<3>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten A: Vergleich mit 5,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Wurzelknoten: Vergleich mit 5,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -359,6 +374,8 @@
       firstnumber=8
       ]
       {jit_listing.asm}
+      \tcblower
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_6}}
     \end{tcolorbox}
   \end{textblock*}}
   
@@ -380,11 +397,13 @@
       firstnumber=12
       ]
       {jit_listing.asm}
+      \tcblower
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_7}}
     \end{tcolorbox}
   \end{textblock*}}
   
   \only<5>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: 2. Bitvector,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: 3. Bitvektor,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -401,6 +420,8 @@
       firstnumber=16
       ]
       {jit_listing.asm}
+      \tcblower
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_8}}
     \end{tcolorbox}
   \end{textblock*}}
   
@@ -421,9 +442,10 @@
       ]
       {jit_listing.asm}
   \end{multicols}}
-  %TODO: nur Teile des Codes highliten
 \end{frame}
 
+%TODO: anderes Bild, eher so:
+% Test mit M und M', dann Vergleich der Ergebnisse
 \section{\scshape Auswertung}
 \subsection{\scshape Akzeptanztest}
 \begin{frame}
@@ -448,14 +470,64 @@
   \end{figure}
 \end{frame}
 
+%TODO: die 3 Fälle (abw) + Vorgehen eläutern
+\begin{frame}
+  Ergebnisse im guten Fall:
+  \includegraphics[height=0.9\textheight]{figures/eval_b}
+\end{frame}
+
+\begin{frame}
+  Relative Verbesserung gegenüber der Liste:
+  \includegraphics[height=0.9\textheight]{figures/eval_b_relative}
+\end{frame}
+
 \section{\scshape Fazit und Ausblick}
 \begin{frame}
+  %TODO: itemize mit bullets
+  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Wichtigste Ergebnisse,drop fuzzy shadow]
+    \begin{itemize}
+      \item Verbesserung der Switch-Performance durch den Bitvector-Algorithmus.
+      \item Implementierung eines Codegenerators für statische Regelsätze.
+      \item Evaluation und Verifikation der neuen Komponenten.
+    \end{itemize}
+  \end{tcolorbox}
+  \pause %TODO: Wortwahl Titel nächste Box
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Mögliche Anknüpfungspunkte,drop fuzzy shadow]
+    \begin{itemize}
+      \item Inkrementelles Update der JIT-Funktion bei Regelsatzänderung.
+      \item Optimierung der JIT-Funktion nach beobachteten Traffic-Mustern.
+    \end{itemize}
+  \end{tcolorbox}
+\end{frame}
+
+%TODO: Nicht in Navileiste auftauchen
+%\section*{\scshape Fragen?}
+\begin{frame}
+  %\frametitle{\insertsection}
+  \frametitle{\scshape Fragen?}
+  \centering\Huge{!}
 \end{frame}
 
 \appendix
-\section{\scshape Backup}
+\section{\scshape Weitere Daten}
 \begin{frame}[noframenumbering]
-Backupslide
+  Ergebnisse im schlechten Fall:
+  \includegraphics[height=0.9\textheight]{figures/eval_w}
+\end{frame}
+
+\begin{frame}[noframenumbering]
+  Relative Verbesserung gegenüber der Liste:
+  \includegraphics[height=0.9\textheight]{figures/eval_w_relative}
+\end{frame}
+
+\begin{frame}[noframenumbering]
+  Ergebnisse im durchschnittlichen Fall:
+  \includegraphics[height=0.9\textheight]{figures/eval_a}
+\end{frame}
+
+\begin{frame}[noframenumbering]
+  Relative Verbesserung gegenüber der Liste:
+  \includegraphics[height=0.9\textheight]{figures/eval_a_relative}
 \end{frame}
 
 \end{document}
