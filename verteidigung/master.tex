@@ -104,9 +104,28 @@
 \end{frame}
 
 \section{\scshape Einführung}
+\begin{frame}
+  \centering\Huge{\insertsection}
+\end{frame}
+
 \subsection{\scshape Paketklassifikation}
 \begin{frame}
   \frametitle{\insertsubsection}
+  Das Internet wächst und die Anzahl der Knoten steigt ständig.
+  \begin{itemize}
+    \item Viele Knoten müssen Entscheidungen zur Weiterleitung von Paketen treffen
+      (z.B. Switches, Router).
+    \item Knoten dienen dazu, Bereiche abzuschirmen (z.B. Firewalls).
+    \item Diese Prozesse sollen schnell passieren.
+    \item Die Kosten sind so gering wie möglich zu halten.
+  \end{itemize}
+  \pause
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,drop fuzzy shadow]
+    Effiziente Paketklassifikation ist eine wichtige Aufgabe im Netzwerk.
+  \end{tcolorbox}
+\end{frame}
+
+\begin{frame}
   Paketklassifikation modellierbar als Funktion \textit{M}:
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Definition,drop fuzzy shadow]
   \begin{tabularx}{\textwidth}{XX}
@@ -160,6 +179,10 @@
 \end{frame}
 
 \section{\scshape Der Bitvector-Algorithmus}
+\begin{frame}
+  \centering\Huge{\insertsection}
+\end{frame}
+
 \subsection{\scshape Allgemeine Idee}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -191,7 +214,7 @@
 
 \begin{frame}
   Grundlegende Idee:\\
-  Geometrische Interpretation der Paketklassifikation.
+  Geometrische Repräsentation der Paketklassifikation.
   \pause
   \begin{table}
   \centering
@@ -210,21 +233,30 @@
   \begin{figure}
     \hspace*{-4cm}
     \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1}
-    \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-2}
-    \includegraphics<3>[height=0.9\textheight]{figures/bitvector-L1-3}
+    \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1_4}
+    \includegraphics<3>[height=0.9\textheight]{figures/bitvector-L1_3_4}
     \includegraphics<4>[height=0.9\textheight]{figures/bitvector-L1-4}
     \includegraphics<5>[height=0.9\textheight]{figures/bitvector-L1-5}
-    \includegraphics<6>[height=0.9\textheight]{figures/bitvector-L1-7}
+    \includegraphics<6>[height=0.9\textheight]{figures/bitvector-L1-6}
+    \includegraphics<7>[height=0.9\textheight]{figures/bitvector-L1-7}
+    \includegraphics<8>[height=0.9\textheight]{figures/bitvector-L1-8}
+    \includegraphics<9>[height=0.9\textheight]{figures/bitvector-L1-10}
   \end{figure}
   \begin{tikzpicture}[remember picture,overlay]  
-    \node [xshift=-3.5cm,yshift=-2cm] at (current page.north east)
-      {\begin{tabularx}{0.4\textwidth}{c|l|l}
-  Regel&Quelle&Ziel\\
-  \hline
-  1&3 -- 11&4 -- 13\\
-  2&1 -- 5&2 -- 5\\
-  3&8 -- 13&0 -- 3\\
-  \end{tabularx}};
+    \node [xshift=-3.5cm,yshift=-2cm] at (current page.north east) {
+      \begin{tabularx}{0.4\textwidth}{c|l|l}
+        Regel&Quelle&Ziel\\
+        \hline
+        \only<1>{\color{white}}1&
+          \only<1>{\color{white}}3 -- 11&
+          \only<1>{\color{white}}4 -- 13\\
+        \only<1-2>{\color{white}}2&
+          \only<1-2>{\color{white}}1 -- 5&
+          \only<1-2>{\color{white}}2 -- 5\\
+        \only<1-3>{\color{white}}3&
+          \only<1-3>{\color{white}}8 -- 13&
+          \only<1-3>{\color{white}}0 -- 3\\
+      \end{tabularx}};
   \end{tikzpicture}
 \end{frame}
 
@@ -245,16 +277,28 @@
 
 \begin{frame}
   \begin{figure}
+  \hspace*{-4cm}
   \centering
-  \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1-4_6_8_10}
-  \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-4_6_9_11}
+  \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1-7_9_11_13_15}
+  \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-7_9_12_14_16}
   \end{figure}
+  \begin{tikzpicture}[remember picture,overlay]  
+    \node [xshift=-3.5cm,yshift=-2cm] at (current page.north east) {
+      \begin{tabularx}{0.4\textwidth}{c|l|l}
+        Paket&Quelle&Ziel\\
+        \hline
+        P\ 1&4&4\\
+        \only<1>{\color{white}}P\ 2&
+          \only<1>{\color{white}}14&
+          \only<1>{\color{white}}7\\
+      \end{tabularx}};
+  \end{tikzpicture}
 \end{frame}
 
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics[height=0.7\textheight]{figures/matching}
+  \includegraphics[height=0.7\textheight]{figures/matching} %TODO: layer?
   \end{figure}
 \end{frame}
 
@@ -277,10 +321,14 @@
   \begin{equation*}
   \mathcal O(k \cdot log\ n \onslide<4->{+ \frac{n}{w} \cdot (k - 1)} \onslide<5->{ + n})
   \end{equation*}
-  \end{tcolorbox}
+  \end{tcolorbox}%TODO: evtl underbraces
 \end{frame}
 
 \section{\scshape Die JIT-Komponente}
+\begin{frame}
+  \centering\Huge{\insertsection}
+\end{frame}
+
 \subsection{\scshape Motivation}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -298,12 +346,38 @@
   \pause
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Idee,drop fuzzy shadow]
   Weitere Optimierung durch Vorausberechnung einer Funktion $M_R$.\\
-  Implementierung eines Suchbaumes pro Dimension in nativem Code.
+  Implementierung eines Suchbaumes pro Dimension in nativem Code zur \textbf{Reduktion von Speicherzugriffen}.
   \end{tcolorbox}
-  \pause %TODO: Nachteil weiter hinten?
+  \pause
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Nachteil,drop fuzzy shadow]
   Bei jedem einzelnen Regel-Update erfolgt komplette Neuberechnung des Codes für den Suchbaum.
   \end{tcolorbox}
+\end{frame}
+
+\begin{frame}
+  \begin{columns}[T] % align columns
+    \begin{column}{.48\textwidth}
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Standard Bitvector,drop fuzzy shadow]
+    \begin{enumerate}[label=\arabic*)]%TODO: schöner!
+      \item \textit{k} binäre Suchen in den Dimensionen.
+      \item Ver-UND-en aller Ergebnisvektoren.
+      \item Suche nach dem ersten gesetzten Bit.
+    \end{enumerate}
+    \end{tcolorbox}
+    \end{column}
+    \hfill
+    \pause
+    \begin{column}{.48\textwidth}
+    \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Bitvector mit JIT,drop fuzzy shadow]
+    \begin{enumerate}[label=\arabic*)]%TODO: schöner!
+      \item \textcolor{blue}{\textbf{\textit{k} Aufrufe des JIT-Codes.}}
+      \pause
+      \item Ver-UND-en aller Ergebnisvektoren.
+      \item Suche nach dem ersten gesetzten Bit.
+    \end{enumerate}
+    \end{tcolorbox}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -366,7 +440,7 @@
       ]
       {jit_listing.asm}
       \tcblower
-      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1}}
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_9}}
     \end{tcolorbox}
   \end{textblock*}}
   
@@ -389,7 +463,7 @@
       ]
       {jit_listing.asm}
       \tcblower
-      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_6}}
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_6_9}}
     \end{tcolorbox}
   \end{textblock*}}
   
@@ -412,7 +486,7 @@
       ]
       {jit_listing.asm}
       \tcblower
-      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_7}}
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_7_9}}
     \end{tcolorbox}
   \end{textblock*}}
   
@@ -435,7 +509,7 @@
       ]
       {jit_listing.asm}
       \tcblower
-      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_8}}
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_8_9}}
     \end{tcolorbox}
   \end{textblock*}}
   
@@ -459,6 +533,10 @@
 \end{frame}
 
 \section{\scshape Auswertung}
+\begin{frame}
+  \centering\Huge{\insertsection}
+\end{frame}
+
 \subsection{\scshape Akzeptanztest}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -489,11 +567,6 @@
 \end{frame}
 
 \begin{frame}
-  Ergebnisse für oberstes Drittel:
-  \includegraphics[height=0.9\textheight]{figures/eval_b}
-\end{frame}
-
-\begin{frame}
   Relative Verbesserung gegenüber der Liste:
   \includegraphics[height=0.9\textheight]{figures/eval_b_relative}
 \end{frame}
@@ -509,6 +582,10 @@
 \end{frame}
 
 \section{\scshape Fazit und Ausblick}
+\begin{frame}
+  \centering\Huge{\insertsection}
+\end{frame}
+
 \subsection{\scshape Allgemeine Ergebnisse}
 \begin{frame}
   \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Wichtigste Ergebnisse,drop fuzzy shadow]
@@ -530,19 +607,24 @@
 \section{}
 \begin{frame}
   \frametitle{\scshape Fragen?}
-  \centering\Huge{!}
+  \centering\Huge{?}
 \end{frame}
 
 \appendix
-\section{\scshape Weitere Daten}
+\section{\scshape Weitere Ergebnisse}
 \begin{frame}[noframenumbering]
-  Ergebnisse im letzten Drittel:
-  \includegraphics[height=0.9\textheight]{figures/eval_w}
+  Relative Verbesserung (zweites Drittel):
+  \includegraphics[height=0.9\textheight]{figures/eval_a_relative}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Relative Verbesserung gegenüber der Liste:
+  Relative Verbesserung (letztes Drittel):
   \includegraphics[height=0.9\textheight]{figures/eval_w_relative}
+\end{frame}
+
+\begin{frame}[noframenumbering]
+  Ergebnisse für oberstes Drittel:
+  \includegraphics[height=0.9\textheight]{figures/eval_b}
 \end{frame}
 
 \begin{frame}[noframenumbering]
@@ -551,8 +633,8 @@
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Relative Verbesserung gegenüber der Liste:
-  \includegraphics[height=0.9\textheight]{figures/eval_a_relative}
+  Ergebnisse im letzten Drittel:
+  \includegraphics[height=0.9\textheight]{figures/eval_w}
 \end{frame}
 
 \end{document}

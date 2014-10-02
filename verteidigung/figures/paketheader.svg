@@ -14,7 +14,7 @@
    id="svg3663"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="Neues Dokument 6">
+   sodipodi:docname="paketheader.svg">
   <defs
      id="defs3665" />
   <sodipodi:namedview
@@ -24,14 +24,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="275.8767"
-     inkscape:cy="860.42338"
+     inkscape:zoom="1.4"
+     inkscape:cx="237.79465"
+     inkscape:cy="877.70928"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="755"
+     inkscape:window-width="1680"
+     inkscape:window-height="1032"
      inkscape:window-x="-2"
      inkscape:window-y="-3"
      inkscape:window-maximized="1" />
@@ -43,7 +43,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -113,26 +113,14 @@
        sodipodi:linespacing="125%"
        id="text4701"
        y="223.36734"
-       x="298.82199"
+       x="432.9032"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
        xml:space="preserve"><tspan
          style="font-size:14px"
          id="tspan4705"
          y="223.36734"
-         x="298.82199"
+         x="432.9032"
          sodipodi:role="line">Nutzdaten</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-       x="560.82202"
-       y="224.50894"
-       id="text4707"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         x="560.82202"
-         y="224.50894"
-         id="tspan4711"
-         style="font-size:14px">Footer</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 101.24749,189.69191 0,59.66213"
@@ -148,10 +136,5 @@
        d="m 251.22718,189.69191 0,59.66213"
        id="path4721"
        inkscape:connector-curvature="0" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path4723"
-       d="m 527.24748,189.69191 0,59.66213"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>
