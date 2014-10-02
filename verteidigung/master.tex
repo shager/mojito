@@ -49,6 +49,11 @@
 \setbeamercolor*{palette tertiary}{fg=black,bg=black!10} 
 \setbeamercolor*{palette quaternary}{fg=black,bg=black!10} 
 
+% Set right item bullet points in itemize (due to enumitem package)
+\setitemize{label=\usebeamerfont*{itemize item}%
+  \usebeamercolor[fg]{itemize item}
+  \usebeamertemplate{itemize item}}
+
 \renewcommand{\(}{\begin{columns}}
 \renewcommand{\)}{\end{columns}}
 \newcommand{\<}[1]{\begin{column}{#1}}
@@ -139,18 +144,17 @@
   \normalsize
 \end{frame}
 
-%TODO: aufzählung mit punkten oder sowas in der Art!
 \subsection{\scshape OpenFlow}
 \begin{frame}
   \frametitle{\insertsubsection}
   OpenFlow ist eine Protokollspezifikation für Software Defined Networks:
   \begin{itemize}
-    \item[-] Zentrale Konfiguration von Netzwerkhardware.
-    \item[--] Abstraktion der Aufgaben im Netzwerk von der eigentlichen Hardware.
-    \item[] Einfache Möglichkeit Netzwerke automatisch zu optimieren.
+    \item Zentrale Konfiguration von Netzwerkhardware.
+    \item Abstraktion der Aufgaben im Netzwerk von der eigentlichen Hardware.
+    \item Einfache Möglichkeit Netzwerke automatisch zu optimieren.
   \end{itemize}
   \pause
-  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Ziel der Arbeit,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Ziel dieser Arbeit,drop fuzzy shadow]
   Verbesserung der Matching-Performance im Software-Switch der OpenFlow-Referenzimplementierung 1.0.
   \end{tcolorbox}
 \end{frame}
@@ -204,14 +208,24 @@
 
 \begin{frame}
   \begin{figure}
-  \centering
-  \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1}
-  \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-2}
-  \includegraphics<3>[height=0.9\textheight]{figures/bitvector-L1-3}
-  \includegraphics<4>[height=0.9\textheight]{figures/bitvector-L1-4}
-  \includegraphics<5>[height=0.9\textheight]{figures/bitvector-L1-5}
-  \includegraphics<6>[height=0.9\textheight]{figures/bitvector-L1-7}
+    \hspace*{-4cm}
+    \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1}
+    \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-2}
+    \includegraphics<3>[height=0.9\textheight]{figures/bitvector-L1-3}
+    \includegraphics<4>[height=0.9\textheight]{figures/bitvector-L1-4}
+    \includegraphics<5>[height=0.9\textheight]{figures/bitvector-L1-5}
+    \includegraphics<6>[height=0.9\textheight]{figures/bitvector-L1-7}
   \end{figure}
+  \begin{tikzpicture}[remember picture,overlay]  
+    \node [xshift=-3.5cm,yshift=-2cm] at (current page.north east)
+      {\begin{tabularx}{0.4\textwidth}{c|l|l}
+  Regel&Quelle&Ziel\\
+  \hline
+  1&3 -- 11&4 -- 13\\
+  2&1 -- 5&2 -- 5\\
+  3&8 -- 13&0 -- 3\\
+  \end{tabularx}};
+  \end{tikzpicture}
 \end{frame}
 
 \subsection{\scshape Lookup von Paketen}
@@ -444,19 +458,16 @@
   \end{multicols}}
 \end{frame}
 
-%TODO: anderes Bild, eher so:
-% Test mit M und M', dann Vergleich der Ergebnisse
 \section{\scshape Auswertung}
 \subsection{\scshape Akzeptanztest}
 \begin{frame}
   \frametitle{\insertsubsection}
   Modularer Aufbau des OpenFlow-Switches ermöglicht Test der Module \enquote{gegeneinander}.
-  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Annahme,drop fuzzy shadow]
-    Gleiche Eingabe von \textit{R} und \textit{P} ergibt das gleiche Verhalten.
-  \end{tcolorbox}
   \begin{figure}
   \centering
-  \includegraphics[height=3cm]{figures/ofswitch-acctest}
+  \includegraphics<1>[height=6cm]{figures/acctest-L1}
+  \includegraphics<2>[height=6cm]{figures/acctest-L1-2}
+  \includegraphics<3>[height=6cm]{figures/acctest-L1-3}
   \end{figure}
 \end{frame}
 
@@ -464,15 +475,21 @@
 \begin{frame}
   \frametitle{\insertsubsection}
   Messung der Performance durch einfachen Testaufbau auf virtuellem Netzwerk mit dem \textsf{mininet}-Tool.
+  \begin{itemize}
+    \item Erzeugung von zufälligen Regelsätzen.
+    \item Ableitung von Paketströmen für je $\frac{1}{3}$ der Regeln mit \textsf{classbench}.
+    \item Einfügen der Regeln in den Switch.
+    \item Abarbeiten des Paketstroms auf der Sendeseite.
+    \item Zählen der ankommenden Pakete am Ziel.
+  \end{itemize}
   \begin{figure}
   \centering
   \includegraphics[height=1cm]{figures/ofswitch-perftest}
   \end{figure}
 \end{frame}
 
-%TODO: die 3 Fälle (abw) + Vorgehen eläutern
 \begin{frame}
-  Ergebnisse im guten Fall:
+  Ergebnisse für oberstes Drittel:
   \includegraphics[height=0.9\textheight]{figures/eval_b}
 \end{frame}
 
@@ -481,9 +498,19 @@
   \includegraphics[height=0.9\textheight]{figures/eval_b_relative}
 \end{frame}
 
-\section{\scshape Fazit und Ausblick}
 \begin{frame}
-  %TODO: itemize mit bullets
+  Zeitmessungen zum Aktualisieren des Regelsatzes:
+  \includegraphics[height=0.9\textheight]{figures/eval_time}
+\end{frame}
+
+\begin{frame}
+  Vergleich des Speicherverbrauchs:
+  \includegraphics[height=0.9\textheight]{figures/eval_mem}
+\end{frame}
+
+\section{\scshape Fazit und Ausblick}
+\subsection{\scshape Allgemeine Ergebnisse}
+\begin{frame}
   \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Wichtigste Ergebnisse,drop fuzzy shadow]
     \begin{itemize}
       \item Verbesserung der Switch-Performance durch den Bitvector-Algorithmus.
@@ -491,8 +518,8 @@
       \item Evaluation und Verifikation der neuen Komponenten.
     \end{itemize}
   \end{tcolorbox}
-  \pause %TODO: Wortwahl Titel nächste Box
-  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Mögliche Anknüpfungspunkte,drop fuzzy shadow]
+  \pause
+  \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Künftige Anknüpfungspunkte,drop fuzzy shadow]
     \begin{itemize}
       \item Inkrementelles Update der JIT-Funktion bei Regelsatzänderung.
       \item Optimierung der JIT-Funktion nach beobachteten Traffic-Mustern.
@@ -500,10 +527,8 @@
   \end{tcolorbox}
 \end{frame}
 
-%TODO: Nicht in Navileiste auftauchen
-%\section*{\scshape Fragen?}
+\section{}
 \begin{frame}
-  %\frametitle{\insertsection}
   \frametitle{\scshape Fragen?}
   \centering\Huge{!}
 \end{frame}
@@ -511,7 +536,7 @@
 \appendix
 \section{\scshape Weitere Daten}
 \begin{frame}[noframenumbering]
-  Ergebnisse im schlechten Fall:
+  Ergebnisse im letzten Drittel:
   \includegraphics[height=0.9\textheight]{figures/eval_w}
 \end{frame}
 
@@ -521,7 +546,7 @@
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Ergebnisse im durchschnittlichen Fall:
+  Ergebnisse im mittleren Drittel:
   \includegraphics[height=0.9\textheight]{figures/eval_a}
 \end{frame}
 
