@@ -202,7 +202,7 @@
   Lineare Suche ist langsam, da nur in $\mathcal O(n)$.
   \end{tcolorbox}
   \pause
-  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Grundidee,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Grundidee,drop fuzzy shadow]
   Binäre Suche möglich in $\mathcal O(log\ n)$.\\
   Divide and conquer über die einzelnen Header-Felder.
   \end{tcolorbox}
@@ -311,7 +311,7 @@
   Die lineare Suche liegt in $\mathcal O(k \cdot n)$.
   \end{tcolorbox}
   \pause
-  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Bitvector-Algorithmus,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Bitvector-Algorithmus,drop fuzzy shadow]
   \begin{itemize}[leftmargin=0cm]
     \item[]<3-> Binäre Suche auf $k$ Headerfeldern,
     \item[]<4-> bitweises ver-UND-en der $n$ Bitvektoren,
@@ -340,7 +340,7 @@
 \end{frame}
 
 \begin{frame}
-  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Erinnerung,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Erinnerung,drop fuzzy shadow]
   Die Klassifikationsfunktion \textit{M} hängt vom Regelsatz \textit{R} und dem Paket \textit{P} ab.
   \end{tcolorbox}
   \pause
@@ -366,12 +366,10 @@
     \end{tcolorbox}
     \end{column}
     \hfill
-    \pause
     \begin{column}{.48\textwidth}
     \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Bitvector mit JIT,drop fuzzy shadow]
     \begin{enumerate}[label=\arabic*)]%TODO: schöner!
       \item \textcolor{blue}{\textbf{\textit{k} Aufrufe des JIT-Codes.}}
-      \pause
       \item Ver-UND-en aller Ergebnisvektoren.
       \item Suche nach dem ersten gesetzten Bit.
     \end{enumerate}
@@ -421,7 +419,7 @@
   
   \only<2-5>{\end{transparent}}
 
-  \only<2>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+  \only<2>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Einstieg in die Funktion,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
@@ -429,12 +427,12 @@
       numbers=left,
       texcl=true,
       xleftmargin=5.0ex,
-      basicstyle=\tiny\ttfamily,
+      basicstyle=\normalsize\ttfamily,
       keywordstyle=\bfseries\color{red},
       commentstyle=\itshape\color{grey},
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
-      numberstyle=\tiny,
+      numberstyle=\small,
       linerange={3-5},
       firstnumber=3
       ]
@@ -444,7 +442,7 @@
     \end{tcolorbox}
   \end{textblock*}}
   
-  \only<3>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+  \only<3>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Wurzelknoten: Vergleich mit 5,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
@@ -452,12 +450,12 @@
       numbers=left,
       texcl=true,
       xleftmargin=5.0ex,
-      basicstyle=\tiny\ttfamily,
+      basicstyle=\normalsize\ttfamily,
       keywordstyle=\bfseries\color{red},
       commentstyle=\itshape\color{grey},
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
-      numberstyle=\tiny,
+      numberstyle=\small,
       linerange={8-10},
       firstnumber=8
       ]
@@ -467,7 +465,7 @@
     \end{tcolorbox}
   \end{textblock*}}
   
-  \only<4>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+  \only<4>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Vergleich mit 8,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
@@ -475,12 +473,12 @@
       numbers=left,
       texcl=true,
       xleftmargin=5.0ex,
-      basicstyle=\tiny\ttfamily,
+      basicstyle=\normalsize\ttfamily,
       keywordstyle=\bfseries\color{red},
       commentstyle=\itshape\color{grey},
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
-      numberstyle=\tiny,
+      numberstyle=\small,
       linerange={12-14},
       firstnumber=12
       ]
@@ -490,7 +488,7 @@
     \end{tcolorbox}
   \end{textblock*}}
   
-  \only<5>{\begin{textblock*}{64mm}(32mm,0.25\textheight)
+  \only<5>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: 3. Bitvektor,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
@@ -498,12 +496,12 @@
       numbers=left,
       texcl=true,
       xleftmargin=5.0ex,
-      basicstyle=\tiny\ttfamily,
+      basicstyle=\normalsize\ttfamily,
       keywordstyle=\bfseries\color{red},
       commentstyle=\itshape\color{grey},
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
-      numberstyle=\tiny,
+      numberstyle=\small,
       linerange={16-18},
       firstnumber=16
       ]
@@ -588,7 +586,7 @@
 
 \subsection{\scshape Allgemeine Ergebnisse}
 \begin{frame}
-  \begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Wichtigste Ergebnisse,drop fuzzy shadow]
+  \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Wichtigste Ergebnisse,drop fuzzy shadow]
     \begin{itemize}
       \item Verbesserung der Switch-Performance durch den Bitvector-Algorithmus.
       \item Implementierung eines Codegenerators für statische Regelsätze.
