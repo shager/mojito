@@ -57,7 +57,7 @@ mov $4, %rax
 pop %rbp
 retq
 ;Node E in tree:
-;Compate x < 8
+;Compare x < 8
 cmpq %rax, $8
 ;Jump over return statement
 jb $7

@@ -307,7 +307,7 @@
 \subsection{\scshape Laufzeitanalyse}
 \begin{frame}
   \frametitle{\insertsubsection}
-  $n:$ Anzahl der Regeln, $k:$ Anzahl der Headerfelder,\\$w:$ Registerbreite des Systems in bit.
+  $n:$ Anzahl der Regeln, $k:$ Anzahl der Headerfelder,\\$w:$ Registerbreite des Systems in Bit.
   \pause
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Erinnerung: Lineare Suche,drop fuzzy shadow]
   Die lineare Suche liegt in $\mathcal O(k \cdot n)$.
@@ -401,7 +401,7 @@
 \end{frame}
 
 \subsection{\scshape Generierter Code}
-\begin{frame} %TODO: check if correct, new figures of tree
+\begin{frame} %TODO: new figures of tree
   \only<2-7>{\begin{transparent}{0.4}}
   \only<-7>{\begin{multicols}{3}
   \lstinputlisting[
@@ -423,7 +423,7 @@
   \only<2-7>{\end{transparent}}
 
   \only<2>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Eingabe in die Funktion: 2,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Eingabe in die Funktion: 4,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -436,8 +436,8 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={3-5},
-      firstnumber=3
+      linerange={2-5},
+      firstnumber=2
       ]
       {jit_listing.asm}
       \tcblower
@@ -459,8 +459,8 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={8-10},
-      firstnumber=8
+      linerange={7-10},
+      firstnumber=7
       ]
       {jit_listing.asm}
       \tcblower
@@ -469,7 +469,7 @@
   \end{textblock*}}
   
   \only<4>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Vergleich mit 1,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten B: Vergleich mit 1,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -482,8 +482,8 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={21-23},
-      firstnumber=21
+      linerange={20-23},
+      firstnumber=20
       ]
       {jit_listing.asm}
       \tcblower
@@ -492,7 +492,7 @@
   \end{textblock*}}
   
   \only<5>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Vergleich mit 3,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten D: Vergleich mit 3,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -516,7 +516,7 @@
   
 
   \only<6>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: 3. Bitvektor,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten D: Vergleich mit 3,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -539,7 +539,7 @@
   \end{textblock*}}
   
   \only<7>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: 3. Bitvektor,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: Index 1,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -552,7 +552,7 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={37-40},
+      linerange={41-44},
       firstnumber=37
       ]
       {jit_listing.asm}
