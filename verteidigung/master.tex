@@ -297,6 +297,7 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{\scshape Zusammenfügen der Ergebnisse}
   \begin{figure}
   \centering
   \includegraphics[height=0.7\textheight]{figures/matching} %TODO: layer?
@@ -315,14 +316,14 @@
   \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Bitvector-Algorithmus,drop fuzzy shadow]
   \begin{itemize}[leftmargin=0cm]
     \item[]<3-> Binäre Suche auf $k$ Headerfeldern,
-    \item[]<4-> bitweises ver-UND-en der $n$ Bitvektoren,
+    \item[]<4-> bitweises ver-UND-en der $k$ Bitvektoren,
     \item[]<5-> Suche nach dem ersten gesetzten Bit im Ergebnisvektor.
   \end{itemize}
   \centering
   \begin{equation*}
   \mathcal O(k \cdot log\ n \onslide<4->{+ \frac{n}{w} \cdot (k - 1)} \onslide<5->{ + n})
   \end{equation*}
-  \end{tcolorbox}%TODO: evtl erst grau dann aufdecken
+  \end{tcolorbox}
 \end{frame}
 
 \section{\scshape Die JIT-Komponente}
@@ -356,6 +357,7 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{\scshape Die Schritte beim Lookup}
   \begin{columns}[T] % align columns
     \begin{column}{.48\textwidth}
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Standard Bitvector,drop fuzzy shadow]
