@@ -280,8 +280,8 @@
   \begin{figure}
   \hspace*{-4cm}
   \centering
-  \includegraphics<1>[height=0.9\textheight]{figures/bitvector-L1-7_9_11_13_15}
-  \includegraphics<2>[height=0.9\textheight]{figures/bitvector-L1-7_9_12_14_16}
+  \includegraphics<1-2>[height=0.9\textheight]{figures/bitvector-L1-7_9_11_13_15}
+  \includegraphics<3-4>[height=0.9\textheight]{figures/bitvector-L1-7_9_12_14_16}
   \end{figure}
   \begin{tikzpicture}[remember picture,overlay]  
     \node [xshift=-3.5cm,yshift=-2cm] at (current page.north east) {
@@ -289,20 +289,36 @@
         Paket&Quelle&Ziel\\
         \hline
         P\ 1&4&4\\
-        \only<1>{\color{white}}P\ 2&
-          \only<1>{\color{white}}14&
-          \only<1>{\color{white}}7\\
+        \only<1-2>{\color{white}}P\ 2&
+          \only<1-2>{\color{white}}14&
+          \only<1-2>{\color{white}}7\\
       \end{tabularx}};
+  \end{tikzpicture}
+  \begin{tikzpicture}[remember picture,overlay]  
+    \node [xshift=-3.5cm,yshift=4cm] at (current page.south east) {
+      \only<1-2>{\begin{tabularx}{0.15\textwidth}{ll}
+        \only<1>{\color{white}}Quelle&\only<1>{\color{white}}1 1 0\\
+        \only<1>{\color{white}}Ziel&\only<1>{\color{white}}1 1 0\\
+        \only<1>{\color{white}}\Large\&&\\
+        \only<1>{\color{white}}Ergebnis&\only<1>{\color{white}}\only<2>{\color{red}}1 1 0\\
+      \end{tabularx}}
+      \only<3-4>{\begin{tabularx}{0.15\textwidth}{ll}
+        \only<3>{\color{white}}Quelle&\only<3>{\color{white}}0 0 0\\
+        \only<3>{\color{white}}Ziel&\only<3>{\color{white}}1 0 0\\
+        \only<3>{\color{white}}\Large\&&\\
+        \only<3>{\color{white}}Ergebnis&\only<3>{\color{white}}\only<4>{\color{blue}}0 0 0\\
+      \end{tabularx}}
+      };
   \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
-  \frametitle{\scshape Zusammenfügen der Ergebnisse}
-  \begin{figure}
-  \centering
-  \includegraphics[height=0.7\textheight]{figures/matching} %TODO: layer?
-  \end{figure}
-\end{frame}
+%\begin{frame}
+%  \frametitle{\scshape Zusammenfügen der Ergebnisse}
+%  \begin{figure}
+%  \centering
+%  \includegraphics[height=0.7\textheight]{figures/matching} %TODO: layer?
+%  \end{figure}
+%\end{frame}
 
 \subsection{\scshape Laufzeitanalyse}
 \begin{frame}
