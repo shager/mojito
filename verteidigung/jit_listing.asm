@@ -48,7 +48,7 @@ cmpq %rax, $11
 ;Goto Node E
 jb $21
 ;Node F in tree:
-;Compare x < 13
+;Compare x >= 13
 cmpq %rax, $13
 ;Goto return statement
 jae $35

@@ -333,11 +333,11 @@
   \begin{itemize}[leftmargin=0cm]
     \item[]<3-> Binäre Suche auf $k$ Headerfeldern,
     \item[]<4-> bitweises ver-UND-en der $k$ Bitvektoren,
-    \item[]<5-> Suche nach dem ersten gesetzten Bit im Ergebnisvektor.
+    \item[]<5-> Suche nach dem ersten gesetzten Bit im Ergebnisvektor:
   \end{itemize}
   \centering
   \begin{equation*}
-  \mathcal O(k \cdot log\ n \onslide<4->{+ \frac{n}{w} \cdot (k - 1)} \onslide<5->{ + n})
+  \mathcal O(k \cdot log\ n \onslide<4->{+ \frac{n}{w} \cdot (k - 1)} \onslide<5->{ + n}).
   \end{equation*}
   \end{tcolorbox}
 \end{frame}
@@ -417,7 +417,7 @@
 \end{frame}
 
 \subsection{\scshape Generierter Code}
-\begin{frame} %TODO: new figures of tree
+\begin{frame} %TODO: figures of tree with "14" packet, Node B: fix comments!
   \only<2-7>{\begin{transparent}{0.4}}
   \only<-7>{\begin{multicols}{3}
   \lstinputlisting[
@@ -439,7 +439,7 @@
   \only<2-7>{\end{transparent}}
 
   \only<2>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Eingabe in die Funktion: 4,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Eingabe in die Funktion: 14,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -485,7 +485,7 @@
   \end{textblock*}}
   
   \only<4>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten B: Vergleich mit 1,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Wurzelknoten: Vergleich mit 8,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -498,17 +498,17 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={20-23},
-      firstnumber=20
+      linerange={11-14},
+      firstnumber=11
       ]
       {jit_listing.asm}
       \tcblower
-      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_9_11}}
+      \centering{\includegraphics[height=0.35\textheight]{figures/match_in_tree-L1_6_9}}
     \end{tcolorbox}
   \end{textblock*}}
   
   \only<5>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten D: Vergleich mit 3,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten C: Vergleich mit 11,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -521,8 +521,8 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={25-27},
-      firstnumber=25
+      linerange={46-49},
+      firstnumber=46
       ]
       {jit_listing.asm}
       \tcblower
@@ -532,7 +532,7 @@
   
 
   \only<6>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten D: Vergleich mit 3,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Knoten F: Vergleich mit 13,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -545,8 +545,8 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={34-36},
-      firstnumber=34
+      linerange={52-54},
+      firstnumber=52
       ]
       {jit_listing.asm}
       \tcblower
@@ -555,7 +555,7 @@
   \end{textblock*}}
   
   \only<7>{\begin{textblock*}{64mm}(32mm,0.15\textheight)
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: Index 1,drop fuzzy shadow]
+    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Ergebnis: Index 5,drop fuzzy shadow]
     \lstinputlisting[
       language={[x86masm]Assembler},
       breaklines=true,
@@ -568,8 +568,8 @@
       identifierstyle=\color{blue},
       morekeywords={retq,cmpq},
       numberstyle=\small,
-      linerange={41-44},
-      firstnumber=37
+      linerange={77-80},
+      firstnumber=77
       ]
       {jit_listing.asm}
       \tcblower
