@@ -7,7 +7,7 @@ process = 0
 
 def fetch_remote_udp_count():
     tmp_name = "____________SOME_CRAZY_NAME___________________"
-    cmd = "../../oldrepo/mininet/util/m h2 netstat -s -u | grep Udp: -A 2 | grep -o -E [0-9]+ | awk '{sum = sum + $1} END {print sum}' > %s" % tmp_name
+    cmd = "ssh praktikum@192.168.30.107 netstat -s -u | grep Udp: -A 2 | grep -o -E [0-9]+ | awk '{sum = sum + $1} END {print sum}' > %s" % tmp_name
     os.system(cmd)
     with open(tmp_name, "r") as tmp:
         content = tmp.read()
@@ -17,7 +17,7 @@ def fetch_remote_udp_count():
 def execute_on_host(hostname, call_string):
     try:
         #print "../../mininet/util/m " + str(hostname) + " " + str(call_string)
-        retval = os.system("../../oldrepo/mininet/util/m " + str(hostname) + " " + str(call_string))
+        retval = os.system("ssh " + str(hostname) + " " + str(call_string))
     except subprocess.CalledProcessError:
         print "Error with command " + str(call_string) + " on host " + str(hostname) + "."
         retval = ""
@@ -25,10 +25,10 @@ def execute_on_host(hostname, call_string):
 
 # add default entry in routing table of receiver
 def set_routing_table():
-    execute_on_host("h2", "route add default gw 10.0.0.1 h2-eth0")
+    execute_on_host("praktikum@192.168.30.107", "sudo route add default gw 10.0.0.1 eth7")
 
 def run_sender(tracefile):
-    execute_on_host("h1", "timeout 10s /home/samuel/mojito/eval/sender /home/samuel/mojito/eval/" + str(tracefile) + " yes" + " no")
+    os.system("timeout 10s ./sender " + str(tracefile) + " yes" + " no")
 
 def get_netstat(host):
     netstat_output = execute_on_host(host, "netstat -s -u")
@@ -59,6 +59,12 @@ def stop_mininet():
     process = subprocess.Popen("mn -c", stdout=devnull, stderr=devnull, shell=True)
     process.wait()
     print "Mininet stopped."
+
+def start_switch():
+    execute_on_host("fpga@192.168.30.101", "sudo nohup sdn_paper/ofdatapath -i eth1,eth2,eth3,eth4 ptcp:localhost:6633 --no-slicing -D &")
+
+def stop_switch():
+    execute_on_host("fpga@192.168.30.101", "sudo killall ofdatapath")
 
 def main():
     #parse options
@@ -92,10 +98,12 @@ def main():
         rnd_trace = filename[filename.find("_", filename.find("2_")+2)+1:filename.find(".")]
 #        for run in range(0, 1):
         while True:
-            start_mininet()
-            print "Started mininet"
+            #start_mininet()
+            #print "Started mininet"
+            start_switch()
+            print "Started switch"
             insert_rules_in_switch("rulesets/" + filename, case)
-            set_routing_table()
+            #set_routing_table()
             
             old_udp_count = fetch_remote_udp_count()
             start = time.time()
@@ -110,7 +118,9 @@ def main():
 #            remote_udp = fetch_remote_udp_count()
             print "Packets received: " + str(pkg_count)
             packets.append(pkg_count)
-            stop_mininet()
+#            stop_mininet()
+            stop_switch()
+            stop_switch()
             break
         
         outfile = open(outfile_name, 'a')

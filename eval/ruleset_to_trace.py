@@ -7,7 +7,7 @@ from optparse import OptionParser
 import os, subprocess
 
 def deploy_rule(dpctl_args):
-    subprocess.call("/usr/local/bin/dpctl " + dpctl_args, shell=True)
+    subprocess.call("ssh fpga@192.168.30.101 sdn_paper/dpctl " + dpctl_args, shell=True)
 
 def write_lines_to_casefile(lines, filename):
     # do nothing if file exists
@@ -45,22 +45,24 @@ def main():
 
     ruleset = read_file(infile)
 
-    deploy_rule("add-flow tcp:127.0.0.1:6634 arp,idle_timeout=0,actions=all")
-    #deploy_rule("add-flow tcp:127.0.0.1:6634 nw_proto=2,idle_timeout=0,actions=all")
+    print "Deploy ARP rule..."
+    deploy_rule("add-flow tcp:127.0.0.1:6633 arp,idle_timeout=0,actions=all")
+    print "...done!"
+    #deploy_rule("add-flow tcp:127.0.0.1:6633 nw_proto=2,idle_timeout=0,actions=all")
 
     for rule in ruleset:
         if rule == "":
             continue
         values = rule.split(" ")
-        if values[4] == "-": #input port not specified
-            deploy_rule("add-flow tcp:127.0.0.1:6634 nw_src=" + values[0]  + ",nw_dst="
+        #if values[4] == "-": #input port not specified
+        deploy_rule("add-flow tcp:127.0.0.1:6633 nw_src=" + values[0]  + ",nw_dst="
                 + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
                 ",nw_proto=" + values[5] + ",ip,idle_timeout=0,actions=" + values[6])
-        else:
-            deploy_rule("add-flow tcp:127.0.0.1:6634 nw_src=" + values[0]  + ",nw_dst="
-                + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
-                ",in_port=" + values[4]  + ",nw_proto=" + values[5] + 
-                ",ip,idle_timeout=0,actions=" + values[6])
+        #else:
+        #    deploy_rule("add-flow tcp:127.0.0.1:6633 nw_src=" + values[0]  + ",nw_dst="
+        #        + values[1] + ",tp_src=" + values[2] + ",tp_dst=" + values[3] + 
+        #        ",in_port=" + values[4]  + ",nw_proto=" + values[5] + 
+        #        ",ip,idle_timeout=0,actions=" + values[6])
 
     if case == "b":
         tracefile = infile + ".bcase"

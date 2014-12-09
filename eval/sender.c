@@ -103,6 +103,8 @@ Input* read_trace_file(char* filename, int worst_case) {
         &src_ip, &dst_ip,
         &src_port, &dst_port);
 
+    //printf("Src IP: %d\n", src_ip);
+    //printf("Dst IP: %d\n", dst_ip);
     input->src_ips[i] = htonl(src_ip);
     input->dst_ips[i] = htonl(dst_ip);
     input->src_ports[i] = worst_case ? htons(65535) : htons(src_port);
@@ -163,7 +165,7 @@ main (int argc, char **argv)
   ip_flags = allocate_intmem (4);
 
   // Interface to send packet through.
-  strcpy (interface, "h1-eth0");
+  strcpy (interface, "eth5");
 
   // Submit request for a socket descriptor to look up interface.
   if ((sd = socket (AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
