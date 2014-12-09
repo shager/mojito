@@ -30,15 +30,6 @@ def set_routing_table():
 def run_sender(tracefile):
     os.system("timeout 10s ./sender " + str(tracefile) + " yes" + " no")
 
-def get_netstat(host):
-    netstat_output = execute_on_host(host, "netstat -s -u")
-#    print netstat_output
-    lines = netstat_output.split("\n")
-    for line in lines:
-        if line.find("packets to unknown port received") != -1:
-            return line.strip().split(" ")[0]
-    return 0
-
 def insert_rules_in_switch(ruleset, case):
     ruleset = ruleset[:-12]
     print "Ruleset = " + ruleset
