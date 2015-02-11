@@ -521,7 +521,7 @@ performance advantages of instance-specific native code.
 % For peerreview papers, this IEEEtran command inserts a page break and
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
-\vspace{-0.4cm}
+%\vspace{-0.4cm}
 \section{Introduction}
 \label{sec:intro}
 %text here
@@ -558,17 +558,20 @@ Due to the characteristics of packet switched networks, every station in the pat
 has to decide for each packet which action to execute.
 Typical actions are DROP, REJECT, OUTPUT(\textit{port}), MODIFY and ACCEPT.
 The packet classification problem can be modeled by the following formal description:
-A packet header $H$ comprises of a $k$-tuple of non-negative integers.
-These integers are elements from a set $S_i,\ 1 \leq i \leq k$, which describes the range of possible values for a header field.
-A rule constitutes of a set $R$ of at most $k$ boolean functions
-$F_i:\ S_i \rightarrow \{true, false\},\ 1 \leq i \leq k$ and an action $A$.
-That means that each rule holds an interval for every header field.
-If $H_i \in R_i,\ 1 \leq i \leq k$ for a packet header $H$, the packet matches the rule and action $A$ will be executed.
-A rule set is an ordered list $C$ of multiple rules $R$.
-Finding the first rule $R \in C$ so that $H$ matches 
-$R$ is called the packet classification problem.\footnote{FIXME: reference}
+A packet header $H$ consists of a $k$-tuple of non-negative integers representing header fields $H_i$.
 
-%FIXME: diese anmerkung wurde kaum umgesetzt
+A rule $R$ is a set of at most $k$ intervals, each a subset $R_i$ of the 
+corresponding possible header field range and an Action $A$.
+For example, a TCP port interval may be every subset of the range $[0, 65536)$.
+That means that each rule holds an interval for every header field.
+A rule set is an ordered list of multiple rules $R$.
+For classification, a packet with header $H$ arrives and every rule $R$ is checked if
+$H_i \in R_i,\ 1 \leq i \leq k$.
+When this is true for all $i$, the packet matches the rule and action $A$ will be executed.
+Finding the first rule $R$ so that $H$ matches in a given rule set is called 
+the packet classification problem~\cite{taylor2005survey}.
+
+%FIXME: diese anmerkung von Sven wurde kaum umgesetzt
 \subsection{Scope of the Implementation}
 The emphasis lies on optimizing a classifier executing this process.
 Many rule sets require five header fields for matching: source 
@@ -593,7 +596,7 @@ The OpenFlow software switch uses twelve header fields per rule.
 Speeding up packet classification is an important research topic in the computer network community since the 1990s.
 Therefore, several algorithms have been developed in the last 
 years~\cite{algorithms_survey}, including the usage of tries~\cite{tries}, 
-hash maps\footnote{FIXME: reference}, decision trees~\cite{hicuts, efficuts, hypercuts} or divide 
+hash maps~\cite{taylor2005survey}, decision trees~\cite{hicuts, efficuts, hypercuts} or divide 
 and conquer strategies~\cite{bv}.
 Most of these algorithms perform significantly faster than searching the 
 matching rule in a linear list.
@@ -619,17 +622,18 @@ Similarly to this work when using OpenFlow 1.0.0~\cite{openflow_spec10}
 the authors of that publication also faced the challenge to improve the efficiency 
 of packet classification on more than the usual five-tuple of header fields.
 
-Other research groups focus on implementing wire speed packet matching in (programmable) hardware instead of software.
+Other research groups focus on implementing wire-speed packet matching in (programmable) hardware instead of software.
 The bitvector approach has been evaluated in FPGAs~\cite{bitvector_fpga, qu2013fast}.
-However, those publications mainly focus on five-tuple rule sets, which decreases 
-the complexity of the problem compared to a twelve-tuple.
+However, those publications focus on hardware-based classification, which decreases 
+the flexibility of the matching engine once produced.
+Furthermore the production costs for special hardware are significantly high compared to software solutions.
 
 Further improvement on the bitvector algorithm includes the elimination of the linear processing of the resulting bitvectors itself:
 When all dimensions are matched and the resulting bitvectors are retrieved, 
-these vectors have to be ANDed bit per bit until a one bit is found.
+these vectors have to be ANDed bit per bit until a 1-bit is found.
 This results in a worst case time complexity of $\mathcal O(n)$, with $n$ being the number of rules.
 The aggregated bitvector algorithm implements a hierarchical system 
-of bitvectors with fixed length and performs lookups in less memory accesses~\cite{abv}.
+of bitvectors with fixed length and performs lookups using a lower number of memory accesses~\cite{abv}.
 However, more memory space is needed to store the bitvectors of the respective hierarchies.
 
 Another approach to improve matching performance in a packet filter is to reorganize the rule set.
@@ -663,21 +667,28 @@ to the next section which checks the source and destination addresses.
 From there, a jump might go out to a section which evaluates rules for transport protocols and so on.
 Generally, that process is considerably faster than a linear search for matches in a list.
 Nevertheless, the algorithms tuned by a JIT compiler are relatively simple so far.
-The algorithm used in this work however follows a more complex divide and conquer strategy and a JIT compiled optimization 
+The algorithm used in this work however follows a more complex divide and conquer strategy, and a JIT-compiled optimization 
 to the bitvector approach is new.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/hypercubes}
+    \caption{Three two-dimensional hyper cubes.}
+    \label{fig:cubes}
+\end{figure}
 
 \section{The Bitvector Algorithm}
 \subsection{General Description}
-\label{sec:bv-general} %FIXME: hypercube-Bild
+\label{sec:bv-general}
 The bitvector algorithm~\cite{bv} is an efficient solution to the packet 
 classification problem, which is designed for matching multi-dimensional header data in a short amount of time.
 The basic idea of the algorithm is based on a divide and conquer approach in 
 which each relevant header field is classified in isolation.
 One way to visualize this method is to think of the rule set as a set of multi-dimensional hyper cubes.
+Figure~\ref{fig:cubes} shows three partially overlapping two-dimensional cubes.
 Each header field represents one dimension in this geometric object, so 
-that every hyper cube (which represents exactly one rule) has got as many dimensions as the packet matching engine is operating on.
+that every hyper cube (which represents exactly one rule) has as many dimensions as the packet matching engine is operating on.
 The projection of one rule in one dimension is therefore an interval between two integers.
-These delimiting integers are determined by projecting the hyper cube onto the relevant dimension.
 If hyper cubes (and their respective rules) are overlapping, one point in this dimension can be the target of multiple cubes' projections. 
 This property leads to a model, where for any given point in a matching
 dimension, there is a set of cubes (and therefore rules) that are projected on intervals containing this point.
@@ -693,11 +704,11 @@ This construction is done in every dimension for all intervals.
 
 As an illustrating example, consider packet headers consisting only of a source and a destination address.
 These addresses are four bit wide each.
-For example, the rule set in Table~\ref{tab:rules}is a possible rule set in this scenario:
-%FIXME: evtl den Satz umbauen?
+For example, the rule set in Table~\ref{tab:rules} is a possible rule set in this scenario.
 
 \begin{table}
 \centering
+  \caption{Rule set used as a running example}
   \begin{tabularx}{0.48\textwidth}{c|X|X}
   Rule&Source Addresses&Destination Addresses\\
   \hline
@@ -705,7 +716,6 @@ For example, the rule set in Table~\ref{tab:rules}is a possible rule set in this
   2&1 -- 5&2 -- 5\\
   3&8 -- 13&0 -- 3\\
   \end{tabularx}
-\caption{Rule set used as a running example.}
 \label{tab:rules}
 \end{table}
 
@@ -714,7 +724,7 @@ Each rectangle (a two-dimensional hyper cube) represents one of the rules.
 Corresponding bitvectors are displayed at every interval on the axis of the coordinate system.
 These vectors store the information which rules are matching in the interval.
 
-When two or more rules are overlapping (in this example rules 1 and 2 happen 
+When two or more rules overlap (in this example rules 1 and 2 happen 
 to overlap) the bitvectors display the validity of both rules in the affected area.
 Therefore, there has to be a preference expression in the bitvector algorithm, 
 if rules with different priorities are inserted.
@@ -722,42 +732,40 @@ A common way to implement this preference is to assign smaller rule numbers to h
 In this example, rule R1 is higher prioritized than R2 or R3.
 
 \subsection{Lookup}
-When classifying a packet with the bitvector algorithm, one has to determine a point to look up in every matching dimension.
-The coordinates of these points are header data.
-After all relevant points are determined, the lookup process works as follows:
+For classifying a packet with the bitvector algorithm, one has to determine a point to look up in every matching dimension.
+The coordinates of this k-dimensional point are the header data of the packet to match.
+When that point is determined, the lookup process works as follows:
 at first, there is a search for the target point in every dimension.
 This search returns the matching interval (constructed when inserting the rules) of the search space.
 That interval contains the relevant bitvector with $n$ bit length, where $n$ is the size of the rule set.
 
-Again, the example from Figure~\ref{fig:bv-lookup} will be considered.
+Again, consider the example from Figure~\ref{fig:bv-lookup}.
 Assume that packets P1 with header data $(4, 4)$ and P2 with header data $(14, 7)$ arrive at the switch.
 For P1, the source address bitvector can be looked up by finding the
 bitvector left of the point $4$ on the source address axis.
 The same process applies for the destination address.
 In case of P1, the algorithm thus returns the bitvector $(1, 1, 0)$ in the 
 source address dimension and the bitvector $(1, 1, 0)$ in the other dimension.
-Figure~\ref{fig:bv-lookup} holds a graphical representation of this process.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{images/bitvector-L1_3}
 \caption{Looking up packets P1 and P2.}
 \label{fig:bv-lookup}
-\vspace{-0.5cm}
+%\vspace{-0.5cm}
 \end{figure}
 
-The same lookup process can be done for P2, which returns the $(0, 0, 0)$ and $(1, 0, 0)$ bitvectors.
+The same lookup process can be done for P2, which returns the bitvectors $(0, 0, 0)$ and $(1, 0, 0)$.
 As one can easily see, in case of P2 there exists no matching rule for both dimensions,
 which will be determined by the next step of the algorithm.
 
-Finally, all bitvectors from all dimensions are aggregated by a bitwise AND-operation.
+Finally, all bitvectors from all dimensions are aggregated by a bitwise AND operation.
 The resulting vector then indicates by a $1$ at position $p$ that the packet has matched rule $p$.
-Generally, there can be one or more matching rules, for example when default rules exist, that match every packet.
+Generally, there can be one or more matching rules, for example when default rules exist that match every packet.
 In the example from above, this case occurs with packet P1, where rules R1 and R2 are matching.
 In order to determine the most prioritized matching rule, the resulting 
 bitvector is then searched for the leftmost set bit, which is the first bit standing for R1 in the example from above.
-The index of the leftmost set bit represents the highest priority rule as explained in Section~\ref{sec:bv-general}
-and determines the first matching rule.
+The position of the leftmost set bit determines the first matching rule.
 After that, the actions defined in the rule can be executed by the network device.
 
 %For a brief runtime analysis, let $n$ be the number of rules in the rule set, 
@@ -770,18 +778,15 @@ After that, the actions defined in the rule can be executed by the network devic
 %The implementation in this thesis uses 64 bit wide integers and a binary search with $C_s = \mathcal O(log\ n)$.
 
 \section{Implementation}
-\subsection{Bitvector Implementation Details}
-In this thesis, the bitvector algorithm has been implemented in C.
+\subsection{Bitvector Implementation}
+We implemented the bitvector algorithm in the OpenFlow reference switch.
 The bitvectors are stored in a structure that points to the delimiting edge
 between rule intervals.
-On insertion of a new rule, all existing bitvectors are extended to the new length and new bitvectors 
-are created, if necessary.
+On insertion of a new rule, all existing bitvectors are extended to the new length.
+New bitvectors are created as necessary.
 The search algorithm used for locating a match in a dimension in the bitvector 
 data structure is a binary search, which returns the nearest left bitvector from the point where 
 the header data point is located.
-%This bitvector has a length of $n$ bit, where $n$ is the size of the rule set.
-%If no bitvector is matching, a null vector is returned.
-%FIXME: braucht man evtl trotzdem noch
 
 \subsection{JIT Lookup}
 To further speed up the lookup process, another optimization has been implemented.
@@ -789,7 +794,7 @@ In theory, packet classification is done by a function that depends on the packe
 The rule set is static when a packet is classified.
 Thus, with partial evaluation~\cite{partial_eval}, a function $class'(p)$ can be constructed that depends only on the packet as input.
 Otherwise, $class'(p)$ behaves exactly like $class(p, r)$ for a specific $r$:
-$$class(p, r) = class'_r(p),\ \forall p$$
+$$\forall p: class(p, r) = class'_r(p),$$
 $class'$ differs from $class$ because each operation in $class$ that depends on the 
 rule set $r$ is exchanged by an operation with the specific values that $r$ currently holds.
 This mapping from $class$ to $class'$ is called the First Futamura projection~\cite{DBLP:journals/ngc/MogensenH88}.
@@ -819,7 +824,7 @@ With that knowledge, the compiler can emit a function $\textsc{F}'(x)$, as liste
 \label{alg:futamura-f-optimized}
 \end{algorithm}
 
-This optimization can be applied at the packet classification problem, too.
+This optimization can be applied to the packet classification problem, too.
 At each lookup, the algorithm has to perform a binary search on the bitvectors' 
 locations in each dimension in order to find the matching bitvector for the current packet.
 These locations can be interpreted as delimiters between the realms of the bitvectors.
@@ -844,22 +849,21 @@ dimension when given the header value to be matched.
 \label{fig:bv-tree}
 \end{figure}
 
-The function is designed to have zero memory accesses when looking up header 
-values after it is loaded.
-Therefore, it performs the binary search only on precomputed values, which 
-leads to the necessity of rebuilding the function at every rule set update.
-%The assembly code generated from the example rule set of Table~\ref{table:bv_ruleset} is printed in Listing~\ref{lst:jit} in the Appendix.
-Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
+%The function is designed to have zero memory accesses when looking up header 
+%values after it is loaded.
+%Therefore, it performs the binary search only on precomputed values, which 
+%leads to the necessity of rebuilding the function at every rule set update.
+%%The assembly code generated from the example rule set of Table~\ref{table:bv_ruleset} is printed in Listing~\ref{lst:jit} in the Appendix.
+%Clearly, that leads to a performance disadvantage for fast changing rule sets at the benefit of having generally faster lookups.
 
-Implementing that functionality has lead to a just-in-time generated function written in machine 
-language.
-Every assembly instruction was split up into its respective opcodes following the 
-Intel 64 and IA-32 Architectures Software Developer Manuals~\cite{intelsys}.
-For example, the opcodes for the instruction 
-\textsf{mov \%rsp,\%rbp} (Copying the value of the stack pointer to the base pointer) 
-are $\texttt{0x48}, \texttt{0x89}, \texttt{0xE5}$.
-After that, these generated opcodes were copied into an executable memory block and a function pointer to that block has been returned.
-The example shows that bitvector $-1$ is never returned by the JIT compiled code.
+Implementing that functionality has led to a just-in-time generation of x86\_64 machine code.
+%Every assembly instruction was split up into its respective opcodes following the 
+%Intel 64 and IA-32 Architectures Software Developer Manuals~\cite{intelsys}.
+%For example, the opcodes for the instruction 
+%\textsf{mov \%rsp,\%rbp} (Copying the value of the stack pointer to the base pointer) 
+%are $\texttt{0x48}, \texttt{0x89}, \texttt{0xE5}$.
+The generated machine code is copied into an executable memory block and a function pointer to that block has been returned.
+The example shows that the leftmost bitvector is never returned by the JIT compiled code.
 In this implementation, a separate check if a match is the first existing bitvector or the null 
 vector is done by the calling function.
 
@@ -870,8 +874,8 @@ zero as the lower bound of operation and the last index in the delimiters array 
 Its return value is the length of newly written bytes to the executable memory in order to perform relative jumps over entire code blocks.
 
 Every time \textsc{EmitCode} is called in Algorithm~\ref{alg:jit}, the opcodes 
-of the corresponding assembler instruction are looked up and appended to a segment of executable memory.
-Due to working in an Intel microprocessor, numeral arguments have to be 
+of the corresponding assembler instruction are appended to a segment of executable memory.
+Due to working on an Intel microprocessor, numeral arguments have to be 
 transformed into little-endian byte order in the \textsc{EmitCode} function.
 
 \begin{algorithm}
@@ -904,59 +908,13 @@ transformed into little-endian byte order in the \textsc{EmitCode} function.
 \caption{Algorithm to create the JIT-compiled function.}
 \label{alg:jit}
 \end{algorithm}
-\vspace{-0.5cm}
+
 \section{Evaluation}
 \subsection{Acceptance Test}
 An important goal in every software project is to ensure that the program operates correctly.
 In this project the matching engines have been tested separately before integrating them into the OpenFlow switch.
 They can easily be exchanged when compiling the OpenFlow switch.
 In addition, the just-in-time code generator has been tested independently to work properly.
-
-In order to guarantee the correctness of the two new implementations, a predefined acceptance test was developed.
-A reasonable assumption is, that under the condition of a fixed rule set and 
-a corresponding trace, the old and new implementations are behaving the same.
-This was tested by deriving traces from randomly generated rule sets using 
-the Classbench~\cite{classbench_website} tool \textit{trace\_generator}.
-For each implementation, there was a virtual network set up with ten hosts and a switch connecting them in a star topology.
-The generated traces were then fed into the switch with 50\ ms delay between each packet from a particular host.
-After finishing this test, each host was queried on how many packets arrived there.
-All implementations generated the same packet statistics on the hosts, therefore it is assumed they are behaving correctly.
-
-\subsection{Performance Evaluation}
-
-The performance evaluation of the newly implemented matching algorithms has 
-been executed in a virtual environment created by the \textit{mininet}~\cite{mininet} tool.
-It provides an easily usable and lightweight virtual network on a local computer.
-It creates two new local interfaces (virtual hosts) and connects them through 
-a local OpenFlow switch.
-Rule set updates are done via a command line call of the tool \textit{dpctl}.
-The evaluation system is a computer with a quad core Intel Xeon E3-1270 v3 CPU 
-running at 3.5\ GHz and 16\ GB of RAM providing an Ubuntu Linux 14.04 LTS.
-This computer was otherwise idle when performing the tests.
-
-\subsubsection{Matching Performance}
-The evaluation of the matching performance was set up in the following way.
-Due to the utilization of random seeds the entire process is reproducible.
-\begin{itemize}
-    \item Creation of different sized rule sets from 100 to 3500 rules.
-        For measuring average performances there are ten different rule sets created for every rule set size.
-    %%\item Generating good, average and bad case sub-rule sets. 
-    %%    Each original rule set is split into thirds and each of them is saved separately as a sub-rule set.
-    \item Generating traces for every rule set.
-        Using the Classbench~\cite{classbench_website} tool, a packet trace is generated for each rule set.
-\end{itemize}
-
-A packet trace consists of header data like IP addresses, transport and Internet protocols et cetera.
-Every trace entry can be translated into a UDP packet that is sent into the OpenFlow switch.
-The performance was tested by looping through every generated trace for ten seconds and sending packets through the switch.
-After that time the number of received packets was measured on the destination host.
-
-The results in Figure~\ref{fig:eval_bad_case_relative} show that the list implementation
-clearly suffers from hard performance losses when inserting more rules.
-Both bitvector implementations outperform the linear search algorithm after inserting about 300 rules.
-The initial negative peak, just as the dent at 500 inserted rules, can be caused by an unfortunate rule set and trace combination.
-Additional manual tests were selectively performed to confirm the evaluation plots.
-With growing rule sets, the performance boost is clearly increasing up to a 30 fold increase.
 
 \begin{figure*}
     \centering
@@ -981,12 +939,60 @@ With growing rule sets, the performance boost is clearly increasing up to a 30 f
         \label{fig:eval-mem}
     \end{subfigure}
     \caption{An overview over the evaluation results.}
-    \vspace{-0.5cm}
+    %\vspace{-0.5cm}
 \end{figure*}
+
+In order to guarantee the correctness of the two new implementations, a predefined acceptance test was developed.
+For a given rule set, the old and new implementations should behave identically.
+This was tested by deriving traces from randomly generated rule sets using 
+the Classbench~\cite{classbench_website} tool \textit{trace\_generator}.
+For each implementation, a virtual network was set up with ten hosts and a switch connecting them in a star topology.
+The generated traces were then fed into the switch with 50\ ms delay between each packet from a particular host.
+After finishing this test, each host was queried how many packets arrived there.
+All implementations generated the same packet statistics on the hosts, therefore it is assumed they behave correctly.
+
+\subsection{Performance Evaluation}
+The performance evaluation of the newly implemented matching algorithms has 
+been executed in a virtual environment created by the \textit{mininet}~\cite{mininet} tool.
+It provides an easily usable and lightweight virtual network on a local computer.
+It creates two new local interfaces (virtual hosts) and connects them through 
+a local OpenFlow switch.
+Rule set updates are done via a command line call of the tool \textit{dpctl}.
+The evaluation system is a computer with a quad core Intel Xeon E3-1270 v3 CPU 
+running at 3.5\ GHz and 16\ GB of RAM providing an Ubuntu Linux 14.04 LTS.
+This computer was otherwise idle when performing the tests.
+
+\subsubsection{Matching Performance}
+The evaluation of the matching performance was set up in the following way.
+Due to the utilization of random seeds the entire process is reproducible.
+\begin{itemize}
+    \item Creation of different sized rule sets from 100 to 3500 rules.
+        For measuring average performances there are ten different rule sets created for every rule set size.
+    %%\item Generating good, average and bad case sub-rule sets. 
+    %%    Each original rule set is split into thirds and each of them is saved separately as a sub-rule set.
+    \item Generating traces for every rule set.
+        Using the Classbench~\cite{classbench_website} tool, a packet trace is generated for each rule set.
+\end{itemize}
+
+A packet trace consists of header data like IP addresses, transport protocols et cetera.
+Every trace entry can be translated into a packet that is sent into the OpenFlow switch.
+The performance was tested by looping through every generated trace for ten seconds and sending packets through the switch.
+After that time the number of received packets was measured on the destination host.
+
+Figure~\ref{fig:eval_bad_case_relative} shows, for a raising number of inserted rules,
+the performance ratio between the default list-based packet classification mechanism in
+the OpenFlow reference switch and the two new implementations introduced here.
+It can be seen that the list implementation
+clearly suffers from massive performance losses and that their relative 
+performance difference increases when inserting rule sets with increasing sizes.
+Both bitvector implementations outperform the linear search algorithm after inserting about 300 rules.
+The initial negative peak, just as the dent at 500 inserted rules, can be caused by an unfortunate rule set and trace combination.
+Additional manual tests were selectively performed to confirm the evaluation plots.
+With growing rule sets, the performance boost increases up to 30 fold.
 
 \subsubsection{Insertion Time}
 \label{sec:eval-ins}
-Figure~\ref{fig:eval-times} shows the significant loss in efficiency when inserting rules into the code generating algorithm.
+Figure~\ref{fig:eval-times} shows the required time for inserting rules into the code generating algorithm.
 The two graphs show the duration of an update with different sized rule sets in the 
 JIT implementation and in the conventional bitvector approach.
 Unfortunately, adding rules with the \textit{dpctl} tool is relatively slow itself, so that measurements using this tool
@@ -996,7 +1002,7 @@ In order to compensate for the decreased complexity of this approach compared to
 a greater number of rules was inserted into each matching engine.
 Due to the requirement that the matching engine has to be operable 
 immediately after every update operation, every insertion implies a complete regeneration of the JIT code.
-That behaviour induces the massive additional update time seen in the measured data.
+That behaviour induces the high additional update time seen in the measured data.
 %A reduction might be possible by waiting if the next update is immediately following
 %and, if true, waiting for the JIT regeneration until no more updates arrive for a certain time.
 %The downside of this approach is the incorrect state of the JIT until it is rebuilt.
@@ -1004,17 +1010,19 @@ That behaviour induces the massive additional update time seen in the measured d
 
 \subsubsection{Memory Usage}
 An increased memory consumption is the trade-off for using the bitvector implementation
-instead of the list based lookup.
-Figure~\ref{fig:eval-mem} shows a crude estimate of the difference.
+instead of the list-based lookup.
+Figure~\ref{fig:eval-mem} shows an estimate of the difference.
 The data for the two bitvector implementations was obtained by measuring memory consumption of the separate implementation
 similar to Section~\ref{sec:eval-ins}.
-The memory consumption of the list implementation is based on source code analysis.
+The memory consumption of the list implementation is based on source code analysis of the 
+OpenFlow reference implementation.
 Even though this method implies an uncertainty, it is sufficient to recognize the difference in magnitudes.
 The small overhead of the JIT implementation in comparison with the simple bitvector approach
 arises from the size of the actual JIT compiled function.
 
 \section{Conclusion and Future Work}
-The implementation of sophisticated algorithms in the OpenFlow reference switch indicates a gain in packet classification performance.
+The implementation of advanced algorithms in the OpenFlow reference switch 
+results in a gain in packet classification performance.
 The bitvector algorithm itself achieves an impressive gain in classification 
 performance in comparison to the previously used linear lookup.
 Further optimization resulted in the development of a just-in-time compiler 
@@ -1025,10 +1033,8 @@ of the time needed to regenerate the JIT compiled function for each new rule.
 
 The evaluation also indicates that the prize to pay for faster classification 
 is an increased usage of memory compared to the list implementation.
-However, the JIT solution is in the same magnitude of memory consumption 
+The JIT solution is in the same order of memory consumption 
 compared to the simple bitvector implementation. 
-Another new benefit is the possibility to perform parallel lookups for each header dimension.
-Only the bitvector aggregation step has to take place on one single node.
 
 One of the main objectives for further optimization is the matching algorithm.
 One possibility to speed this up is to reduce the JIT code update time.
@@ -1036,6 +1042,8 @@ Modifying the existing JIT function instead of deleting the old one and building
 a new one might be a worthwhile task.
 Especially in environments with fast-changing rule sets that idea may offer 
 a significant advantage over the current implementation.
+Another possible approach is the ability to perform parallel lookups for each header dimension.
+Only the bitvector aggregation step has to take place on one single node.
 
 %Another idea that comes to mind is to implement a heuristic which detects 
 %the most popular flows of the last time span in an operating switch.
@@ -1043,7 +1051,6 @@ a significant advantage over the current implementation.
 %the JIT function in such a way that the search for packet header data in a popular flow returns faster.
 
 %eo text
-\vspace{-0.3cm}
 \balance
 
 % trigger a \newpage just before the given reference
