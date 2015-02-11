@@ -1,4 +1,3 @@
-
 %% bare_conf.tex
 %% V1.3
 %% 2007/01/11
@@ -479,7 +478,6 @@ packet classification engine in the OpenFlow reference switch.
 The algorithm chosen for this task follows a divide and conquer approach
 instead of searching in a linear list, which can lead to a significant performance 
 boost at packet classification performance by over an order of magnitude.
-
 Further optimization with just-in-time compiled native code proved to increase 
 matching performance at the cost of consumed memory and insertion time.
 This strategy is new as it combines an advanced filtering algorithm with the
@@ -549,6 +547,9 @@ In this work, the focus lies on the reference implementation of the SDN protocol
 OpenFlow is the first mechanism that specified the communication between the controller and the network hardware~\cite{onf_whitepaper}.
 The OpenFlow reference implementation provides a software switch.
 Optimization of the matching engine as part of the switching software is the main contribution of this thesis.
+At first the bitvector algorithm has been implemented, which is then improved by a lookup strategy
+based on the compilation of native x86\_64 code.
+These approaches are then evaluated in a performance analysis and their correctness is tested.
 
 \section{Problem Statement}
 \subsection{The Packet Classification Problem}
@@ -556,7 +557,7 @@ Due to the characteristics of packet switched networks, every station in the pat
 has to decide for each packet which action to execute.
 Typical actions are DROP, REJECT, OUTPUT(\textit{port}), MODIFY and ACCEPT.
 The packet classification problem can be modeled by the following formal description:
-A packet header $H$ compromises of a $k$-tuple of non-negative integers, with $k \in \mathds{N}_0$.
+A packet header $H$ comprises of a $k$-tuple of non-negative integers.
 These integers are elements from a set $S_i,\ 1 \leq i \leq k$, which describes the range of possible values for a header field.
 A rule constitutes of a set $R$ of at most $k$ boolean functions
 $F_i:\ S_i \rightarrow \{true, false\},\ 1,\leq i \leq k$ and an action $A$.
@@ -564,7 +565,7 @@ That means that each rule holds an interval for every header field.
 If $H_i \in R_i,\ 1 \leq i \leq k$ for a packet header $H$, the packet matches the rule and action $A$ will be executed.
 A rule set is an ordered list $C$ of multiple rules $R$.
 Finding the first rule $R \in C$ so that $H$ matches 
-$R$ for a given $C$ is called the packet classification problem.
+$R$ is called the packet classification problem.
 
 \subsection{Affected Internet Infrastructure}
 The emphasis lies on optimizing a classifier executing this process.
@@ -581,7 +582,7 @@ Additionally, some fields require rules that imply certain ranges or prefixes, f
 
 The main objective of this work is to implement a faster matching engine in the 
 software switch of the OpenFlow 1.0 reference implementation.
-Currently, that matching engine uses a linear search in the specified rule set to classify packets.
+Currently, that matching engine uses linear search in the specified rule set to classify packets.
 This approach may be fast enough in cases of small rule sets but it does not scale
 with a growing number of inserted rules.
 The OpenFlow software switch uses twelve header fields per rule.
@@ -597,10 +598,10 @@ It builds a separate matching structure for each packet header dimension and
 then performs a binary search in each of these structures.
 Every dimension returns a bitvector of $n$ bit length, with $n$ being the number of rules.
 After retrieving all matching dimensions, the resulting vectors are aggregated by a bitwise AND.
-This algorithm is used in this thesis, a more detailed description can be found in Section~\ref{sec:bv-general}.
+This algorithm is used in this work.
 
-Real-world applications of these theoretical concepts have been evaluated in different projects.
-Following, there is an overview over examples where a software packet filter environment was used.
+Real-world applications of advanced packet classification schemes have been evaluated in different projects.
+Following, there is an overview of examples where a software packet filter environment was used.
 The Netfilter~\cite{netfilter} packet filter was improved in the HiPAC project~\cite{hipac} 
 which was introduced during a diploma thesis~\cite{heinzhigh}.
 The author developed a Linux kernel module with a much faster matching algorithm, 
