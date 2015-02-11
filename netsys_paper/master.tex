@@ -670,13 +670,6 @@ Nevertheless, the algorithms tuned by a JIT compiler are relatively simple so fa
 The algorithm used in this work however follows a more complex divide and conquer strategy, and a JIT-compiled optimization 
 to the bitvector approach is new.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/hypercubes}
-    \caption{Three two-dimensional hyper cubes.}
-    \label{fig:cubes}
-\end{figure}
-
 \section{The Bitvector Algorithm}
 \subsection{General Description}
 \label{sec:bv-general}
@@ -693,6 +686,13 @@ If hyper cubes (and their respective rules) are overlapping, one point in this d
 This property leads to a model, where for any given point in a matching
 dimension, there is a set of cubes (and therefore rules) that are projected on intervals containing this point.
 If there are no matching rules for a point, there is no cube projecting an interval to the relevant dimension.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/hypercubes}
+    \caption{Three two-dimensional hyper cubes.}
+    \label{fig:cubes}
+\end{figure}
 
 The bitvector algorithm collects these projected rules for all dimensions.
 After that step, the intervals of the scopes of the rules are determined.
