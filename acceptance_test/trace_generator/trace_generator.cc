@@ -99,7 +99,7 @@ main(int argc, char *argv[])
     fprintf(stderr,"ERROR: trace_generator could not get time of day to seed random number generator\n");
     exit(1);
   }
-  seed = tp.tv_usec;
+  seed = 42;
   srand48(seed);
 
   // Generate headers
