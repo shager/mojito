@@ -92,16 +92,11 @@
   \vspace*{-1cm}
 	\normalsize{\it Samuel Brack}\\
 }
-\date{11. März 2015}
+\date{March 11, 2015}
 \titlepage
 \end{frame}
 
 %-----------------------------------------------------------------------------%
-
-\begin{frame}
-  \frametitle{Agenda}
-  \tableofcontents
-\end{frame}
 
 \section{\scshape Introduction}
 \begin{frame}
@@ -324,6 +319,9 @@
   \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Reminder,drop fuzzy shadow]
   The matching function \textit{M} depends on the rule set \textit{R} and the packet \textit{P}.
   \end{tcolorbox}
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Bottleneck,drop fuzzy shadow]
+  The main bottleneck has been identified as the memory interface.
+  \end{tcolorbox}
   \pause
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Idea,drop fuzzy shadow]
   Further optimization by precomputing a function $M_R$.\\
@@ -445,7 +443,7 @@
   \pause
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Future Work,drop fuzzy shadow]
     \begin{itemize}
-      \item Inkremental update of the JIT funktion when the rule set changes.
+      \item Incremental update of the JIT funktion when the rule set changes.
       \item Optimization of the JIT funktion using traffic patterns.
     \end{itemize}
   \end{tcolorbox}
