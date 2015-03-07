@@ -13,7 +13,7 @@
    height="297mm"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="matching_function.svg">
   <defs
      id="defs4">
@@ -39,15 +39,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4000714"
-     inkscape:cx="199.70255"
+     inkscape:cx="454.56852"
      inkscape:cy="533.67288"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="1032"
-     inkscape:window-x="-2"
-     inkscape:window-y="-3"
+     inkscape:window-width="1280"
+     inkscape:window-height="741"
+     inkscape:window-x="-4"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -111,13 +111,13 @@
          id="text3935"
          y="146.57707"
          x="432.2334"
-         style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:125%;font-family:Sans;-inkscape-font-specification:Clean;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
          xml:space="preserve"><tspan
            style="font-size:18px"
            y="146.57707"
            x="432.2334"
            id="tspan3937"
-           sodipodi:role="line">Regeln R</tspan></text>
+           sodipodi:role="line">Rules R</tspan></text>
       <g
          transform="translate(263.38477,-185.2851)"
          id="g3520">
@@ -530,28 +530,28 @@
        y="593.65167" />
     <text
        xml:space="preserve"
-       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
-       x="251.63795"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;line-height:125%;font-family:Sans;-inkscape-font-specification:Clean;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="246.68092"
        y="619.29071"
        id="text5103"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5105"
-         x="251.63795"
+         x="246.68092"
          y="619.29071"
-         style="font-size:18px">Paket P</tspan></text>
+         style="font-size:18px">Packet P</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text5112"
        y="517.70654"
        x="489.9032"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12px;line-height:125%;font-family:Sans;-inkscape-font-specification:Clean;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          style="font-size:24px"
          y="517.70654"
          x="489.9032"
          id="tspan5114"
-         sodipodi:role="line">Entscheidung</tspan></text>
+         sodipodi:role="line">Decision</tspan></text>
     <rect
        style="opacity:0.95999995000000005;fill:#afc6e9;stroke:#0000bf;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect2985"

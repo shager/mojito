@@ -13,7 +13,7 @@
    height="297mm"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="matching.svg">
   <defs
      id="defs4" />
@@ -25,15 +25,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="130.80476"
-     inkscape:cy="880.03724"
+     inkscape:cx="84.464012"
+     inkscape:cy="816.51276"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="755"
-     inkscape:window-x="-2"
-     inkscape:window-y="-3"
+     inkscape:window-height="741"
+     inkscape:window-x="-4"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -265,7 +265,7 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Clean"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:Clean;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="25.714285"
        y="226.44374"
        id="text3133"
@@ -273,7 +273,7 @@
          sodipodi:role="line"
          id="tspan3135"
          x="25.714285"
-         y="226.44374">Resultat</tspan></text>
+         y="226.44374">Result</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.82779431px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 89.632053,205.52058 146.447277,0"

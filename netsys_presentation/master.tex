@@ -75,7 +75,7 @@
 \begin{frame}
   \begin{figure}
     \begin{minipage}[c]{0.6\textwidth} 
-    \tiny{Humboldt-Universität zu Berlin\\Mathematisch-Naturwissenschaftliche Fakultät\\Institut für Informatik\\Lehrstuhl Technische Informatik}
+    \tiny{Humboldt University of Berlin\\Department of Computer Science\\Computer Engineering Group}
     \end{minipage}
     \hfill
     \begin{minipage}[c]{0.15\textwidth}
@@ -86,7 +86,7 @@
   \end{figure}
 
 \title{\textbf{Measurements and Optimizations with Just-In-Time Code Generation on the OpenFlow Reference Implementation}}
-\subtitle{KUVS-Prize, NetSys 2015 Cottbus}
+\subtitle{KuVS-Prize, NetSys 2015 Cottbus}
 
 \author{
   \vspace*{-1cm}
@@ -99,21 +99,18 @@
 %-----------------------------------------------------------------------------%
 
 \section{\scshape Introduction}
-\begin{frame}
-  \centering\Huge{\insertsection}
-\end{frame}
-
-\subsection{\scshape Packet Classification}
+\subsection{\scshape Motivation}
 \begin{frame}
   \frametitle{\insertsubsection}
   \begin{itemize}
-    \item The Internet is growing constantly
-    \item Data rates are in magnitudes of 100\ GBit/s
-    \item Line speed packet classification is a necessity for powerful switches, routers and firewalls
-    \item Budgets for network operation are low
+    \item Line speed packet classification is a necessity for powerful switches, routers and firewalls.
+    \item Target: Optimizing the OpenFlow reference software switch using an existing sophisticated algorithm.
+    \item Even better performance by implementing a Just-In-Time code generator.
   \end{itemize}
+  To our knowledge this is a new approach. %FIXME: umformulieren?
 \end{frame}
 
+\subsection{\scshape Packet Classification}
 \begin{frame}
   Packet Classification can be modeled as a function \textit{M}:
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Definition,drop fuzzy shadow]
@@ -128,37 +125,7 @@
   \end{figure}
 \end{frame}
 
-%\subsection{\scshape OpenFlow}
-%\begin{frame}
-  %\frametitle{\insertsubsection}
-  %OpenFlow ist eine Protokollspezifikation für Software Defined Networks:
-  %\begin{itemize}
-    %\item Zentrale Konfiguration von Netzwerkhardware.
-    %\item Abstraktion der Aufgaben im Netzwerk von der eigentlichen Hardware.
-    %\item Einfache Möglichkeit Netzwerke automatisch zu optimieren.
-  %\end{itemize}
-  %\pause
-  %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Ziel dieser Arbeit,drop fuzzy shadow]
-  %Verbesserung der Matching-Performance im Software-Switch der OpenFlow-Referenzimplementierung 1.0.
-  %\end{tcolorbox}
-%\end{frame}
-
 \section{\scshape The Bitvector Algorithm}
-\begin{frame}
-  \centering\Huge{\insertsection}
-\end{frame}
-
-%\begin{frame}
-  %Paketfilter sind häufig als einfache Liste von Regeln implementiert.
-  %\begin{figure}
-  %\centering
-  %\includegraphics<1>[width=\textwidth]{figures/list_workflow-L1}
-  %\includegraphics<2>[width=\textwidth]{figures/list_workflow-L1-2}
-  %\includegraphics<3>[width=\textwidth]{figures/list_workflow-L1-3}
-  %\includegraphics<4>[width=\textwidth]{figures/list_workflow-L1-4}
-  %\end{figure}
-%\end{frame}
-
 \subsection{\scshape Basic Idea}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -276,35 +243,7 @@
   \end{tikzpicture}
 \end{frame}
 
-%TODO
-%\subsection{\scshape Runtime analysis}
-%\begin{frame}
-  %\frametitle{\insertsubsection}
-  %$n:$  Number of rules, $k:$ Number of header fields,\\$w:$ Register width of the system in bit.
-  %\pause
-  %\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Erinnerung: Lineare Suche,drop fuzzy shadow]
-  %Die lineare Suche liegt in $\mathcal O(k \cdot n)$.
-  %\end{tcolorbox}
-  %\pause
-  %\begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Bitvector-Algorithmus,drop fuzzy shadow]
-  %\begin{itemize}[leftmargin=0cm]
-    %\item[]<3-> Binäre Suche auf $k$ Headerfeldern,
-    %\item[]<4-> bitweises ver-UND-en der $k$ Bitvektoren,
-    %\item[]<5-> Suche nach dem ersten gesetzten Bit im Ergebnisvektor:
-  %\end{itemize}
-  %\centering
-  %\begin{equation*}
-  %\mathcal O(k \cdot log\ n \onslide<4->{+ \frac{n}{w} \cdot (k - 1)} \onslide<5->{ + n}).
-  %\end{equation*}
-  %\end{tcolorbox}
-%\end{frame}
-%EOT
-
 \section{\scshape The JIT component}
-\begin{frame}
-  \centering\Huge{\insertsection}
-\end{frame}
-
 \subsection{\scshape Motivation}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -320,17 +259,13 @@
   The matching function \textit{M} depends on the rule set \textit{R} and the packet \textit{P}.
   \end{tcolorbox}
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Bottleneck,drop fuzzy shadow]
-  The main bottleneck has been identified as the memory interface.
+  The memory interface has been identified as the main bottleneck.
   \end{tcolorbox}
   \pause
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Idea,drop fuzzy shadow]
   Further optimization by precomputing a function $M_R$.\\
   Implementation of a search tree per dimension in native code in order to \textbf{reduce memory accesses}.
   \end{tcolorbox}
-  %\pause
-  %\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Nachteil,drop fuzzy shadow]
-  %Bei jedem einzelnen Regel-Update erfolgt komplette Neuberechnung des Codes für den Suchbaum.
-  %\end{tcolorbox}
 \end{frame}
 
 \begin{frame}
@@ -365,35 +300,7 @@
   \end{figure}
 \end{frame}
 
-%\subsection{\scshape JIT-Lookup}
-%\begin{frame}
-  %\frametitle{\insertsubsection}
-  %\begin{figure}
-  %\centering
-  %\includegraphics<1>[height=0.7\textheight]{figures/match_in_tree-L1-2}
-  %\includegraphics<2>[height=0.7\textheight]{figures/match_in_tree-L1_3}
-  %\includegraphics<3>[height=0.7\textheight]{figures/match_in_tree-L1_4}
-  %\includegraphics<4>[height=0.7\textheight]{figures/match_in_tree-L1_5}
-  %\end{figure}
-%\end{frame}
-
 \section{\scshape Evaluation}
-\begin{frame}
-  \centering\Huge{\insertsection}
-\end{frame}
-
-%\subsection{\scshape Acceptance test}
-%\begin{frame}
-  %\frametitle{\insertsubsection}
-  %Modular design of the OpenFlow switch allows testing the modules \enquote{against each other}.
-  %\begin{figure}
-  %\centering
-  %\includegraphics<1>[height=6cm]{figures/acctest-L1}
-  %\includegraphics<2>[height=6cm]{figures/acctest-L1-2}
-  %\includegraphics<3>[height=6cm]{figures/acctest-L1-3}
-  %\end{figure}
-%\end{frame}
-
 \subsection{\scshape Performance analysis}
 \begin{frame}
   \frametitle{\insertsubsection}
@@ -427,10 +334,6 @@
 \end{frame}
 
 \section{\scshape Conclusion}
-\begin{frame}
-  \centering\Huge{\insertsection}
-\end{frame}
-
 \subsection{\scshape Results}
 \begin{frame}
   \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Important Results,drop fuzzy shadow]
@@ -458,37 +361,37 @@
 \appendix
 \section{\scshape Further Results}
 \begin{frame}[noframenumbering]
-  \frametitle{Aufteilung der Regelmenge}
+  \frametitle{Generating Test Rule Sets}
   \centering\includegraphics[height=0.9\textheight]{figures/rule-thirds}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Ergebnisse für oberstes Drittel:
+  Results for upper third:
   \includegraphics[height=0.9\textheight]{figures/eval_b}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Ergebnisse im mittleren Drittel:
+  Results for second third:
   \includegraphics[height=0.9\textheight]{figures/eval_a}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Ergebnisse im letzten Drittel:
+  Results for last third:
   \includegraphics[height=0.9\textheight]{figures/eval_w}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Relative Verbesserung (oberstes Drittel):
+  Relative improvement (upper third):
   \includegraphics[height=0.9\textheight]{figures/eval_b_relative}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Relative Verbesserung (mittleres Drittel):
+  Relative improvement (second third):
   \includegraphics[height=0.9\textheight]{figures/eval_a_relative}
 \end{frame}
 
 \begin{frame}[noframenumbering]
-  Relative Verbesserung (letztes Drittel):
+  Relative improvement (last third):
   \includegraphics[height=0.9\textheight]{figures/eval_w_relative}
 \end{frame}
 
