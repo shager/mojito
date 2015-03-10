@@ -268,35 +268,42 @@
   \end{tcolorbox}
 \end{frame}
 
-\begin{frame}
-  \frametitle{\scshape Lookup steps}
-  \begin{columns}[T] % align columns
-    \begin{column}{.48\textwidth}
-    \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Standard bitvector,drop fuzzy shadow]
-    \begin{enumerate}[label=\arabic*)]%TODO: schöner!
-      \item \textit{k} binary search in all dimension.
-      \item AND all result vectors.
-      \item Search for first set bit.
-    \end{enumerate}
-    \end{tcolorbox}
-    \end{column}
-    \hfill
-    \begin{column}{.48\textwidth}
-    \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Bitvector with JIT,drop fuzzy shadow]
-    \begin{enumerate}[label=\arabic*)]%TODO: schöner!
-      \item \textcolor{blue}{\textbf{\textit{k} calls of the JIT code.}}
-      \item AND all result vectors.
-      \item Search for first set bit.
-    \end{enumerate}
-    \end{tcolorbox}
-    \end{column}
-  \end{columns}
-\end{frame}
+%\begin{frame}
+  %\frametitle{\scshape Lookup steps}
+  %\begin{columns}[T] % align columns
+    %\begin{column}{.48\textwidth}
+    %\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Standard bitvector,drop fuzzy shadow]
+    %\begin{enumerate}[label=\arabic*)]%TODO: schöner!
+      %\item \textit{k} binary search in all dimension.
+      %\item AND all result vectors.
+      %\item Search for first set bit.
+    %\end{enumerate}
+    %\end{tcolorbox}
+    %\end{column}
+    %\hfill
+    %\begin{column}{.48\textwidth}
+    %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Bitvector with JIT,drop fuzzy shadow]
+    %\begin{enumerate}[label=\arabic*)]%TODO: schöner!
+      %\item \textcolor{blue}{\textbf{\textit{k} calls of the JIT code.}}
+      %\item AND all result vectors.
+      %\item Search for first set bit.
+    %\end{enumerate}
+    %\end{tcolorbox}
+    %\end{column}
+  %\end{columns}
+%\end{frame}
+
+%\begin{frame}
+  %\begin{figure}
+  %\centering
+  %\includegraphics[scale=0.6]{figures/array_to_tree}
+  %\end{figure}
+%\end{frame}
 
 \begin{frame}
   \begin{figure}
   \centering
-  \includegraphics[scale=0.6]{figures/array_to_tree}
+  \includegraphics[width=\textwidth]{figures/flowchart}
   \end{figure}
 \end{frame}
 
