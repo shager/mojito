@@ -9,7 +9,7 @@
 >
 
 <title>Gnuplot</title>
-<desc>Produced by GNUPLOT 4.6 patchlevel 5 </desc>
+<desc>Produced by GNUPLOT 4.6 patchlevel 6 </desc>
 
 <g id="gnuplot_canvas">
 
@@ -30,64 +30,68 @@
 	<use xlink:href='#gpPt9' id='gpPt10' fill='currentColor' stroke='none'/>
 	<use xlink:href='#gpPt3' id='gpPt11' stroke='currentColor' transform='rotate(45)'/>
 	<use xlink:href='#gpPt11' id='gpPt12' fill='currentColor' stroke='none'/>
+	<filter id='greybox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>
+	  <feFlood flood-color='lightgrey' flood-opacity='1' result='grey'/>
+	  <feComposite in='SourceGraphic' in2='grey' operator='atop'/>
+	</filter>
 </defs>
 <g style="fill:none; color:white; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
 </g>
 <g style="fill:none; color:white; stroke:currentColor; stroke-width:1.50; stroke-linecap:butt; stroke-linejoin:miter">
 </g>
 <g style="fill:none; color:black; stroke:currentColor; stroke-width:1.50; stroke-linecap:butt; stroke-linejoin:miter">
-	<path stroke='black'  d='M46.5,332.0 L54.0,332.0 M478.9,332.0 L471.4,332.0  '/>	<g transform="translate(39.5,335.7)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>0</text>
+	<path stroke='black'  d='M53.5,332.0 L61.0,332.0 M478.9,332.0 L471.4,332.0  '/>	<g transform="translate(46.5,335.7)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>0x</text>
 	</g>
-	<path stroke='black'  d='M46.5,286.6 L54.0,286.6 M478.9,286.6 L471.4,286.6  '/>	<g transform="translate(39.5,290.3)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>5</text>
+	<path stroke='black'  d='M53.5,286.6 L61.0,286.6 M478.9,286.6 L471.4,286.6  '/>	<g transform="translate(46.5,290.3)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>5x</text>
 	</g>
-	<path stroke='black'  d='M46.5,241.2 L54.0,241.2 M478.9,241.2 L471.4,241.2  '/>	<g transform="translate(39.5,244.9)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>10</text>
+	<path stroke='black'  d='M53.5,241.2 L61.0,241.2 M478.9,241.2 L471.4,241.2  '/>	<g transform="translate(46.5,244.9)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>10x</text>
 	</g>
-	<path stroke='black'  d='M46.5,195.8 L54.0,195.8 M478.9,195.8 L471.4,195.8  '/>	<g transform="translate(39.5,199.5)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>15</text>
+	<path stroke='black'  d='M53.5,195.8 L61.0,195.8 M478.9,195.8 L471.4,195.8  '/>	<g transform="translate(46.5,199.5)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>15x</text>
 	</g>
-	<path stroke='black'  d='M46.5,150.3 L54.0,150.3 M478.9,150.3 L471.4,150.3  '/>	<g transform="translate(39.5,154.0)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>20</text>
+	<path stroke='black'  d='M53.5,150.3 L61.0,150.3 M478.9,150.3 L471.4,150.3  '/>	<g transform="translate(46.5,154.0)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>20x</text>
 	</g>
-	<path stroke='black'  d='M46.5,104.9 L54.0,104.9 M478.9,104.9 L471.4,104.9  '/>	<g transform="translate(39.5,108.6)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>25</text>
+	<path stroke='black'  d='M53.5,104.9 L61.0,104.9 M478.9,104.9 L471.4,104.9  '/>	<g transform="translate(46.5,108.6)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>25x</text>
 	</g>
-	<path stroke='black'  d='M46.5,59.5 L54.0,59.5 M478.9,59.5 L471.4,59.5  '/>	<g transform="translate(39.5,63.2)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>30</text>
+	<path stroke='black'  d='M53.5,59.5 L61.0,59.5 M478.9,59.5 L471.4,59.5  '/>	<g transform="translate(46.5,63.2)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>30x</text>
 	</g>
-	<path stroke='black'  d='M46.5,14.1 L54.0,14.1 M478.9,14.1 L471.4,14.1  '/>	<g transform="translate(39.5,17.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
-		<text>35</text>
+	<path stroke='black'  d='M53.5,14.1 L61.0,14.1 M478.9,14.1 L471.4,14.1  '/>	<g transform="translate(46.5,17.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+		<text>35x</text>
 	</g>
-	<path stroke='black'  d='M46.5,332.0 L46.5,324.5 M46.5,14.1 L46.5,21.6  '/>	<g transform="translate(50.2,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M53.5,332.0 L53.5,324.5 M53.5,14.1 L53.5,21.6  '/>	<g transform="translate(57.2,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>100</text>
 	</g>
-	<path stroke='black'  d='M97.4,332.0 L97.4,324.5 M97.4,14.1 L97.4,21.6  '/>	<g transform="translate(101.1,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M103.5,332.0 L103.5,324.5 M103.5,14.1 L103.5,21.6  '/>	<g transform="translate(107.2,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 500</text>
 	</g>
-	<path stroke='black'  d='M161.0,332.0 L161.0,324.5 M161.0,14.1 L161.0,21.6  '/>	<g transform="translate(164.7,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M166.1,332.0 L166.1,324.5 M166.1,14.1 L166.1,21.6  '/>	<g transform="translate(169.8,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 1000</text>
 	</g>
-	<path stroke='black'  d='M224.5,332.0 L224.5,324.5 M224.5,14.1 L224.5,21.6  '/>	<g transform="translate(228.2,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M228.7,332.0 L228.7,324.5 M228.7,14.1 L228.7,21.6  '/>	<g transform="translate(232.4,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 1500</text>
 	</g>
-	<path stroke='black'  d='M288.1,332.0 L288.1,324.5 M288.1,14.1 L288.1,21.6  '/>	<g transform="translate(291.8,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M291.2,332.0 L291.2,324.5 M291.2,14.1 L291.2,21.6  '/>	<g transform="translate(294.9,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 2000</text>
 	</g>
-	<path stroke='black'  d='M351.7,332.0 L351.7,324.5 M351.7,14.1 L351.7,21.6  '/>	<g transform="translate(355.4,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M353.8,332.0 L353.8,324.5 M353.8,14.1 L353.8,21.6  '/>	<g transform="translate(357.5,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 2500</text>
 	</g>
-	<path stroke='black'  d='M415.3,332.0 L415.3,324.5 M415.3,14.1 L415.3,21.6  '/>	<g transform="translate(419.0,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
+	<path stroke='black'  d='M416.3,332.0 L416.3,324.5 M416.3,14.1 L416.3,21.6  '/>	<g transform="translate(420.0,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 3000</text>
 	</g>
 	<path stroke='black'  d='M478.9,332.0 L478.9,324.5 M478.9,14.1 L478.9,21.6  '/>	<g transform="translate(482.6,339.0) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text> 3500</text>
 	</g>
-	<path stroke='black'  d='M46.5,14.1 L46.5,332.0 L478.9,332.0 L478.9,14.1 L46.5,14.1 Z  '/>	<g transform="translate(14.7,173.1) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:middle">
+	<path stroke='black'  d='M53.5,14.1 L53.5,332.0 L478.9,332.0 L478.9,14.1 L53.5,14.1 Z  '/>	<g transform="translate(14.7,173.1) rotate(270)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:middle">
 		<text>Performace factor against List</text>
 	</g>
-	<g transform="translate(262.7,393.2)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:middle">
+	<g transform="translate(266.2,393.2)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:middle">
 		<text>Number of rules</text>
 	</g>
 </g>
@@ -98,25 +102,25 @@
 	<g transform="translate(422.4,32.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>Bitvector with JIT</text>
 	</g>
-	<path stroke='rgb(  0,  96, 173)'  d='M429.4,29.1 L464.9,29.1 M46.5,327.5 L71.9,280.4 L97.4,278.4 L122.8,269.8 L148.2,236.9 L173.7,229.9 
-		L199.1,237.5 L224.5,240.6 L250.0,173.4 L275.4,250.5 L300.9,191.5 L326.3,212.0 L351.7,124.6 L377.2,119.8 
-		L402.6,99.1 L428.0,68.3 L453.5,65.4 L478.9,117.6  '/>	<use xlink:href='#gpPt4' transform='translate(46.5,327.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(71.9,280.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(97.4,278.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(122.8,269.8) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(148.2,236.9) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(173.7,229.9) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(199.1,237.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(224.5,240.6) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(250.0,173.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(275.4,250.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(300.9,191.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(326.3,212.0) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(351.7,124.6) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(377.2,119.8) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(402.6,99.1) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(428.0,68.3) scale(2.62)' color='rgb(  0,  96, 173)'/>
-	<use xlink:href='#gpPt4' transform='translate(453.5,65.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<path stroke='rgb(  0,  96, 173)'  d='M429.4,29.1 L464.9,29.1 M53.5,327.5 L78.5,280.4 L103.5,278.4 L128.6,269.8 L153.6,236.9 L178.6,229.9 
+		L203.6,237.5 L228.7,240.6 L253.7,173.4 L278.7,250.5 L303.7,191.5 L328.8,212.0 L353.8,124.6 L378.8,119.8 
+		L403.8,99.1 L428.9,68.3 L453.9,65.4 L478.9,117.6  '/>	<use xlink:href='#gpPt4' transform='translate(53.5,327.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(78.5,280.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(103.5,278.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(128.6,269.8) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(153.6,236.9) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(178.6,229.9) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(203.6,237.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(228.7,240.6) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(253.7,173.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(278.7,250.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(303.7,191.5) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(328.8,212.0) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(353.8,124.6) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(378.8,119.8) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(403.8,99.1) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(428.9,68.3) scale(2.62)' color='rgb(  0,  96, 173)'/>
+	<use xlink:href='#gpPt4' transform='translate(453.9,65.4) scale(2.62)' color='rgb(  0,  96, 173)'/>
 	<use xlink:href='#gpPt4' transform='translate(478.9,117.6) scale(2.62)' color='rgb(  0,  96, 173)'/>
 	<use xlink:href='#gpPt4' transform='translate(447.1,29.1) scale(2.62)' color='rgb(  0,  96, 173)'/>
 </g>
@@ -126,25 +130,25 @@
 	<g transform="translate(422.4,47.8)" style="stroke:none; fill:black; font-family:Verdana, Helvetica, Arial, sans-serif; font-size:10.00pt; text-anchor:end">
 		<text>Simple Bitvector</text>
 	</g>
-	<path stroke='rgb(221,  24,  31)' stroke-dasharray=' 5,8'  d='M429.4,44.1 L464.9,44.1 M46.5,323.1 L71.9,279.7 L97.4,316.3 L122.8,268.3 L148.2,261.4 L173.7,253.5 
-		L199.1,239.9 L224.5,272.8 L250.0,188.0 L275.4,254.9 L300.9,202.1 L326.3,211.3 L351.7,148.3 L377.2,225.1 
-		L402.6,64.8 L428.0,109.7 L453.5,81.2 L478.9,159.7  '/>	<use xlink:href='#gpPt6' transform='translate(46.5,323.1) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(71.9,279.7) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(97.4,316.3) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(122.8,268.3) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(148.2,261.4) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(173.7,253.5) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(199.1,239.9) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(224.5,272.8) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(250.0,188.0) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(275.4,254.9) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(300.9,202.1) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(326.3,211.3) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(351.7,148.3) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(377.2,225.1) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(402.6,64.8) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(428.0,109.7) scale(2.62)' color='rgb(221,  24,  31)'/>
-	<use xlink:href='#gpPt6' transform='translate(453.5,81.2) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<path stroke='rgb(221,  24,  31)' stroke-dasharray=' 5,8'  d='M429.4,44.1 L464.9,44.1 M53.5,323.1 L78.5,279.7 L103.5,316.3 L128.6,268.3 L153.6,261.4 L178.6,253.5 
+		L203.6,239.9 L228.7,272.8 L253.7,188.0 L278.7,254.9 L303.7,202.1 L328.8,211.3 L353.8,148.3 L378.8,225.1 
+		L403.8,64.8 L428.9,109.7 L453.9,81.2 L478.9,159.7  '/>	<use xlink:href='#gpPt6' transform='translate(53.5,323.1) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(78.5,279.7) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(103.5,316.3) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(128.6,268.3) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(153.6,261.4) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(178.6,253.5) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(203.6,239.9) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(228.7,272.8) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(253.7,188.0) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(278.7,254.9) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(303.7,202.1) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(328.8,211.3) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(353.8,148.3) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(378.8,225.1) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(403.8,64.8) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(428.9,109.7) scale(2.62)' color='rgb(221,  24,  31)'/>
+	<use xlink:href='#gpPt6' transform='translate(453.9,81.2) scale(2.62)' color='rgb(221,  24,  31)'/>
 	<use xlink:href='#gpPt6' transform='translate(478.9,159.7) scale(2.62)' color='rgb(221,  24,  31)'/>
 	<use xlink:href='#gpPt6' transform='translate(447.1,44.1) scale(2.62)' color='rgb(221,  24,  31)'/>
 </g>
@@ -152,7 +156,7 @@
 <g style="fill:none; color:white; stroke:rgb(221,  24,  31); stroke-width:1.50; stroke-linecap:butt; stroke-linejoin:miter">
 </g>
 <g style="fill:none; color:black; stroke:currentColor; stroke-width:1.50; stroke-linecap:butt; stroke-linejoin:miter">
-	<path stroke='black'  d='M46.5,14.1 L46.5,332.0 L478.9,332.0 L478.9,14.1 L46.5,14.1 Z  '/></g>
+	<path stroke='black'  d='M53.5,14.1 L53.5,332.0 L478.9,332.0 L478.9,14.1 L53.5,14.1 Z  '/></g>
 </g>
 </svg>
 
