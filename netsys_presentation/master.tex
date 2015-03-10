@@ -159,6 +159,8 @@
   \end{table}
   Nota bene:\\
   The first match \enquote{wins} and the search returns.
+  
+  The real OpenFlow switch uses 12 dimensions.
 \end{frame}
 
 \begin{frame}
@@ -247,58 +249,17 @@
 \subsection{\scshape Motivation}
 \begin{frame}
   \frametitle{\insertsubsection}
-  Assuming a static rule set, the binary search operates always in the same array.\\
-  \begin{figure}
-  \centering
-  \includegraphics[height=5.5cm]{figures/matching_process}
-  \end{figure}
-\end{frame}
-
-\begin{frame}
   \begin{tcolorbox}[colback=teal!5!white,colframe=teal!75!black,title=Reminder,drop fuzzy shadow]
   The matching function \textit{M} depends on the rule set \textit{R} and the packet \textit{P}.
   \end{tcolorbox}
   \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Bottleneck,drop fuzzy shadow]
   The memory interface has been identified as the main bottleneck.
   \end{tcolorbox}
-  \pause
   \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Idea,drop fuzzy shadow]
   Further optimization by precomputing a function $M_R$.\\
   Implementation of a search tree per dimension in native code in order to \textbf{reduce memory accesses}.
   \end{tcolorbox}
 \end{frame}
-
-%\begin{frame}
-  %\frametitle{\scshape Lookup steps}
-  %\begin{columns}[T] % align columns
-    %\begin{column}{.48\textwidth}
-    %\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Standard bitvector,drop fuzzy shadow]
-    %\begin{enumerate}[label=\arabic*)]%TODO: schöner!
-      %\item \textit{k} binary search in all dimension.
-      %\item AND all result vectors.
-      %\item Search for first set bit.
-    %\end{enumerate}
-    %\end{tcolorbox}
-    %\end{column}
-    %\hfill
-    %\begin{column}{.48\textwidth}
-    %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Bitvector with JIT,drop fuzzy shadow]
-    %\begin{enumerate}[label=\arabic*)]%TODO: schöner!
-      %\item \textcolor{blue}{\textbf{\textit{k} calls of the JIT code.}}
-      %\item AND all result vectors.
-      %\item Search for first set bit.
-    %\end{enumerate}
-    %\end{tcolorbox}
-    %\end{column}
-  %\end{columns}
-%\end{frame}
-
-%\begin{frame}
-  %\begin{figure}
-  %\centering
-  %\includegraphics[scale=0.6]{figures/array_to_tree}
-  %\end{figure}
-%\end{frame}
 
 \begin{frame}
   \begin{figure}
@@ -313,11 +274,9 @@
   \frametitle{\insertsubsection}
   Evaluation of performance by a simple test setup in a virtual network using the \textsf{mininet} tool.
   \begin{itemize}
-    \item Creation of random rule sets
-    \item Derivation of packet streams from these rule sets using \textsf{classbench}.
-    \item Inserting the rules into the switch.
-    \item Sending the packets from the source.
-    \item Counting the number of received packets on the receiver side.
+    \item Tested on the real OpenFlow switch reference implementation.
+    \item Modular design allows for exchange of the matching engine.
+    \item Same flows and rules are used to compare the algorithms.
   \end{itemize}
   \begin{figure}
   \centering
