@@ -28,7 +28,7 @@ def set_routing_table():
     execute_on_host("h2", "route add default gw 10.0.0.1 h2-eth0")
 
 def run_sender(tracefile):
-    execute_on_host("h1", "timeout 10s /home/samuel/mojito/eval/sender /home/samuel/mojito/eval/" + str(tracefile) + " yes" + " no")
+    execute_on_host("h1", "timeout 10s /home/samuel/studium/ba/mojito/eval/sender /home/samuel/studium/ba/mojito/eval/" + str(tracefile) + " yes" + " no")
 
 def get_netstat(host):
     netstat_output = execute_on_host(host, "netstat -s -u")
@@ -72,7 +72,7 @@ def main():
     tracefile = options.tracefile
     algorithm = options.algorithm
 
-    outfile_name = str(algorithm) + ".eval"
+    outfile_name = str(algorithm) + ".eval_lcn"
     if os.path.isfile(outfile_name):
         os.remove(outfile_name)
     
@@ -88,6 +88,8 @@ def main():
 
     for filename in tracefiles:
         case = filename[filename.find("case")-1:filename.find("case")]
+        if case != "l":
+            continue
         rules = filename[filename.find("2_")+2:filename.find("_", filename.find("2_")+2)]
         rnd_trace = filename[filename.find("_", filename.find("2_")+2)+1:filename.find(".")]
 #        for run in range(0, 1):
