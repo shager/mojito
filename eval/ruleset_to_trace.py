@@ -33,14 +33,14 @@ def main():
     #parse options
     parser = OptionParser()
     parser.add_option("-c", "--case", dest = "case", default = "w",
-                       help = "select (w)orst, (a)verage or (b)est case test", metavar = "w, a or c")
+                       help = "select (w)orst, (a)verage, a(l)l or (b)est case test", metavar = "w, a, l or c")
     parser.add_option("-i", "--input-file", dest = "infile", default = "rulesets/100_100_0.random.rules",
                        help = "input rule file", metavar = "FILE")
     
     (options, args) = parser.parse_args()
     infile = options.infile
     case = options.case
-    if not any(x == case for x in ['w', 'a', 'b']):
+    if not any(x == case for x in ['w', 'a', 'l', 'b']):
         case = "w"
 
     ruleset = read_file(infile)
@@ -68,6 +68,9 @@ def main():
     elif case == "a":
         tracefile = infile + ".acase"
         generate_trace(ruleset[len(ruleset) / 3:2 * (len(ruleset) / 3)], tracefile)
+    elif case == "l":
+        tracefile = infile + ".lcase"
+        generate_trace(ruleset, tracefile)
     else: #case == w 
         tracefile = infile + ".wcase"
         generate_trace(ruleset[2 * (len(ruleset) / 3):], tracefile)
